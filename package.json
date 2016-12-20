@@ -1,0 +1,29 @@
+{
+  "name": "purepress",
+  "version": "1.0.0",
+  "description": "Open-source website building framework",
+  "main": "index.js",
+  "dependencies": {
+    "babel-runtime": "*",
+    "bcrypt": "*",
+    "cheerio": "*",
+    "jsmediatags": "*",
+    "knox": "*",
+    "mp3-duration": "*",
+    "request": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pureappsio/purepress.git"
+  },
+  "author": "Marco Schwartz <marcolivier.schwartz@gmail.com> (http://www.marcoschwartz.com/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pureappsio/purepress/issues"
+  },
+  "homepage": "https://github.com/pureappsio/purepress#readme"
+}

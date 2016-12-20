@@ -1,0 +1,29 @@
+<template name='boxParameters'>
+    
+    <div class='row'>
+        <div class='col-md-4'>
+            <input class='form-control' id='box-title' placeholder="Box name ..." value='{{title}}'>
+        </div>
+        <div class='col-md-4'>
+            <select class='form-control' id='box-sequence'>
+            </select>
+        </div>
+        <div class='col-md-4'>
+            <select class='form-control' multiple id='tags-id'>
+            </select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-12'>
+            <label>Content</label>
+            <input type="text" id='box-content' class="summernote" />
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-12'>
+            <label>Popup Content</label>
+            <input type="text" id='popup-content' class="summernote" />
+        </div>
+    </div>
+
+</template>

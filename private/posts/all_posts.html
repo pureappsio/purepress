@@ -1,0 +1,47 @@
+{{#each post in posts}} {{#if isFeaturedPicture post}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-featured'><img class='img-responsive' src='{{postImage post.featuredPicture}}'></div>
+    </div>
+</div>
+{{/if}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-title all-post-title'><a href='/{{post.url}}'>{{post.title}}</a></div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-info'>{{formatDate post.creationDate}} / by {{userName}}</div>
+    </div>
+</div>
+<div class='row post-content-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{post.excerpt}}}</div>
+        <div class='post-content'><a href='/{{post.url}}'>Read more ...</a></div>
+    </div>
+</div>
+{{/each}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {{#each page in pages}} {{#if isActive page}}
+                <li class='active'><a href="/{{blogPage}}?page={{page.number}}">{{page.number}}</a></li>
+                {{else}}
+                <li><a href="/{{blogPage}}?page={{page.number}}">{{page.number}}</a></li>
+                {{/if}} {{/each}}
+               <!--  <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li> -->
+            </ul>
+        </nav>
+    </div>
+</div>

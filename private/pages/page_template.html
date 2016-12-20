@@ -1,0 +1,217 @@
+{{#each element in elements}} {{#if isElementType element 'image'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <img class='img-responsive' src='{{elementImage element}}'>
+    </div>
+</div>
+{{/if}}
+{{#if isElementType element 'imagehalf'}}
+<div class='row element-container'>
+    <div class='col-md-4'></div>
+    <div class='col-md-4'>
+        <img class='img-responsive' src='{{elementImage element}}'>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'text'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{element.content}}}</div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'resource'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    {{#if isImage element}}
+    <div class='col-md-2'>
+        <a href='{{element.link}}'><img class='img-responsive' src='{{elementImage element}}'></a>
+    </div>
+    <div class='col-md-6'>
+        <div class='resource-title'><a href='{{element.link}}'>{{element.title}}</a></div>
+        <div class='post-content'>{{{element.content}}}</div>
+    </div>
+    {{else}}
+    <div class='col-md-8'>
+        <div class='resource-title'><a href='{{element.link}}'>{{element.title}}</a></div>
+        <div class='post-content'>{{{element.content}}}</div>
+    </div>
+    {{/if}}
+</div>
+{{/if}} {{#if isElementType element 'fullpicture'}}
+<div class='row full-width-container vertical-align' style='color: white; background-image: url("{{elementImage element}}");'>
+    <!--     <div class='col-md-1'></div>
+ -->
+    <div class='col-md-12'>
+        <div class='full-width-title'>{{element.title}}</div>
+        <div class='full-width-button'>
+            <a href='{{element.link}}' class='btn btn-warning btn-lg'>
+                <div class='full-width-button'>{{element.button}}</div>
+            </a>
+        </div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'fullwidthpicture'}}
+<div class='row full-width-image'>
+    <img class='img-responsive' src='{{elementImage element}}'>
+</div>
+{{/if}} {{#if isElementType element 'title'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8 col-center'>
+        <div class='page-title'>{{{element.title}}}</div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'button'}}
+<div class='row element-container-center'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='full-width-button'>
+            <a href='{{element.link}}' class='btn btn-warning btn-lg'>
+                <div class='full-width-button'>{{element.button}}</div>
+            </a>
+        </div>
+    </div>
+</div>
+{{/if}}
+<!-- {{#if isElementType element 'rowstart'}}
+<div class='row element-container'>
+{{/if}}
+
+{{#if isElementType element 'rowend'}}
+</div>
+{{/if}} -->
+{{#if isElementType element 'featurebox'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='resource-title'><i class="fa fa-{{element.icon}}" aria-hidden="true"></i><a href='{{element.link}}'> {{element.title}}</a></div>
+        <div class='post-content'>{{{element.content}}}</div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'featureboxbutton'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='resource-title'><i class="fa fa-{{element.icon}}" aria-hidden="true"></i><a href='{{element.link}}'> {{element.title}}</a></div>
+        <div class='post-content'>{{{element.content}}}</div>
+        <div class='full-width-button'>
+            <a href='{{element.link}}' class='btn btn-warning'>
+                <div class='full-width-button'>{{element.button}}</div>
+            </a>
+        </div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'twopictures'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-4'>
+        <a href='{{element.linkOne}}'><img class='img-responsive' src='{{element.pictureOne}}'></a>
+    </div>
+    {{#if isPictureTwo element}}
+    <div class='col-md-4'>
+        <a href='{{element.linkTwo}}'><img class='img-responsive' src='{{element.pictureTwo}}'></a>
+    </div>{{/if}}
+</div>
+{{/if}} {{#if isElementType element 'store'}}
+<div class='row element-container'>
+    {{#each product in products}}
+    <div class='col-md-4 store-product'>
+        <div class='product-image'><img class='img-responsive' src='{{product.image}}'></div>
+        <div class='product-name'><a href='{{product.salesPageUrl}}'>{{product.name}}</a></div>
+    </div>
+    {{/each}}
+</div>
+{{/if}} {{#if isElementType element 'pricing'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    {{#each pricing in pricingElements}}
+    <div class='col-md-2'>
+        <div class='pricing-element'>
+            <div class='pricing-name'>{{pricing.name}}</div>
+            <div class='pricing-price'>{{pricing.price}}</div>
+            {{#each pricingFeature in pricing.features}}
+            <div class='pricing-feature'>{{pricingFeature}}</div>
+            {{/each}}
+            <div class='pricing-button-container'>
+                <a href='{{pricing.link}}' class='pricing-button btn btn-primary'>{{pricing.button}}</a>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+{{/if}} {{#if isElementType element 'portfolio'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Value</th>
+                    <th>Yield</th>
+                    <th>Monthly Income</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each portfolioElement in portfolio}}
+                <tr>
+                    <td>{{portfolioElement.type}}</td>
+                    <td>{{portfolioElement.value}}</td>
+                    <td>{{portfolioElement.yield}}</td>
+                    <td>{{portfolioElement.income}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        <div class='post-content'>The current value of the portfolio is <b> {{total.value}} Euros</b>, producing an estimated monthly income of <b>{{total.monthlyIncome}} Euros</b>, yielding at <b>{{total.yield}}%</b> annually. This portfolio is updated live, as I update it anytime I make a new addition to the portfolio.</div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'emailsignup'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='signup-container'>
+            <div class='signup-title'>{{#if langEN}}Do you want to learn more?{{else}}Vous voulez en savoir plus?{{/if}}</div>
+            <div class='signup-content'>{{{signupBoxContent element}}}</div>
+            <div class='signup-button-container'>
+                <button data-toggle="modal" data-target="#myModal" class='signup-button btn btn-warning'>{{#if langEN}}Get Started!{{else}}En Savoir Plus{{/if}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header popup-title">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title popup-title" id="myModalLabel">{{#if langEN}}Get Your Free Resource Now!{{else}}Recevez votre ressource gratuite maintenant!{{/if}}</h4>
+            </div>
+            <div class="modal-body popup-content">
+                {{{signupPopupContent element}}}
+                <div class='popup-message'>{{#if langEN}}Simply enter your email below, and you’ll be on your way!{{else}}Pour continuer, entrez votre email ci-dessous!{{/if}}</div>
+                <form accept-charset="utf-8" action="https://email.schwartzindustries.com/subscribe" method="POST">
+                    <div class='popup-input-container'>
+                        <input id='email' name='email' type="email" class="form-control input-lg" placeholder="{{#if langEN}}Your email ...{{else}}Votre email ...{{/if}}">
+                    </div>
+                    <div class='popup-button-container'>
+                        <input value="{{#if langEN}}Click Here to Subscribe{{else}}Cliquez Ici Pour Vous Inscrire{{/if}}" type="submit" class="btn btn-block btn-lg btn-warning">
+                    </div>
+                    <input name="list" type="hidden" value="{{listId element}}" />
+                    <input name="origin" type="hidden" value="blog" />
+                    <input name="sequence" type="hidden" value="{{sequenceId element}}" />
+                    {{#each tag in tags element}}
+                        <input name="tag" type="hidden" value="{{tag}}" />
+                    {{/each}}
+                </form>
+                <div class='popup-disclaimer'>{{#if langEN}}We won’t send you spam. Unsubscribe at any time.{{else}}Je ne vous enverrai jamais de spam. Vous pouvez vous désincrire à tout moment.{{/if}}
+                </div>
+            </div>
+            <!-- <div class="modal-footer">
+        
+      </div> -->
+        </div>
+    </div>
+</div>
+{{/if}} {{/each}}

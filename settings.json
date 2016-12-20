@@ -1,0 +1,19 @@
+{
+  "s3": {
+        "key": "",
+        "secret": "",
+        "bucket": "",
+        "region": "",
+        "cloudfront": ""
+    },
+    "useCache": false,
+    "adminUser": {
+    	"email": "",
+    	"password": ""
+    },
+    "editorUser": {
+    	"email": "",
+    	"password": ""
+    },
+    "useChat": false
+}

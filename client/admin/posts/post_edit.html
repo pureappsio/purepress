@@ -1,0 +1,188 @@
+<template name='postEdit'>
+    <h2>Editing Post {{title}}</h2>
+    <div class='row'>
+        <div class="col-md-12">
+            <input id='post-title' class='form-control' value='{{title}}'>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-md-12">
+            <input id='post-url' class='form-control' value='{{url}}'>
+        </div>
+    </div>
+    <div class='row'>
+
+        <div class="col-md-4">
+            <span class="label label-{{statusLabel}}">{{status}}</span>
+        </div>
+
+        <div class="col-md-4">
+            <button id='post-publish' class='btn btn-block btn-primary'>Publish</button>
+        </div>
+        <div class="col-md-4">
+            <button id='post-draft' class='btn btn-block btn-warning'>Draft</button>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-md-12">
+            <div class="input-group datetimepicker">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                <input class="set-due-date form-control" id='creation-date' type="text" />
+            </div>
+        </div>
+    </div>
+    <!-- Category -->
+    <div class='row'>
+        <div class="col-md-6">
+            <select class='form-control' id='blog-post-category'>
+                <option value='general'>General</option>
+                {{#each categories}}
+                    {{> categoryOption}}
+                {{/each}}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input id='new-category' class='form-control' placeholder="New category ...">
+        </div>
+        <div class="col-md-2">
+             <button id='create-category' class='btn btn-primary btn-block'>Create Category</button>
+        </div>
+    </div>
+    <h3>Type</h3>
+    <div class='row'>
+        <div class="col-md-12">
+            <select class='form-control' id='post-category'>
+                <option value='general'>Generic</option>
+                <option value='affiliate'>Affiliate Reviews</option>
+                <option value='podcast'>Podcast</option>
+            </select>
+        </div>
+    </div>
+    <div class='row podcast-url-selector'>
+        <div class="col-md-6">
+            <input id='podcast-url' class='form-control' value='{{podcastUrl}}' placeholder="Podcast file URL">
+        </div>
+        <div class="col-md-2">
+            <button id='get-data' class='btn btn-primary btn-block'>Get Data</button>
+        </div>
+        <div class="col-md-2">
+            <input id='podcast-size' class='form-control' value='{{podcastSize}}' placeholder="Podcast size (Ex: 29500)">
+        </div>
+        <div class="col-md-2">
+            <input id='podcast-duration' class='form-control' value='{{podcastDuration}}' placeholder="Podcast length (Ex: 18:50)">
+        </div>
+    </div>
+    <h3>Featured Picture</h3>
+    <div class='row'>
+        <div class='col-md-12'>
+            {{> uploadForm imageId="featuredPicture"}}
+        </div>
+    </div>
+    <div class='main-content'>
+        <h3>Content</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                <input type="text" id='post-content' class="summernote" />
+            </div>
+        </div>
+        <h3>Insert Pictures (Copy link then insert in content)</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                {{> uploadForm}}
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-12'>
+                {{imgLink}}
+            </div>
+        </div>
+    </div>
+    <div class='affiliate-content'>
+        <h3>Post Introduction</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                <input type="text" id='post-introduction' class="summernote" />
+            </div>
+        </div>
+        <h3>Insert Affiliate Reviews</h3>
+        <div class='row'>
+            <div class='col-md-1'>
+                <label for="affiliate-rank">Rank</label>
+                <input type="text" id='affiliate-rank' class="form-control" />
+            </div>
+            <div class='col-md-2'>
+                <label for="affiliate-rating">Rating (0-5)</label>
+                <input type="text" id='affiliate-rating' class="form-control" />
+            </div>
+            <div class='col-md-5'>
+                <label for="affiliate-title">Product Title</label>
+                <input type="text" id='affiliate-title' class="form-control" />
+            </div>
+            <div class='col-md-4'>
+                <label for="affiliate-link">Product Link</label>
+                <input type="text" id='affiliate-link' class="form-control" />
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-12'>
+                <label for="affiliate-pic">Product Picture</label>
+                {{> uploadForm imageId="affiliatePicture"}}
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-12'>
+                <label for="affiliate-short">Short Description (will be in the products comparison table)</label>
+                <input type="text" id='affiliate-short' class="summernote" />
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-12'>
+                <label for="affiliate-description">Long Description (leave blank if no detailed description)</label>
+                <input type="text" id='affiliate-description' class="summernote" />
+            </div>
+        </div>
+        <div class='row'>
+            <div class='col-md-12'>
+                <button class='btn btn-primary btn-block' id='affiliate-add'>Add Element</button>
+            </div>
+        </div>
+        {{#each affiliateListings}}
+            {{> affiliateElementListing}}
+        {{/each}}
+        <h3>Post Middle Content (optional)</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                <input type="text" id='post-middle' class="summernote" />
+            </div>
+        </div>
+        <h3>Post Conclusion</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                <input type="text" id='post-conclusion' class="summernote" />
+            </div>
+        </div>
+    </div>
+    <h3>Excerpt</h3>
+    <div class='row'>
+        <div class='col-md-12'>
+            <input type="text" id='post-excerpt' class="summernote" />
+        </div>
+    </div>
+    <h3>List Signup</h3>
+    <div class='row'>
+        <div class="col-md-12">
+            <select class='form-control' id='post-box'></select>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-md-4">
+            <button id='edit-post' class='btn btn-primary btn-block'>Save</button>
+        </div>
+        <div class="col-md-4">
+            <a class='btn btn-info btn-block' href='/{{url}}'>Preview</a>
+        </div>
+        <div class="col-md-4">
+            <a class='btn btn-warning btn-block' href='/admin/panel'>Come Back</a>
+        </div>
+    </div>
+</template>

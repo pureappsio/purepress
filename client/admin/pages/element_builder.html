@@ -1,0 +1,57 @@
+<template name='elementBuilder'>
+
+  <div class='row'>
+    <div class="col-md-12">
+      <select id='element-type' class='form-control'>
+        <option value='text'>Text</option>
+        <option value='title'>Title</option>
+        <option value='image'>Full-Width Image</option>
+        <option value='imagehalf'>Half-Width Image</option>
+        <option value='button'>Button</option>
+        <option value='resource'>Resource</option>
+        <option value='fullwidthpicture'>Full-width background picture</option>
+        <option value='fullpicture'>Full-width background picture with button</option>
+        <option value='rowstart'>Row Start</option>
+        <option value='rowend'>Row End</option>
+        <option value='featurebox'>Feature Box</option>
+        <option value='featureboxbutton'>Feature Box with Button</option>
+        <option value='portfolio'>Portfolio</option>
+        <option value='store'>Store</option>
+        <option value='pricing'>Pricing</option>
+        <option value='twopictures'>Two Pictures Row</option>
+        <option value='emailsignup'>Email Signup</option>
+
+      </select>
+    </div>
+  </div>
+
+  <div id='builder-container'>
+    <div class='row'>
+        <div class='col-md-12'>
+            <input type="text" id='element-content' class="summernote" />
+        </div>
+    </div>
+  </div>
+
+  {{#if imageNeeded}}
+
+  <div class='row'>
+      <div class='col-md-2'>Upload picture:</div>
+      <div class='col-md-3'>
+          {{> uploadForm imageId="elementPicture"}}
+      </div>
+  </div>
+
+<div class='row'>
+      <div class='col-md-6'>{{imageLink}}</div>
+</div>
+
+  {{/if}}
+
+  <div class='row'>
+    <div class="col-md-12">
+      <button id='add-element' class='btn btn-block btn-primary'>Add New Element</button>
+    </div>
+  </div>
+
+</template>

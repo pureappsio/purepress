@@ -1,0 +1,25 @@
+body {
+  font-size: 18px;
+}
+
+.post-title {
+	font-size: 26px;
+	margin-bottom: 25px;
+}
+
+.post-content {
+	text-align: justify;
+	font-size: 18px;
+}
+
+.row {
+	margin-top: 15px;
+}
+
+.section-selector {
+	cursor: pointer;
+}
+
+.voffset30 {
+	margin-bottom: 30px;
+}

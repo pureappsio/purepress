@@ -1,0 +1,31 @@
+<template name='pageEdit'>
+    <h2>Editing Page {{title}}</h2>
+    <h3>General Data</h3>
+    <div class='row'>
+        <div class="col-md-12">
+            <input id='page-title' class='form-control' value='{{title}}'>
+        </div>
+    </div>
+    <div class='row'>
+        <div class="col-md-12">
+            <input id='page-url' class='form-control' value='{{url}}'>
+        </div>
+    </div>
+    <h3>Add Elements</h3> {{> elementBuilder this}} {{#each elements}} {{> elementListing}} {{/each}}
+    <!-- <div class='row'>
+        <div class='col-md-12'>
+            <input type="text" id='page-content' class="summernote" />
+        </div>
+    </div> -->
+    <div class='row'>
+        <div class="col-md-4">
+            <button id='edit-page' class='btn btn-primary btn-block'>Save Page</button>
+        </div>
+        <div class="col-md-4">
+            <a class='btn btn-info btn-block' href='/{{url}}'>Preview</a>
+        </div>
+        <div class="col-md-4">
+            <a class='btn btn-warning btn-block' href='/admin/panel'>Come Back</a>
+        </div>
+    </div>
+</template>

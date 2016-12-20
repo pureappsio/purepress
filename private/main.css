@@ -1,0 +1,367 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    font-size: 18px;
+    margin-bottom: 45px;
+    font-family: 'Open Sans' !important;
+}
+
+h2 {
+    text-align: left !important;
+}
+
+.post-audio {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.post-square-container {
+    padding: 15px;
+}
+
+.table > tbody > tr > td {
+    vertical-align: middle !important;
+}
+
+.table > tbody {
+    text-align: center !important;
+    font-size: 22px;
+}
+
+.table > thead > tr > th {
+    text-align: center !important;
+    font-size: 22px;
+    vertical-align: middle !important;
+}
+
+.main-container {
+    margin-bottom: 45px;
+/*    line-height: 29.7px !important;
+*/}
+
+.post-featured {
+    margin-top: 15px;
+}
+
+.post-title {
+    font-size: 36px;
+    font-weight: 600;
+}
+
+.post-content {
+    text-align: justify;
+    font-size: 18px;
+    line-height: 29.7px !important;
+}
+
+.affiliate-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.affiliate-picture-table {
+    margin-top: 10px;
+    min-width: 160px !important;
+}
+
+.affiliate-short {
+    font-size: 18px;
+}
+
+.affiliate-img {
+    width: 300px !important;
+    float: left;
+    display: inline !important;
+}
+
+.affiliate-button {
+    font-size: 18px !important;
+}
+
+.affiliate-rank {
+    border-radius: 10px;
+}
+
+.post-content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.navbar-nav {
+    font-size: 22px;
+    color: black;
+}
+
+.post-content-container {
+    margin-bottom: 25px;
+}
+
+.navbar-brand {
+    padding: 0px;
+    margin: 0px;
+}
+
+.navbar-brand img {
+    margin-top: -30px;
+    max-width: 225px;
+}
+
+.navbar {
+    min-height: 90px !important;
+    background-color: white !important;
+    margin: 0px !important;
+    border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+}
+
+.navbar-nav > li > a,
+.navbar-brand {
+    padding-top: 33px !important;
+    padding-bottom: 33px !important;
+    height: 90px;
+}
+
+.navbar-toggle {
+    margin-top: 23px !important;
+    min-height: 40px !important;
+}
+
+.post-title a {
+    color: black;
+}
+
+.post-title a:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.all-post-title {
+    margin-top: 5px;
+}
+
+.all-post-title-square {
+    margin-top: 5px;
+    font-size: 22px !important;
+}
+
+.single-post-title {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.element-container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.element-container-center {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.resource-title {
+    font-size: 24px;
+}
+
+.resource-title a {
+    color: black;
+}
+
+.resource-title a:hover {
+    color: black;
+}
+
+img {
+    width: 100% !important;
+}
+
+.post-info {
+    margin-bottom: 15px;
+    color: gray;
+}
+
+.post-info-single {
+    margin-bottom: 25px;
+    color: gray;
+    font-size: 18px;
+    text-align: center;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 45px;
+    padding-top: 12px;
+    color: white;
+    background-color: #333333;
+}
+
+.full-width-container {
+    min-height: 100%;
+    margin-top: 0px !important;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.full-width-title {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 30px;
+}
+
+.full-width-button {
+    text-align: center;
+    font-weight: bold;
+    font-size: 26px;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.page-title {
+    font-size: 36px;
+    font-weight: 600;
+}
+
+.col-center {
+    text-align: center;
+}
+
+a:active {
+    text-decoration: none;
+}
+
+.full-width-image {
+    text-align: center;
+    margin-top: 0px !important;
+}
+
+.signup-container {
+    border: 1px solid black;
+    padding: 0 !important;
+    width: 100%;
+}
+
+.signup-title {
+    font-size: 24px;
+    text-align: center;
+    font-size: bold;
+    color: white;
+    background-color: gray;
+    border-bottom: 1px solid black;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.signup-content {
+    font-size: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+}
+
+.signup-button-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.signup-button {
+    font-size: 22px !important;
+}
+
+.popup-title {
+    font-size: 26px !important;
+}
+
+.popup-content {
+    font-size: 20px;
+}
+
+.popup-input-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.popup-button-container {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.popup-disclaimer {
+    color: gray;
+    text-align: center;
+    font-size: 12px;
+}
+
+.popup-message {
+    font-weight: bold;
+}
+
+.section-selector {
+    cursor: pointer;
+}
+
+.pagination li {
+    cursor: pointer;
+}
+
+.store-product {
+    text-align: center;
+    font-size: 22px;
+}
+
+.product-name {
+    margin-top: 15px;
+}
+
+.pricing-element {
+    text-align: center;
+    border: 1px solid gray;
+    font-size: 20px;
+}
+
+.pricing-name {
+    font-size: 24px;
+    background-color: #CCCCCC;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.pricing-price {
+    font-size: 26px;
+    background-color: #EEEEEE;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.pricing-button-container {
+    background-color: #EEEEEE;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.pricing-button {
+    font-size: 22px !important;
+}
+
+.pricing-feature {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}

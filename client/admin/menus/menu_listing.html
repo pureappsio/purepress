@@ -1,0 +1,16 @@
+<template name='menuListing'>
+    <div class='row'>
+        <div class="col-md-2">
+            <div class="btn-group" role="group" aria-label="...">
+                <button type="button" class="menu-plus btn btn-default">+</button>
+                <button type="button" class="menu-minus btn btn-default">-</button>
+            </div>
+        </div>
+        <div class="col-md-3">{{name}}</div>
+        <div class="col-md-2">{{type}}</div>
+        <div class="col-md-3">{{link}}</div>
+        <div class="col-md-1">
+            <button class='btn btn-danger menu-delete'>X</button>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,455 @@
+<template name="admin">
+    {{#if isAdmin}}
+    <div class='admin-panel'>
+        <h2>Admin Panel</h2>
+        <nav aria-label="...">
+            <ul class="pager">
+                <li><a class='section-selector' id="brand">Brand</a></li>
+                <li><a class='section-selector' id="posts">Posts</a></li>
+                <li><a class='section-selector' id="comments">Comments</a></li>
+                <li><a class='section-selector' id="pages">Pages</a></li>
+                <li><a class='section-selector' id="boxes">Boxes</a></li>
+                <li><a class='section-selector' id="menu">Menu</a></li>
+                <li><a class='section-selector' id="podcast">Podcast</a></li>
+                <li><a class='section-selector' id="store">Store</a></li>
+                <li><a class='section-selector' id="pricing">Pricing</a></li>
+                <li><a class='section-selector' id="affiliate">Affiliate</a></li>
+                <li><a class='section-selector' id="theme">Theme</a></li>
+                <li><a class='section-selector' id="integrations">Integrations</a></li>
+            </ul>
+        </nav>
+        <div style='display: {{showSection "brand"}}'>
+            <h3>Brand</h3>
+            <div class='row'>
+                <div class='col-md-9'>
+                    <input id='brand-name' type='text' class='form-control' placeholder="Brand name ..." value="{{getMeta 'brandName'}}">
+                </div>
+                <div class='col-md-3'>
+                    <button id='create-brand' class='btn btn-block btn-primary'>Save Brand Name</button>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-9'>
+                    <input id='user-name' type='text' class='form-control' placeholder="User name ..." value="{{getMeta 'userName'}}">
+                </div>
+                <div class='col-md-3'>
+                    <button id='set-name' class='btn btn-block btn-primary'>Set User Name</button>
+                </div>
+            </div>
+            <h3>Social Media Networks</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <select id='social-type' class='form-control'>
+                        <option value='facebook'>Facebook</option>
+                        <option value='twitter'>Twitter</option>
+                        <option value='youtube'>Youtube</option>
+                        <option value='github'>GitHub</option>
+                        <option value='instagram'>Instagram</option>
+                        <option value='envelope-o'>Mail</option>
+                    </select>
+                </div>
+                <div class='col-md-3'>
+                    <input id='social-link' type='text' class='form-control' placeholder="Link ...">
+                </div>
+                <div class='col-md-3'>
+                    <button id='save-social' class='btn btn-block btn-primary'>Save Social Media</button>
+                </div>
+            </div>
+            {{#each networks}} {{> networkListing}} {{/each}}
+            <h3>Logo & Favicon</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    {{> uploadForm imageId="websiteLogo"}}
+                </div>
+                <div class='col-md-3'>
+                    <button id='save-logo' class='btn btn-block btn-primary'>Save Logo</button>
+                </div>
+                <div class='col-md-3'>
+                    {{> uploadForm imageId="favicon"}}
+                </div>
+                <div class='col-md-3'>
+                    <button id='save-fav' class='btn btn-block btn-primary'>Save Favicon</button>
+                </div>
+            </div>
+            <h3>Home Page & Blog Page</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    Home Page:
+                </div>
+                <div class='col-md-3'>
+                    <select id='home-page' class='form-control'>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    Blog Page:
+                </div>
+                <div class='col-md-3'>
+                    <select id='blog-page' class='form-control'>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='save-pages' class='btn btn-block btn-primary'>Save</button>
+                </div>
+            </div>
+            <h3>Google Analytics</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    Google Analytics ID:
+                </div>
+                <div class='col-md-3'>
+                    <input class='form-control' id='analytics-id' value="{{getMeta 'analytics'}}">
+                </div>
+                <div class='col-md-3'>
+                    <button id='save-analytics' class='btn btn-block btn-primary'>Save Analytics</button>
+                </div>
+            </div>
+            <h3>Cache</h3>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <button id='flush-cache' class='btn btn-block btn-primary'>Flush Cache</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "posts"}}'>
+            <h3>Posts</h3>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <input class='form-control' id='post-title' placeholder="Post name ...">
+                </div>
+                <div class='col-md-4'>
+                    <input class='form-control' id='post-url' placeholder="Post url ...">
+                </div>
+                <!--  <div class='col-md-2'>
+    <input class='form-control' id='post-content' placeholder="Post content ...">
+  </div> -->
+                <div class='col-md-2'>
+                    <button id='create-post' class='btn btn-block btn-primary'>Create New Post</button>
+                </div>
+            </div>
+            {{#each posts}} {{> postListing}} {{/each}}
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button id='publish-posts' class='btn btn-block btn-primary'>Publish All Posts</button>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button id='import-posts' class='btn btn-block btn-danger'>Import WordPress Posts</button>
+                </div>
+            </div>
+            <h3>Assign Signup Box to Posts</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <select id='assigned-box' class='form-control'>
+                    </select>
+                </div>
+                <div class='col-md-3'>
+                    <select id='selected-posts' multiple>
+                    </select>
+                </div>
+                <div class='col-md-3'>
+                    <button id='assign-box' class='btn btn-block btn-primary'>Assign Box</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "comments"}}'>
+            <h3>Comments</h3>
+            <div class='row'>
+                <div class='col-md-4'>
+                    <input class='form-control' id='disqus-id' placeholder="Disqus site name ..." value="{{getMeta 'disqus'}}">
+                </div>
+                <div class='col-md-2'>
+                    <button id='save-disqus' class='btn btn-block btn-primary'>Save Disqus</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "pages"}}'>
+            <h3>Pages</h3>
+            <div class='row'>
+                <div class='col-md-4'>
+                    <input class='form-control' id='page-title' placeholder="Page name ...">
+                </div>
+                <div class='col-md-2'>
+                    <input class='form-control' id='page-url' placeholder="Page url ...">
+                </div>
+                <div class='col-md-2'>
+                    <select class='form-control' id='page-type'>
+                        <option value='generic'>Generic Page</option>
+                        <option value='category'>Blog Posts Category</option>
+                        <option value='portfolio'>Portfolio</option>
+                        <option value='link'>Link</option>
+                        <option value='purepages'>PurePages</option>
+                    </select>
+                </div>
+                <div class='col-md-2' id='page-option-container'>
+                </div>
+                <div class='col-md-2'>
+                    <button id='create-page' class='btn btn-block btn-primary'>Create Page</button>
+                </div>
+            </div>
+            {{#each pages}} {{> pageListing}} {{/each}}
+            <h3>Copy Page</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='origin-page'>
+                    </select>
+                </div>
+                <div class='col-md-4'>
+                    <input class='form-control' id='target-page-title' placeholder="Page name ...">
+                </div>
+                <div class='col-md-2'>
+                    <input class='form-control' id='target-page-url' placeholder="Page url ...">
+                </div>
+                <div class='col-md-2'>
+                    <button id='copy-page' class='btn btn-block btn-primary'>Copy Page</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "menu"}}'>
+            <h3>Menu</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <select class='form-control' id='menu-type'>
+                        <option value='page'>Page</option>
+                        <option value='link'>Link</option>
+                    </select>
+                </div>
+                <div class='col-md-3'>
+                    <div id='menu-content'></div>
+                </div>
+                <div class='col-md-3'>
+                    <input id='menu-name' type='text' class='form-control' placeholder="name">
+                </div>
+                <div class='col-md-3'>
+                    <button id='add-menu-element' class='btn btn-block btn-primary'>Save Menu Element</button>
+                </div>
+            </div>
+            {{#each menus}} {{> menuListing}} {{/each}}
+            <h3>Sub Menus Elements</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='submenu-type'>
+                        <option value='page'>Page</option>
+                        <option value='link'>Link</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <div id='submenu-content'></div>
+                </div>
+                <div class='col-md-2'>
+                    <input id='submenu-name' type='text' class='form-control' placeholder="name">
+                </div>
+                <div class='col-md-2'>
+                    <select class='form-control' id='submenu-top'></select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='add-submenu-element' class='btn btn-block btn-primary'>Save</button>
+                </div>
+            </div>
+            {{#each submenus}} {{> menuListing}} {{/each}}
+        </div>
+        <div style='display: {{showSection "boxes"}}'>
+            {{> boxes}}
+        </div>
+        <div style='display: {{showSection "pricing"}}'>
+            {{> pricing}}
+        </div>
+        <div style='display: {{showSection "theme"}}'>
+            <h3>Set General Theme</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='theme-value'>
+                        <option value='white'>White</option>
+                        <option value='black'>Black</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-theme' class='btn btn-block btn-primary'>Set Theme</button>
+                </div>
+            </div>
+            <h3>Set Affiliate Theme</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='affiliate-theme-value'>
+                        <option value='default'>Default</option>
+                        <option value='picture'>Big Pictures</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-affiliate-theme' class='btn btn-block btn-primary'>Set Theme</button>
+                </div>
+            </div>
+            <h3>Set Blog Theme</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='blog-theme-value'>
+                        <option value='big'>Big Pictures</option>
+                        <option value='square'>Squares</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-blog-theme' class='btn btn-block btn-primary'>Set Blog Theme</button>
+                </div>
+            </div>
+            <h3>Set Language</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='language'>
+                        <option value='en'>English</option>
+                        <option value='fr'>French</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-language' class='btn btn-block btn-primary'>Set Language</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "podcast"}}'>
+            <h3>General Settings</h3>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <input type='text' id='podcast-title' class='form-control' placeholder="Podcast title ..." value='{{getMeta "podcastTitle"}}'>
+                </div>
+                <div class='col-md-6'>
+                    <input type='text' id='podcast-description' class='form-control' placeholder="Podcast description ...">
+                </div>
+            </div>
+            <h3>iTunes Settings</h3>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <input type='text' id='itunes-summary' class='form-control' placeholder="Podcast itunes summary ...">
+                </div>
+                <div class='col-md-6'>
+                    <input type='text' id='itunes-author' class='form-control' placeholder="Podcast itunes author ...">
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-6'>
+                    <input type='text' id='itunes-image' class='form-control' placeholder="Podcast itunes image ...">
+                </div>
+                <div class='col-md-6'>
+                    <input type='text' id='itunes-subtitle' class='form-control' placeholder="Podcast itunes subtitle ...">
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button class='btn btn-block btn-primary' id='save-podcast'>Save Podcast Data</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "store"}}'>
+            <h3>Store</h3>
+            <div class='row'>
+                <div class='col-md-4'>
+                    <select class='form-control' id='product-id'>
+                    </select>
+                </div>
+                <div class='col-md-4'>
+                    <select class='form-control' id='page-id'>
+                    </select>
+                </div>
+                <div class='col-md-4'>
+                    <button id='add-product' class='btn btn-block btn-primary'>Add Product</button>
+                </div>
+            </div>
+            {{#each products}} {{> productListing}} {{/each}}
+        </div>
+        <div style='display: {{showSection "affiliate"}}'>
+            <h3>Affiliate IDs</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <label for="affiliate-us">US Affiliate ID</label>
+                    <input value='{{getMeta "affiliateUS"}}' class='form-control' id='affiliate-us'>
+                </div>
+                <div class='col-md-3'>
+                    <label for="affiliate-ca">CA Affiliate ID</label>
+                    <input value='{{getMeta "affiliateCA"}}' class='form-control' id='affiliate-ca'>
+                </div>
+                <div class='col-md-3'>
+                    <label for="affiliate-uk">UK Affiliate ID</label>
+                    <input value='{{getMeta "affiliateUK"}}' class='form-control' id='affiliate-uk'>
+                </div>
+                <div class='col-md-3'>
+                    <label for="affiliate-de">DE Affiliate ID</label>
+                    <input value='{{getMeta "affiliateDE"}}' class='form-control' id='affiliate-de'>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <label for="affiliate-it">IT Affiliate ID</label>
+                    <input value='{{getMeta "affiliateIT"}}' class='form-control' id='affiliate-it'>
+                </div>
+                <div class='col-md-3'>
+                    <label for="affiliate-fr">FR Affiliate ID</label>
+                    <input value='{{getMeta "affiliateFR"}}' class='form-control' id='affiliate-fr'>
+                </div>
+                <div class='col-md-3'>
+                    <label for="affiliate-es">ES Affiliate ID</label>
+                    <input value='{{getMeta "affiliateES"}}' class='form-control' id='affiliate-es'>
+                </div>
+            </div>
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button id='save-affiliate' class='btn btn-lg btn-block btn-primary'>Save Affiliate IDs</button>
+                </div>
+            </div>
+        </div>
+        <div style='display: {{showSection "integrations"}}'>
+            <h3>API Key</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <button id='generate-key' class='btn btn-block btn-primary'>Generate API Key</button>
+                </div>
+                <div class='col-md-3'>
+                    <span id='api-key'>{{key}}</span>
+                </div>
+            </div>
+            <h3>Add Integration</h3>
+            <div class='row'>
+                <div class='col-md-1'>Type: </div>
+                <div class='col-md-2'>
+                    <select class='form-control' id='integration-type'>
+                        <option value='puremail'>PureMail</option>
+                        <option value='purecart'>PureCart</option>
+                        <option value='purepages'>PurePages</option>
+                        <option value='puresocial'>PureSocial</option>
+                        <option value='pureportfolio'>PurePortfolio</option>
+                        <option value='wordpress'>WordPress</option>
+                    </select>
+                </div>
+                <div class='col-md-1'>URL: </div>
+                <div class='col-md-3'>
+                    <input class='form-control' id='integration-url'>
+                </div>
+                <div class='col-md-1'>Key: </div>
+                <div class='col-md-2'>
+                    <input class='form-control' id='integration-key'>
+                </div>
+                <div class='col-md-2'>
+                    <button id='add-integration' class='btn btn-block btn-primary'>Link</button>
+                </div>
+            </div>
+            <h3>Integrations</h3> {{#each integrations}} {{> integration}} {{/each}}
+            <h3>Email List</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <select class='form-control' id='email-lists'></select>
+                </div>
+                <div class='col-md-3'>
+                    <button id='set-list' class='btn btn-block btn-primary'>Connect to List</button>
+                </div>
+            </div>
+            <h3>Facebook Pixel</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <input type='form-control' class='form-control' id='pixel-id' value='{{getMeta "pixelId"}}'>
+                </div>
+                <div class='col-md-3'>
+                    <button id='set-pixel' class='btn btn-block btn-primary'>Set Facebook Pixel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{else}}
+    <h2>Access Not Authorized</h2> {{/if}}
+</template>

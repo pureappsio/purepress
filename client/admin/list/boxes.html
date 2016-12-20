@@ -1,0 +1,16 @@
+<template name="boxes">
+
+    <h3>Boxes</h3>
+
+    {{> boxParameters}}
+
+    <div class='row'>
+        <div class='col-md-6'>
+            <button id='create-box' class='btn btn-block btn-primary'>Create Signup Box</button>
+        </div>
+    </div>
+    
+    <div class='voffset30'></div>
+    {{#each boxesElements}} {{> boxElement}} {{/each}}
+    <div class='voffset30'></div>
+</template>

@@ -1,0 +1,194 @@
+<div class='row'>
+    <div class='col-md-1'></div>
+    <div class='col-md-10'>
+        <div class='post-featured'><img class='img-responsive' src='{{postImage featuredPicture}}'></div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-title single-post-title'>{{title}}</div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-info post-info-single'>{{formatDate creationDate}} / by {{userName}}</div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{introduction}}}</div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        {{#if isAffiliateTheme 'default'}}
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Rating</th>
+                        <th>Product</th>
+                        <th>Our Rating</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each element in elements}}
+                    <tr>
+                        <td>
+                            <div class='affiliate-rank'>{{element.rank}}</div>
+                        </td>
+                        <td>
+                            <a href='{{element.link}}'>
+                                <div class='affiliate-product'>{{element.title}}</div>
+                            </a>
+                        </td>
+                        <td>
+                            <div class='affiliate-rating'>{{{rating element}}}</div>
+                        </td>
+                        <td><a href='{{element.link}}' class='affiliate-button btn btn-primary'>CHECK PRICES</a></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        {{/if}} {{#if isAffiliateTheme 'picture'}}
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Summary</th>
+                        <th>Our Rating</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each element in elements}}
+                    <tr>
+                        <td>
+                            <a href='{{element.link}}'>
+                                <div class='affiliate-product'>{{element.title}}</div>
+                            </a>
+                            <a href='{{element.link}}'>
+                                <img class='affiliate-picture-table' src='{{elementImage element}}'>
+                            </a>
+                        </td>
+                        <td>
+                            <div class='affiliate-short'>{{{element.shortDescription}}}
+                            </div>
+                        </td>
+                        <td>
+                            <div class='affiliate-rating'>{{{rating element}}}</div>
+                        </td>
+                        <td><a href='{{element.link}}' class='affiliate-button btn btn-primary'>CHECK PRICES</a></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        {{/if}}
+    </div>
+</div>
+{{#if hasMiddleContent}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{middle}}}</div>
+    </div>
+</div>
+{{/if}}
+{{#each element in elements}}
+{{#if hasDescription element}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='affiliate-title'>{{element.title}}</div>
+        <div class='post-content'>
+            <a href='{{element.link}}'><img class='affiliate-img' src='{{elementImage element}}'></a>{{{element.description}}}
+        </div>
+    </div>
+</div>
+{{/if}}
+{{/each}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{conclusion}}}</div>
+    </div>
+</div>
+{{#if isEmailBox}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='signup-container'>
+            <div class='signup-title'>{{#if langEN}}Do you want to learn more?{{else}}Vous voulez en savoir plus?{{/if}}</div>
+            <div class='signup-content'>{{{signupBoxContent}}}</div>
+            <div class='signup-button-container'>
+                <button data-toggle="modal" data-target="#myModal" class='signup-button btn btn-warning'>{{#if langEN}}Get Started!{{else}}En Savoir Plus{{/if}}</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header popup-title">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title popup-title" id="myModalLabel">
+                {{#if langEN}}Get Your Free Resource Now!{{else}}Recevez votre ressource gratuite maintenant!{{/if}}
+                </h4>
+            </div>
+            <div class="modal-body popup-content">
+                {{{signupPopupContent}}}
+                <div class='popup-message'>
+                    {{#if langEN}}Simply enter your email below, and you’ll be on your way!{{else}}Pour continuer, entrez votre email ci-dessous!{{/if}}
+                </div>
+                <form accept-charset="utf-8" action="https://email.schwartzindustries.com/subscribe" method="POST">
+                    <div class='popup-input-container'>
+                        <input id='email' name='email' type="email" class="form-control input-lg" placeholder="{{#if langEN}}Your email ...{{else}}Votre email ...{{/if}}">
+                    </div>
+                    <div class='popup-button-container'>
+                        <input value="{{#if langEN}}Click Here to Subscribe{{else}}Cliquez Ici Pour Vous Inscrire{{/if}}" type="submit" class="btn btn-block btn-lg btn-warning">
+                    </div>
+                    <input name="list" type="hidden" value="{{listId}}" />
+                    <input name="origin" type="hidden" value="blog" />
+                    <input name="sequence" type="hidden" value="{{sequenceId}}" />
+                    {{#each tag in tags}}
+                        <input name="tag" type="hidden" value="{{tag}}" />
+                    {{/each}}
+                </form>
+                <div class='popup-disclaimer'>{{#if langEN}}We won’t send you spam. Unsubscribe at any time.{{else}}Je ne vous enverrai jamais de spam. Vous pouvez vous désincrire à tout moment.{{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}}
+
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div id="disqus_thread"></div>
+    </div>
+</div>
+
+<script>
+
+var disqus_config = function () {
+    this.page.url = '{{siteUrl}}{{url}}/';
+};
+
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = '//{{disqusId}}.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

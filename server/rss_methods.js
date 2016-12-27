@@ -85,7 +85,7 @@ Meteor.methods({
 
         xml += '<itunes:author><![CDATA[' + itunesAuthor + ']]></itunes:author>';
         xml += '<itunes:explicit>clean</itunes:explicit>';
-        xml += '<itunes:image href="http://marcoschwartz.com/wp-content/uploads/powerpress/itunes_logo.jpg" />';
+        xml += '<itunes:image href="' + itunesImage + '" />';
         xml += '<itunes:owner>';
         xml += '<itunes:name><![CDATA[' + itunesAuthor + ']]></itunes:name>';
         xml += '<itunes:email>marcolivier.schwartz@gmail.com</itunes:email>';
@@ -95,7 +95,7 @@ Meteor.methods({
         xml += '<image>';
         xml += '<title>' + podcastTitle + '</title>';
         xml += '<link>' + Meteor.absoluteUrl() + '</link>';
-        xml += '<url>https://marcoschwartz.com/wp-content/uploads/powerpress/itunes_logo.jpg</url>';
+        xml += '<url>' + itunesImage + '</url>';
         xml += '</image>';
         xml += '<itunes:category text="Business">';
         xml += '<itunes:category text="Management &amp; Marketing" />';

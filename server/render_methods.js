@@ -605,7 +605,7 @@ Meteor.methods({
                                     return Boxes.findOne(element.boxId).popupContent;
                                 }
                             },
-                            tags: function(tags) {
+                            tags: function(element) {
                                 return Boxes.findOne(element.boxId).tags;
                             },
                             listId: function(element) {

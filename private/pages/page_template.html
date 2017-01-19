@@ -5,8 +5,7 @@
         <img class='img-responsive' src='{{elementImage element}}'>
     </div>
 </div>
-{{/if}}
-{{#if isElementType element 'imagehalf'}}
+{{/if}} {{#if isElementType element 'imagehalf'}}
 <div class='row element-container'>
     <div class='col-md-4'></div>
     <div class='col-md-4'>
@@ -125,20 +124,22 @@
 {{/if}} {{#if isElementType element 'pricing'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
-    {{#each pricing in pricingElements}}
-    <div class='col-md-2'>
-        <div class='pricing-element'>
-            <div class='pricing-name'>{{pricing.name}}</div>
-            <div class='pricing-price'>{{pricing.price}}</div>
-            {{#each pricingFeature in pricing.features}}
-            <div class='pricing-feature'>{{pricingFeature}}</div>
-            {{/each}}
-            <div class='pricing-button-container'>
-                <a href='{{pricing.link}}' class='pricing-button btn btn-primary'>{{pricing.button}}</a>
+    <div class='col-md-8'>
+        {{#each pricing in pricingElements}}
+        <div class='col-md-4'>
+            <div class='pricing-element'>
+                <div class='pricing-name'>{{pricing.name}}</div>
+                <div class='pricing-price'>{{pricing.price}}</div>
+                {{#each pricingFeature in pricing.features}}
+                <div class='pricing-feature'>{{pricingFeature}}</div>
+                {{/each}}
+                <div class='pricing-button-container'>
+                    <a href='{{pricing.link}}' class='pricing-button btn btn-primary'>{{pricing.button}}</a>
+                </div>
             </div>
         </div>
+        {{/each}}
     </div>
-    {{/each}}
 </div>
 {{/if}} {{#if isElementType element 'portfolio'}}
 <div class='row element-container'>
@@ -167,7 +168,49 @@
         <div class='post-content'>The current value of the portfolio is <b> {{total.value}} Euros</b>, producing an estimated monthly income of <b>{{total.monthlyIncome}} Euros</b>, yielding at <b>{{total.yield}}%</b> annually. This portfolio is updated live, as I update it anytime I make a new addition to the portfolio.</div>
     </div>
 </div>
-{{/if}} {{#if isElementType element 'emailsignup'}}
+{{/if}} 
+
+{{#if isElementType element 'portfoliodetail'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <table class="table">
+            <thead>
+                <tr>
+                    {{#if isStock element.portfolioType}}
+                        <th>Ticker</th>
+                    {{/if}}
+                    <th>Name</th>
+                    {{#if isStock element.portfolioType}}
+                        <th>Shares</th>
+                    {{/if}}
+                    <th>Value</th>
+                    <th>Yield</th>
+                    <th>Income</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each position in positions element.portfolioType}}
+                <tr>
+                    {{#if isStock element.portfolioType}}
+                        <td>{{position.ticker}}</td>
+                    {{/if}}
+                    <td>{{position.name}}</td>
+                    {{#if isStock element.portfolioType}}
+                        <td>{{position.qty}}</td>
+                    {{/if}}
+                    <td>{{formatMoney position.value}}</td>
+                    <td>{{position.positionYield}}</td>
+                    <td>{{position.income}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{/if}}
+
+{{#if isElementType element 'emailsignup'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
@@ -200,10 +243,8 @@
                     </div>
                     <input name="list" type="hidden" value="{{listId element}}" />
                     <input name="origin" type="hidden" value="blog" />
-                    <input name="sequence" type="hidden" value="{{sequenceId element}}" />
-                    {{#each tag in tags element}}
-                        <input name="tag" type="hidden" value="{{tag}}" />
-                    {{/each}}
+                    <input name="sequence" type="hidden" value="{{sequenceId element}}" /> {{#each tag in tags element}}
+                    <input name="tag" type="hidden" value="{{tag}}" /> {{/each}}
                 </form>
                 <div class='popup-disclaimer'>{{#if langEN}}We won’t send you spam. Unsubscribe at any time.{{else}}Je ne vous enverrai jamais de spam. Vous pouvez vous désincrire à tout moment.{{/if}}
                 </div>

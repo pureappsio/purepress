@@ -48,6 +48,18 @@ Template.admin.onRendered(function() {
 
     });
 
+    // Init brands
+    Meteor.call('getPurePagesBrands', function(err, brands) {
+
+        for (l = 0; l < brands.length; l++) {
+            $('#pages-brand').append($('<option>', {
+                value: brands[l]._id,
+                text: brands[l].name
+            }));
+        }
+
+    });
+
     // Init products
     Meteor.call('getAllProducts', function(err, products) {
 
@@ -92,6 +104,21 @@ Template.admin.onRendered(function() {
 
 Template.admin.events({
 
+    'click #spot-dead-links': function() {
+
+        Meteor.call('spotDeadAmazonLinks');
+
+    },
+    'click #localise-all-posts': function() {
+
+        Meteor.call('localiseAllPosts');
+
+    },
+    'click #set-dates-posts': function() {
+
+        Meteor.call('setDatesPosts');
+
+    },
     'click #assign-box': function() {
 
         Meteor.call('assignBox', $('#assigned-box :selected').val(), $('#selected-posts').val());
@@ -117,7 +144,7 @@ Template.admin.events({
         });
 
     },
-     'click #set-language': function() {
+    'click #set-language': function() {
 
         // Insert Metas
         Meteor.call('insertMeta', {
@@ -131,10 +158,10 @@ Template.admin.events({
         // Title
         var title = $('#post-title').val();
 
-        title = title.replace(" ", "-");
+        title = title.replace(/ /g, "-");
 
         // Fill URL
-        $('#post-url').val(title);
+        $('#post-url').val(title.toLowerCase());
 
     },
     'click #publish-posts': function() {
@@ -620,6 +647,12 @@ Template.admin.events({
         Meteor.call('setList', $('#email-lists :selected').val());
 
     },
+    'click #set-brand': function() {
+
+        // Set list
+        Meteor.call('setBrand', $('#pages-brand :selected').val());
+
+    },
     'click #set-pixel': function() {
 
         meta = {
@@ -646,7 +679,7 @@ Template.admin.helpers({
         return Integrations.find({});
     },
     posts: function() {
-        return Posts.find({});
+        return Posts.find({}, { sort: { creationDate: -1 } });
     },
     pages: function() {
         return Pages.find({});

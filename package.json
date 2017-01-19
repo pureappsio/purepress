@@ -9,8 +9,7 @@
     "cheerio": "*",
     "jsmediatags": "*",
     "knox": "*",
-    "mp3-duration": "*",
-    "request": "*"
+    "mp3-duration": "*"
   },
   "devDependencies": {},
   "scripts": {

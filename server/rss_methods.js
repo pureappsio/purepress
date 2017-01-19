@@ -57,74 +57,82 @@ Meteor.methods({
 
     renderPodcastRSS: function() {
 
-        // Get Metas
-        var podcastTitle = Metas.findOne({ type: 'podcastTitle' }).value;
-        var podcastDescription = Metas.findOne({ type: 'podcastDescription' }).value;
+        // Check if podcast exist
+        if (Metas.findOne({ type: 'podcastTitle' })) {
 
-        var itunesSummary = Metas.findOne({ type: 'itunesSummary' }).value;
-        var itunesAuthor = Metas.findOne({ type: 'itunesAuthor' }).value;
-        var itunesImage = Metas.findOne({ type: 'itunesImage' }).value;
-        var itunesSubtitle = Metas.findOne({ type: 'itunesSubtitle' }).value;
+            // Get Metas
+            var podcastTitle = Metas.findOne({ type: 'podcastTitle' }).value;
+            var podcastDescription = Metas.findOne({ type: 'podcastDescription' }).value;
 
-        // Build xml start
-        var xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        xml += '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">';
+            var itunesSummary = Metas.findOne({ type: 'itunesSummary' }).value;
+            var itunesAuthor = Metas.findOne({ type: 'itunesAuthor' }).value;
+            var itunesImage = Metas.findOne({ type: 'itunesImage' }).value;
+            var itunesSubtitle = Metas.findOne({ type: 'itunesSubtitle' }).value;
 
-        // Channel
-        xml += '<channel>'
-        xml += '<title>' + podcastTitle + '</title>';
-        xml += '<atom:link href="' + Meteor.absoluteUrl() + 'feed/podcast/" rel="self" type="application/rss+xml" />'
-        xml += '<link>' + Meteor.absoluteUrl() + 'feed/podcast/</link>';
-        xml += '<description>' + podcastDescription + '</description>';
-        xml += '<lastBuildDate>' + moment(new Date()).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</lastBuildDate>';
-        xml += '<language>en-US</language>';
-        xml += '<sy:updatePeriod>hourly</sy:updatePeriod>';
-        xml += '<sy:updateFrequency>1</sy:updateFrequency>';
-        xml += '<generator>PurePress</generator>';
-        xml += '<itunes:summary>' + itunesSummary + '</itunes:summary>';
+            // Build xml start
+            var xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            xml += '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">';
 
-        xml += '<itunes:author><![CDATA[' + itunesAuthor + ']]></itunes:author>';
-        xml += '<itunes:explicit>clean</itunes:explicit>';
-        xml += '<itunes:image href="' + itunesImage + '" />';
-        xml += '<itunes:owner>';
-        xml += '<itunes:name><![CDATA[' + itunesAuthor + ']]></itunes:name>';
-        xml += '<itunes:email>marcolivier.schwartz@gmail.com</itunes:email>';
-        xml += '</itunes:owner>';
-        xml += '<managingEditor>marcolivier.schwartz@gmail.com</managingEditor>';
-        xml += '<itunes:subtitle><![CDATA[' + itunesSubtitle + ']]></itunes:subtitle>';
-        xml += '<image>';
-        xml += '<title>' + podcastTitle + '</title>';
-        xml += '<link>' + Meteor.absoluteUrl() + '</link>';
-        xml += '<url>' + itunesImage + '</url>';
-        xml += '</image>';
-        xml += '<itunes:category text="Business">';
-        xml += '<itunes:category text="Management &amp; Marketing" />';
-        xml += '</itunes:category>';
+            // Channel
+            xml += '<channel>'
+            xml += '<title>' + podcastTitle + '</title>';
+            xml += '<atom:link href="' + Meteor.absoluteUrl() + 'feed/podcast/" rel="self" type="application/rss+xml" />'
+            xml += '<link>' + Meteor.absoluteUrl() + 'feed/podcast/</link>';
+            xml += '<description>' + podcastDescription + '</description>';
+            xml += '<lastBuildDate>' + moment(new Date()).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</lastBuildDate>';
+            xml += '<language>en-US</language>';
+            xml += '<sy:updatePeriod>hourly</sy:updatePeriod>';
+            xml += '<sy:updateFrequency>1</sy:updateFrequency>';
+            xml += '<generator>PurePress</generator>';
+            xml += '<itunes:summary>' + itunesSummary + '</itunes:summary>';
 
-        // Items
-        var posts = Posts.find({ category: 'podcast' });
-
-        posts.forEach(function(post) {
-
-            // Form XML
-            xml += '<item>';
-            xml += '<title><![CDATA[' + post.title + ']]></title>';
-            xml += '<description><![CDATA[' + post.content + ']]></description>';
-            xml += '<link>' + Meteor.absoluteUrl() + post.url + '</link>';
-            xml += '<pubDate>' + moment(post.creationDate).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</pubDate>';
-            xml += '<category><![CDATA[Podcast]]></category>';
-            xml += '<enclosure url="' + post.podcastUrl + '" length="' + post.podcastSize + '" type="audio/mpeg" />'
-            xml += '<itunes:subtitle><![CDATA[' + itunesSubtitle + ']]></itunes:subtitle>';
-            xml += '<itunes:summary><![CDATA[' + post.content + ']]></itunes:summary>';
             xml += '<itunes:author><![CDATA[' + itunesAuthor + ']]></itunes:author>';
             xml += '<itunes:explicit>clean</itunes:explicit>';
-            xml += '<itunes:duration>' + post.podcastDuration + '</itunes:duration>';
-            xml += '</item>';
-        });
+            xml += '<itunes:image href="' + itunesImage + '" />';
+            xml += '<itunes:owner>';
+            xml += '<itunes:name><![CDATA[' + itunesAuthor + ']]></itunes:name>';
+            xml += '<itunes:email>marcolivier.schwartz@gmail.com</itunes:email>';
+            xml += '</itunes:owner>';
+            xml += '<managingEditor>marcolivier.schwartz@gmail.com</managingEditor>';
+            xml += '<itunes:subtitle><![CDATA[' + itunesSubtitle + ']]></itunes:subtitle>';
+            xml += '<image>';
+            xml += '<title>' + podcastTitle + '</title>';
+            xml += '<link>' + Meteor.absoluteUrl() + '</link>';
+            xml += '<url>' + itunesImage + '</url>';
+            xml += '</image>';
+            xml += '<itunes:category text="Business">';
+            xml += '<itunes:category text="Management &amp; Marketing" />';
+            xml += '</itunes:category>';
 
-        // End
-        xml += '</channel>'
-        xml += '</rss>'
+            // Items
+            var posts = Posts.find({ category: 'podcast' });
+
+            posts.forEach(function(post) {
+
+                // Form XML
+                xml += '<item>';
+                xml += '<title><![CDATA[' + post.title + ']]></title>';
+                xml += '<description><![CDATA[' + post.content + ']]></description>';
+                xml += '<link>' + Meteor.absoluteUrl() + post.url + '</link>';
+                xml += '<pubDate>' + moment(post.creationDate).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</pubDate>';
+                xml += '<category><![CDATA[Podcast]]></category>';
+                xml += '<enclosure url="' + post.podcastUrl + '" length="' + post.podcastSize + '" type="audio/mpeg" />'
+                xml += '<itunes:subtitle><![CDATA[' + itunesSubtitle + ']]></itunes:subtitle>';
+                xml += '<itunes:summary><![CDATA[' + post.content + ']]></itunes:summary>';
+                xml += '<itunes:author><![CDATA[' + itunesAuthor + ']]></itunes:author>';
+                xml += '<itunes:explicit>clean</itunes:explicit>';
+                xml += '<itunes:duration>' + post.podcastDuration + '</itunes:duration>';
+                xml += '</item>';
+            });
+
+            // End
+            xml += '</channel>'
+            xml += '</rss>'
+
+        }
+        else {
+            var xml = "";
+        }
 
         return xml;
 

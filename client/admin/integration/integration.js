@@ -15,6 +15,14 @@ Template.integration.helpers({
   	else {
   		return '';
   	}
+  },
+  brand: function() {
+    if (this.brand) {
+      return '[Connected to brand]';
+    }
+    else {
+      return '';
+    }
   }
 
 });

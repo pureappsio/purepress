@@ -149,6 +149,16 @@ Template.postEdit.onRendered(function() {
 
 Template.postEdit.events({
 
+    'click #fix-links': function() {
+
+        Meteor.call('fixDeadAmazonLinks', this._id);
+
+    },
+    'click #check-links': function() {
+
+        Meteor.call('findDeadLinksPost', this._id);
+
+    },
     'click #post-publish': function() {
 
         // Set to published
@@ -263,7 +273,21 @@ Template.postEdit.events({
             post.featuredPicture = Session.get('featuredPicture');
         }
 
+        $("#processing").show();
         Meteor.call('editPost', post, function(err, data) {
+
+            // Fade out saved message
+            $("#processing").hide();
+            $("#saved").show();
+            $("#saved").fadeOut("slow", function() {
+                // Animation complete.
+            });
+
+            // Localise
+            // var job = new Job(myJobs, 'localisePost', {postId: post._id});
+            // job.priority('normal').save();
+
+            // Remove pic
             delete Session.keys['featuredPicture'];
         });
 
@@ -273,25 +297,47 @@ Template.postEdit.events({
 
 Template.postEdit.helpers({
 
+    areBadLinks: function() {
+
+        if (this.badLinks) {
+            if (this.badLinks == 0) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
+        }
+
+    },
+    notChecked: function() {
+
+        if (typeof this.badLinks !== 'undefined') {
+            return false;
+        } else {
+            return true;
+        }
+
+    },
     imgLink: function() {
         return Session.get('imgLink');
     },
     affiliateListings: function() {
-        return Elements.find({postId: this._id});
+        return Elements.find({ postId: this._id });
     },
     categories: function() {
         return Categories.find({});
     },
     statusLabel: function() {
-    if (this.status) {
-        if (this.status == 'draft') {
-            return 'warning';
+        if (this.status) {
+            if (this.status == 'draft') {
+                return 'warning';
+            }
+            if (this.status == 'published') {
+                return 'primary';
+            }
         }
-        if (this.status == 'published') {
-            return 'primary';
-        }
-    }
 
-  }
+    }
 
 });

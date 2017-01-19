@@ -14,4 +14,5 @@ Tracker.autorun(function() {
     Meteor.subscribe('allUsers');
     Meteor.subscribe('userIntegrations');
     Meteor.subscribe('files.images.all');
+    // Meteor.subscribe('allJobs');
 });

@@ -1,10 +1,22 @@
 Meteor.methods({
 
+    hasElement: function(pageId, elementType) {
+
+        // Get all elements with type
+        if (Elements.findOne({ pageId: pageId, type: elementType })) {
+            console.log('has element');
+            return true;
+        } else {
+            console.log('no element');
+            return false;
+        }
+
+    },
     changeOrderPage: function(elementId, change) {
 
         // Get elements
         var pageElement = Elements.findOne(elementId);
-        var elements = Elements.find({pageId: pageElement.pageId, order: {$exists: true}}, { sort: { order: -1 } }).fetch();
+        var elements = Elements.find({ pageId: pageElement.pageId, order: { $exists: true } }, { sort: { order: -1 } }).fetch();
         console.log('Elements: ' + elements.length);
 
         if ((change == -1 && pageElement.order != 1) || (change == 1 && pageElement.order != elements.length)) {
@@ -12,21 +24,20 @@ Meteor.methods({
             console.log('Changing order of page element');
 
             // Update element
-            Elements.update(elementId, {$inc: {order: change}});
+            Elements.update(elementId, { $inc: { order: change } });
 
             // Update other element
-            Elements.update({pageId: pageElement.pageId, order: pageElement.order + change}, {$inc: {order: -1 * change}});
+            Elements.update({ pageId: pageElement.pageId, order: pageElement.order + change }, { $inc: { order: -1 * change } });
 
             // Flush cache
             Meteor.call('flushCache');
 
-        } 
-        else {
+        } else {
 
             console.log('Doing nothing');
 
         }
-        
+
     },
 
     createPricing: function(pricing) {
@@ -46,7 +57,7 @@ Meteor.methods({
         var page = Pages.findOne(data.originPageId);
 
         // Get all elements linked to page
-        var elements = Elements.find({pageId: page._id}).fetch();
+        var elements = Elements.find({ pageId: page._id }).fetch();
 
         // Create new page
         page.url = data.targetUrl;
@@ -76,15 +87,14 @@ Meteor.methods({
 
             // Get lists
             var url = "https://" + integration.url + "/api/products?key=" + integration.key;
-            
+
             try {
                 var answer = HTTP.get(url);
                 return answer.data.products;
-            }
-            catch (error) {
+            } catch (error) {
                 return [];
             }
-            
+
 
         } else {
             return [];
@@ -120,6 +130,12 @@ Meteor.methods({
 
             // Get lists
             var url = "https://" + integration.url + "/api/pages?key=" + integration.key;
+            
+            // Brand connected?
+            if (integration.brand) {
+                url += '&brand=' + integration.brand;
+            } 
+
             var answer = HTTP.get(url);
             return answer.data.pages;
 
@@ -128,7 +144,23 @@ Meteor.methods({
         }
 
     },
+    getPurePagesBrands: function() {
 
+        // Get integration
+        if (Integrations.findOne({ type: 'purepages' })) {
+
+            var integration = Integrations.findOne({ type: 'purepages' });
+
+            // Get lists
+            var url = "https://" + integration.url + "/api/brands?key=" + integration.key;
+            var answer = HTTP.get(url);
+            return answer.data.brands;
+
+        } else {
+            return [];
+        }
+
+    },
     getPurePage: function(pageId, query) {
 
         // Get integration
@@ -143,6 +175,12 @@ Meteor.methods({
             }
             if (query.origin) {
                 url += '&origin=' + query.origin;
+            }
+            if (query.subscriber) {
+                url += '&subscriber=' + query.subscriber;
+            }
+            if (query.discount) {
+                url += '&discount=' + query.discount;
             }
             console.log(url);
             var answer = HTTP.get(url);
@@ -177,7 +215,7 @@ Meteor.methods({
 
         for (i in posts) {
 
-            Posts.update(posts[i], {$set: {signupBox: boxId, cached: false}});
+            Posts.update(posts[i], { $set: { signupBox: boxId, cached: false } });
 
         }
 
@@ -228,7 +266,7 @@ Meteor.methods({
             return Pages.findOne({ url: page.url })._id;
 
         } else {
-            
+
             // Insert
             var pageId = Pages.insert(page);
 

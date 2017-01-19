@@ -23,3 +23,19 @@ body {
 .voffset30 {
 	margin-bottom: 30px;
 }
+
+.last-row {
+	margin-bottom: 50px;
+}
+
+#saved {
+	text-align: center;
+	margin-top: 5px;
+	display: none;
+}
+
+#processing {
+	text-align: center;
+	margin-top: 5px;
+	display: none;
+}

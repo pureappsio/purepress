@@ -19,7 +19,7 @@ Template.boxParameters.onRendered(function() {
         }
 
         // Init data
-        if (sequence) {
+        if (typeof sequence !== 'undefined') {
 
             // Set sequence
             $('#box-sequence').val(sequence);
@@ -46,7 +46,7 @@ Template.boxParameters.onRendered(function() {
             }));
         }
 
-        if (tagsData) {
+        if (typeof tagsData !== 'undefined') {
             $('#tags-id').val(tagsData);
         }
 

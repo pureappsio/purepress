@@ -11,11 +11,9 @@
         </div>
     </div>
     <div class='row'>
-
         <div class="col-md-4">
             <span class="label label-{{statusLabel}}">{{status}}</span>
         </div>
-
         <div class="col-md-4">
             <button id='post-publish' class='btn btn-block btn-primary'>Publish</button>
         </div>
@@ -36,16 +34,14 @@
         <div class="col-md-6">
             <select class='form-control' id='blog-post-category'>
                 <option value='general'>General</option>
-                {{#each categories}}
-                    {{> categoryOption}}
-                {{/each}}
+                {{#each categories}} {{> categoryOption}} {{/each}}
             </select>
         </div>
         <div class="col-md-4">
             <input id='new-category' class='form-control' placeholder="New category ...">
         </div>
         <div class="col-md-2">
-             <button id='create-category' class='btn btn-primary btn-block'>Create Category</button>
+            <button id='create-category' class='btn btn-primary btn-block'>Create Category</button>
         </div>
     </div>
     <h3>Type</h3>
@@ -77,9 +73,26 @@
         <div class='col-md-12'>
             {{> uploadForm imageId="featuredPicture"}}
         </div>
+        <!--   <div class='col-md-6'>
+            <input id='featuredPicture' class="form-control" value={{featuredPicture}}>
+        </div> -->
     </div>
     <div class='main-content'>
         <h3>Content</h3>
+        <div class='row'>
+            <div class='col-md-6'>
+                {{#if areBadLinks}}
+                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span> {{else if notChecked}}
+                <span class="label label-warning">Warning! You should check Amazon links in this article.</span> {{else}}
+                <span class="label label-success">Everything is ok, all Amazon links in the article are valid :)</span> {{/if}}
+            </div>
+            <div class='col-md-3'>
+                <button class='btn btn-primary btn-block' id='check-links'>Check Amazon Links</button>
+            </div>
+            <div class='col-md-3'>
+                <button class='btn btn-primary btn-block' id='fix-links'>Fix Amazon Links</button>
+            </div>
+        </div>
         <div class='row'>
             <div class='col-md-12'>
                 <input type="text" id='post-content' class="summernote" />
@@ -146,9 +159,22 @@
                 <button class='btn btn-primary btn-block' id='affiliate-add'>Add Element</button>
             </div>
         </div>
-        {{#each affiliateListings}}
-            {{> affiliateElementListing}}
-        {{/each}}
+        <h3>Affiliate Elements</h3>
+        <div class='row'>
+            <div class='col-md-6'>
+                {{#if areBadLinks}}
+                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span> {{else if notChecked}}
+                <span class="label label-warning">Warning! You should check Amazon links in this article.</span> {{else}}
+                <span class="label label-success">Everything is ok, all Amazon links in the article are valid :)</span> {{/if}}
+            </div>
+            <div class='col-md-3'>
+                <button class='btn btn-primary btn-block' id='check-links'>Check Amazon Links</button>
+            </div>
+            <div class='col-md-3'>
+                <button class='btn btn-primary btn-block' id='fix-links'>Fix Amazon Links</button>
+            </div>
+        </div>
+        {{#each affiliateListings}} {{> affiliateElementListing}} {{/each}}
         <h3>Post Middle Content (optional)</h3>
         <div class='row'>
             <div class='col-md-12'>
@@ -174,9 +200,11 @@
             <select class='form-control' id='post-box'></select>
         </div>
     </div>
-    <div class='row'>
+    <div class='row last-row'>
         <div class="col-md-4">
             <button id='edit-post' class='btn btn-primary btn-block'>Save</button>
+            <div id='processing'>Processing ...</div>
+            <div id='saved'>Saved!</div>
         </div>
         <div class="col-md-4">
             <a class='btn btn-info btn-block' href='/{{url}}'>Preview</a>

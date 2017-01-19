@@ -1,12 +1,30 @@
 Meteor.methods({
 
+    renderPosts: function() {
+
+        var countryCodes = Meteor.call('getCountryCodes');
+        // console.log(countryCodes);
+        var posts = Posts.find({}).fetch();
+
+        for (p in posts) {
+            // console.log('Render post ' + p);
+
+            for (c in countryCodes) {
+                Meteor.call('renderPost', posts[p].url, countryCodes[c], {});
+            }
+
+        }
+
+    },
     flushCache: function() {
 
         // Flush
         console.log('Flushing cache');
         Caches.update({}, { $set: { cached: false } }, { multi: true });
         Pages.update({}, { $set: { cached: false } }, { multi: true });
-        Posts.update({}, { $set: { cached: false } }, { multi: true });
+
+        // Posts
+        Posts.update({}, { $set: { cached: false }}, { multi: true });
 
 
     },
@@ -21,12 +39,12 @@ Meteor.methods({
 
                 if (cache.cached == true) {
 
-                    console.log('Returning cached footer');
+                    // console.log('Returning cached footer');
                     return cache.html;
                 } else {
 
                     // Render
-                    console.log('Updating footer cache');
+                    // console.log('Updating footer cache');
                     html = Meteor.call('renderFooter');
 
                     // Update cache
@@ -39,7 +57,7 @@ Meteor.methods({
             } else {
 
                 // Render
-                console.log('Creating footer cache');
+                // console.log('Creating footer cache');
                 html = Meteor.call('renderFooter');
 
                 // Create cache
@@ -50,7 +68,7 @@ Meteor.methods({
             }
 
         } else {
-            console.log('Rendering footer without caching');
+            // console.log('Rendering footer without caching');
             return Meteor.call('renderFooter');
         }
 
@@ -76,13 +94,13 @@ Meteor.methods({
 
                 if (headerCache.cached == true) {
 
-                    console.log('Returning cached header');
+                    // console.log('Returning cached header');
                     return headerCache.html;
 
                 } else {
 
                     // Render
-                    console.log('Updating header cache');
+                    // console.log('Updating header cache');
                     html = Meteor.call('renderHeader');
 
                     // Update cache
@@ -95,7 +113,7 @@ Meteor.methods({
             } else {
 
                 // Render
-                console.log('Creating header cache');
+                // console.log('Creating header cache');
                 html = Meteor.call('renderHeader');
 
                 // Create cache
@@ -106,7 +124,7 @@ Meteor.methods({
             }
 
         } else {
-            console.log('Rendering header without caching');
+            // console.log('Rendering header without caching');
             return Meteor.call('renderHeader');
         }
 
@@ -196,12 +214,12 @@ Meteor.methods({
 
                 if (navCache.cached == true) {
 
-                    console.log('Returning cached navbar');
+                    // console.log('Returning cached navbar');
                     return navCache.html;
                 } else {
 
                     // Render
-                    console.log('Updating navbar cache');
+                    // console.log('Updating navbar cache');
                     html = Meteor.call('renderNavbar');
 
                     // Update cache
@@ -214,7 +232,7 @@ Meteor.methods({
             } else {
 
                 // Render
-                console.log('Creating navbar cache');
+                // console.log('Creating navbar cache');
                 html = Meteor.call('renderNavbar');
 
                 // Create cache
@@ -225,7 +243,7 @@ Meteor.methods({
             }
 
         } else {
-            console.log('Rendering navbar without caching');
+            // console.log('Rendering navbar without caching');
             return Meteor.call('renderNavbar');
         }
 
@@ -311,14 +329,32 @@ Meteor.methods({
             pages.push({ number: i });
         }
 
-        var posts = Posts.find({ status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
-        for (i in posts) {
-            console.log(posts[i].title);
-            console.log(posts[i].creationDate);
+        if (categoryId !== undefined) {
+            var posts = Posts.find({ postCategory: categoryId, status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
+        } else {
+            var posts = Posts.find({ status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
         }
+
+        // Make groups
+        var groups = [];
+        var groupIndex = 0;
+        if (theme == 'square') {
+            for (i = 0; i < posts.length; i + 3) {
+
+                groups[groupIndex] = posts.splice(i, i + 3);
+
+                groupIndex++;
+
+            }
+        }
+        // console.log(groups);
 
         // Helpers
         Template.allPosts.helpers({
+
+            groups: function() {
+                return groups;
+            },
             blogPage: function() {
 
                 if (categoryId !== undefined) {
@@ -347,11 +383,7 @@ Meteor.methods({
                 }
             },
             posts: function() {
-                if (categoryId !== undefined) {
-                    return Posts.find({ postCategory: categoryId, status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * 3, limit: 3 });
-                } else {
-                    return Posts.find({ status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts });
-                }
+                return posts;
             },
             isFeaturedPicture(post) {
                 if (post.featuredPicture) {
@@ -401,7 +433,7 @@ Meteor.methods({
             if (post.type == 'purepages') {
 
                 // Grab page
-                console.log('Returning external page');
+                // console.log('Returning external page');
 
                 // Get page
                 var page = Meteor.call('getPurePage', post.purePageId, query);
@@ -437,18 +469,21 @@ Meteor.methods({
                 footerHtml = Meteor.call('returnFooter');
 
                 // Check if cached
-                if (post.cached == true) {
+                // var countryCode = Meteor.call('getCountryCodeLocation', location);
+                // console.log(post.cached);
+
+                if (post.cached == true && !(query.origin)) {
 
                     // Get render
                     if (post.type) {
-                        console.log('Page cached, returning cached version');
+                        // console.log('Page cached, returning cached version');
 
                         // Return cached HTML
                         var postHtml = post.html;
 
                     } else {
 
-                        console.log('Post cached, returning cached version');
+                        // console.log('Post cached, returning cached version');
 
                         // Return cached HTML
                         var postHtml = Meteor.call('getLocalisedHtml', post, location);
@@ -462,7 +497,7 @@ Meteor.methods({
                     // Compile
                     if (post.type) {
 
-                        console.log('Page not cached, rendering');
+                        // console.log('Page not cached, rendering');
 
                         // Compile
                         SSR.compileTemplate('postTemplate',
@@ -480,64 +515,95 @@ Meteor.methods({
                                 // Get product from store
                                 var storeProduct = Meteor.call('getProductData', allProducts[i].productId);
 
-                                // Get sales page
-                                var salesPageUrl = Pages.findOne(allProducts[i].pageId).url;
-                                storeProduct.salesPageUrl = salesPageUrl;
+                                if (storeProduct) {
+                                    // Get sales page
+                                    var salesPageUrl = Pages.findOne(allProducts[i].pageId).url;
+                                    storeProduct.salesPageUrl = salesPageUrl;
 
-                                // Add
-                                products.push(storeProduct);
+                                    // Add
+                                    products.push(storeProduct);
+                                }
 
                             }
 
                         }
 
                         // Build portfolio
-                        if (Integrations.findOne({ type: 'pureportfolio' })) {
+                        if (Meteor.call('hasElement', post._id, 'portfolio')) {
 
-                            // Get integration
-                            console.log('Grabing portfolio');
-                            var integration = Integrations.findOne({ type: 'pureportfolio' });
+                            if (Integrations.findOne({ type: 'pureportfolio' })) {
 
-                            // Get portfolio
-                            var portfolio = HTTP.get('https://' + integration.url + '/api/portfolio?option=array').data;
+                                // Get integration
+                                // console.log('Grabing portfolio');
+                                var integration = Integrations.findOne({ type: 'pureportfolio' });
 
-                            // Sort
-                            portfolio.sort(function(a, b) {
-                                if (a.value > b.value)
-                                    return -1;
-                                if (a.value < b.value)
-                                    return 1;
-                                // a doit être égale à b
-                                return 0;
-                            });
+                                // Get portfolio
+                                var portfolio = HTTP.get('https://' + integration.url + '/api/portfolio?option=array').data;
 
-                            // Format
-                            var translation = {
-                                'p2p': 'Peer-to-Peer Lending',
-                                'stock': 'Dividend Paying Stocks',
-                                'realestate': 'Real Estate Crowdfunding',
-                                'website': 'Profitable Websites',
-                                'cash': 'Cash',
-                                'equity': 'Private Equity'
-                            };
-                            for (s in portfolio) {
-                                portfolio[s].type = translation[portfolio[s].type];
-                                portfolio[s].value = portfolio[s].value.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-                                portfolio[s].yield = portfolio[s].yield.toFixed(2);
-                                portfolio[s].income = (portfolio[s].income / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                // Sort
+                                portfolio.sort(function(a, b) {
+                                    if (a.value > b.value)
+                                        return -1;
+                                    if (a.value < b.value)
+                                        return 1;
+                                    // a doit être égale à b
+                                    return 0;
+                                });
+
+                                // Format
+                                var translation = {
+                                    'p2p': 'Peer-to-Peer Lending',
+                                    'stock': 'Dividend Paying Stocks',
+                                    'realestate': 'Real Estate Crowdfunding',
+                                    'website': 'Profitable Websites',
+                                    'cash': 'Cash',
+                                    'equity': 'Private Equity'
+                                };
+                                for (s in portfolio) {
+                                    portfolio[s].type = translation[portfolio[s].type];
+                                    portfolio[s].value = portfolio[s].value.toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                    portfolio[s].yield = portfolio[s].yield.toFixed(2);
+                                    portfolio[s].income = (portfolio[s].income / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                }
+
+                                // Get total
+                                var total = HTTP.get('https://' + integration.url + '/api/total').data;
+
+                                // Format
+                                total.value = (total.value).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                total.yield = (total.yield).toFixed(2);
+                                total.monthlyIncome = (total.income / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");;
+
+
+
                             }
-
-                            // Get total
-                            var total = HTTP.get('https://' + integration.url + '/api/total').data;
-
-                            // Format
-                            total.value = (total.value).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-                            total.yield = (total.yield).toFixed(2);
-                            total.monthlyIncome = (total.income / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");;
 
                         } else {
                             portfolio = {};
-                            total = {}
+                            total = {};
+                        }
+
+                        if (Meteor.call('hasElement', post._id, 'portfoliodetail')) {
+
+                            if (Integrations.findOne({ type: 'pureportfolio' })) {
+
+                                var integration = Integrations.findOne({ type: 'pureportfolio' });
+
+                                // Build individual positions
+                                var p2p = HTTP.get('https://' + integration.url + '/api/positions?type=p2p').data;
+                                var stock = HTTP.get('https://' + integration.url + '/api/positions?type=stock').data;
+                                var realestate = HTTP.get('https://' + integration.url + '/api/positions?type=realestate').data;
+
+                                var positions = {
+                                    p2p: p2p,
+                                    stock: stock,
+                                    realestate: realestate
+                                }
+                            }
+
+
+                        } else {
+                            var positions = {};
                         }
 
                         // Build pricing elements for pricing page
@@ -634,8 +700,19 @@ Meteor.methods({
                             portfolio: function() {
                                 return portfolio;
                             },
+                            positions: function(type) {
+                                return positions[type];
+                            },
+                            isStock: function(type) {
+                                if (type == 'stock') {
+                                    return true;
+                                }
+                            },
                             total: function() {
                                 return total;
+                            },
+                            formatMoney: function(number) {
+                                return parseFloat(number).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
                             }
 
                         });
@@ -643,7 +720,7 @@ Meteor.methods({
 
                     } else {
 
-                        console.log('Post not cached, rendering');
+                        // console.log('Post not cached, rendering');
 
                         // Get Meteor URL
                         var websiteUrl = Meteor.absoluteUrl();
@@ -678,8 +755,11 @@ Meteor.methods({
 
                                 },
                                 postImage: function(featuredPicture) {
+
                                     var image = Images.findOne(featuredPicture);
-                                    return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    if (image) {
+                                        return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    }
                                 },
                                 formatDate: function(date) {
                                     return moment(date).format('MMMM Do YYYY');
@@ -717,8 +797,10 @@ Meteor.methods({
                                     return Elements.find({ postId: this._id });
                                 },
                                 elementImage: function(element) {
-                                    var image = Images.findOne(element.picture);
-                                    return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    if (element.picture) {
+                                        var image = Images.findOne(element.picture);
+                                        return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    }
                                 },
                                 isAffiliateTheme: function(theme) {
                                     if (selectedTheme == theme) {
@@ -767,7 +849,17 @@ Meteor.methods({
                                     return websiteUrl;
                                 },
                                 disqusId: function() {
-                                    return Metas.findOne({ type: 'disqus' }).value;
+                                    if (Metas.findOne({ type: 'disqus' })) {
+                                        return Metas.findOne({ type: 'disqus' }).value;
+                                    }
+                                    
+                                },
+                                origin: function() {
+                                    if (query.origin) {
+                                        return query.origin;
+                                    } else {
+                                        return 'blog';
+                                    }
                                 }
                             });
 
@@ -780,7 +872,9 @@ Meteor.methods({
                             Template.postTemplate.helpers({
                                 postImage: function(featuredPicture) {
                                     var image = Images.findOne(featuredPicture);
-                                    return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    if (image) {
+                                        return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    }
                                 },
                                 isPodcast: function() {
                                     if (this.podcastUrl) {
@@ -810,7 +904,10 @@ Meteor.methods({
                                     return Metas.findOne({ type: 'userName' }).value;
                                 },
                                 tags: function() {
-                                    return Boxes.findOne(this.signupBox).tags;
+                                    if (Boxes.findOne(this.signupBox)) {
+                                        return Boxes.findOne(this.signupBox).tags;
+
+                                    }
                                 },
                                 isEmailBox: function() {
                                     if (this.signupBox) {
@@ -824,22 +921,40 @@ Meteor.methods({
                                     }
                                 },
                                 signupBoxContent: function() {
-                                    return Boxes.findOne(this.signupBox).boxContent;
+                                    if (Boxes.findOne(this.signupBox)) {
+                                        return Boxes.findOne(this.signupBox).boxContent;
+                                    }
+
                                 },
                                 signupPopupContent: function() {
-                                    return Boxes.findOne(this.signupBox).popupContent;
+                                    if (Boxes.findOne(this.signupBox)) {
+                                        return Boxes.findOne(this.signupBox).popupContent;
+                                    }
+                                },
+                                origin: function() {
+                                    if (query.origin) {
+                                        return query.origin;
+                                    } else {
+                                        return 'blog';
+                                    }
                                 },
                                 listId: function() {
                                     return Integrations.findOne({ type: 'puremail' }).list;
                                 },
                                 sequenceId: function(element) {
-                                    return Boxes.findOne(this.signupBox).sequence;
+                                    if (Boxes.findOne(this.signupBox)) {
+                                        return Boxes.findOne(this.signupBox).sequence;
+                                    }
+
                                 },
                                 siteUrl: function() {
                                     return websiteUrl;
                                 },
                                 disqusId: function() {
-                                    return Metas.findOne({ type: 'disqus' }).value;
+                                    if (Metas.findOne({ type: 'disqus' })) {
+                                        return Metas.findOne({ type: 'disqus' }).value;
+                                    }
+                                    
                                 }
                             });
 
@@ -851,14 +966,39 @@ Meteor.methods({
 
                     // Save
                     if (post.type) {
-                        Pages.update({ url: postUrl }, { $set: { cached: true, html: rawHtml } })
+
+                        if (query.origin) {
+                            Pages.update({ url: postUrl }, { $set: { cached: false, html: rawHtml } })
+                        } else {
+                            Pages.update({ url: postUrl }, { $set: { cached: true, html: rawHtml } })
+                        }
+
                         postHtml = rawHtml;
 
                     } else {
 
                         // Process for affiliate links
-                        var html = Meteor.call('processHTMLAmazon', rawHtml);
+                        // var countryCode = Meteor.call('getCountryCodeLocation', location);
+                        var renderedHtml = Meteor.call('rawProcessHTMLAmazon', rawHtml);
+
+                        // if (query.origin) {
+                        //     Posts.update({ url: postUrl }, { $set: { cached: {}, html: html } })
+                        // } else {
+
+                        // Get cache & html
+                        // var cache = post.cached;
+                        if (post.html) {
+                            var html = post.html;
+                        }
+                        else {
+                            html = {};
+                        }
+
+                        // Update
+                        // cache[countryCode] = true;
+                        html['US'] = renderedHtml;
                         Posts.update({ url: postUrl }, { $set: { cached: true, html: html } })
+                            // }
 
                         // Get localised HTML
                         var postHtml = Meteor.call('getLocalisedHtml', { html: html }, location);

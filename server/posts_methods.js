@@ -1,5 +1,6 @@
 var jsmediatags = Npm.require("jsmediatags");
 var cheerio = Npm.require("cheerio");
+
 Future = Npm.require('fibers/future');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
@@ -19,6 +20,276 @@ client = knox.createClient({
 
 Meteor.methods({
 
+    localiseAllPosts: function() {
+
+        console.log('Started localising all posts');
+
+        var posts = Posts.find({}).fetch();
+
+        for (p in posts) {
+            Meteor.call('localisePost', posts[p]._id);
+        }
+
+        console.log('Localising posts finished');
+
+    },
+    isLocalised: function(postId) {
+
+        var post = Posts.findOne(postId);
+
+        var localised = true;
+
+        if (post.html) {
+
+            var countryCodes = Meteor.call('getCountryCodes');
+
+            for (c in countryCodes) {
+                if (!(post.html[countryCodes[c]])) {
+                    localised = false;
+                }
+            }
+
+        } else {
+            localised = false;
+        }
+
+        return localised;
+
+    },
+    editElement: function(elementId, item, value) {
+
+        var query = {};
+        query[item] = value;
+
+        Elements.update(elementId, { $set: query });
+
+        console.log(Elements.findOne(elementId));
+
+    },
+    spotDeadAmazonLinks: function() {
+
+        // Grab all posts
+        var posts = Posts.find({}).fetch();
+
+        for (i in posts) {
+
+            var badLinks = Meteor.call('findDeadLinksPost', posts[i]._id);
+            console.log('Post ' + posts[i]._id + ' has ' + badLinks.length + ' bad links');
+
+        }
+
+    },
+    findDeadLinksPost: function(postId) {
+
+        // countryCodes = Meteor.call('getCountryCodes');
+
+        countryCodes = ['US'];
+
+        var badLinks = [];
+
+        // Grab post
+        var post = Posts.findOne(postId);
+        // console.log(post);
+
+        // Render
+        Meteor.call('renderPost', post.url, 'US', {});
+
+        for (c in countryCodes) {
+
+            badLinks = badLinks.concat(Meteor.call('getDeadLinksCountry', postId, countryCodes[c]));
+        }
+
+        Posts.update(postId, { $set: { badLinks: badLinks.length } });
+
+        // console.log(badLinks);
+
+        return badLinks;
+
+    },
+    getDeadLinksCountry(postId, countryCode) {
+
+        // Bad links
+        var badLinks = [];
+
+        // Grab post
+        var post = Posts.findOne(postId);
+
+        console.log('Checking bad links for country:' + countryCode);
+
+        if (post.html[countryCode]) {
+
+            var amazonLinks = [];
+
+            // Load HTML
+            $ = cheerio.load(post.html[countryCode]);
+
+            // console.log($.html());
+
+            // Find all links
+            $('a').each(function(i, elem) {
+
+                // console.log($(elem)[0].children[0]);
+
+                if (Meteor.call('isAmazonLink', $(elem)[0].attribs.href)) {
+
+                    if ($(elem)[0].children[0]) {
+                        var element = {
+                            countryCode: countryCode,
+                            link: $(elem)[0].attribs.href,
+                            text: $(elem)[0].children[0].data
+                        }
+                        amazonLinks.push(element);
+                    }
+
+                }
+
+            });
+
+            // console.log(amazonLinks);
+
+            // Check for dead links
+            for (l in amazonLinks) {
+
+                // Grab content
+                try {
+                    var answer = HTTP.get(amazonLinks[l].link, {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+                    // var content = answer.content;
+                    // console.log(content);
+
+                } catch (err) {
+                    // console.log('Bad link: ' + amazonLinks[l]);
+                    badLinks.push(amazonLinks[l]);
+                }
+
+            }
+
+        }
+
+        console.log(badLinks);
+
+        return badLinks;
+
+    },
+    fixDeadAmazonLinks(postId) {
+
+        // Grab post
+        var post = Posts.findOne(postId);
+
+        if (post.category == 'affiliate') {
+
+            // Grab all elements
+            elements = Elements.find({ postId: postId }).fetch();
+
+            for (e in elements) {
+                try {
+                    var answer = HTTP.get(elements[e].link, {
+                        headers: {
+                            "Content-Type": "application/json"
+                        }
+                    });
+
+                } catch (err) {
+
+                    // console.log('Bad element: ' + elements[e].link);
+
+                    // Find item
+                    var answer = HTTP.get('https://localizer.schwartzindustries.com/keywords/' + elements[e].title);
+                    items = answer.data;
+
+                    // console.log(items);
+
+                    if (items.length > 0) {
+
+                        // Build new link
+                        var newAsin = items[0].ASIN;
+                        // var oldAsin = Meteor.call('extractAsin', links[l].link);
+
+                        var newLink = Meteor.call('addAffiliateCode', newAsin, 'US');
+                        Elements.update(elements[e]._id, { $set: { link: newLink } });
+                    }
+
+                }
+            }
+
+        } else {
+
+            // Render
+            Meteor.call('renderPost', post.url, 'US', {});
+
+            // Get US link
+            var links = Meteor.call('getDeadLinksCountry', postId, 'US');
+            console.log(links);
+
+            for (l in links) {
+
+                // Find item
+                var answer = HTTP.get('https://localizer.schwartzindustries.com/keywords/' + links[l].text);
+                items = answer.data;
+                console.log('Items: ');
+                console.log(items);
+
+                if (items.length > 0) {
+
+                    // Build new link
+                    var newAsin = items[0].ASIN;
+                    // var oldAsin = Meteor.call('extractAsin', links[l].link);
+
+                    var newLink = Meteor.call('addAffiliateCode', newAsin, 'US');
+                    console.log(newLink);
+
+                    // Replace in content
+                    var content = Posts.findOne(postId).content;
+
+                    // Load raw HTML
+                    $ = cheerio.load(content);
+
+                    // Process links
+                    $('a').each(function(i, elem) {
+                        if ($(elem)[0].children[0].data == links[l].text) {
+                            $(elem)[0].attribs.href = newLink;
+                        }
+
+                    });
+
+                    var fixedContent = $.html();
+                    console.log(fixedContent);
+
+                    Posts.update(postId, { $set: { content: fixedContent } });
+
+                }
+
+            }
+
+        }
+
+        // Flush
+        Meteor.call('flushCache');
+
+        // Check
+        Meteor.call('findDeadLinksPost', postId);
+
+    },
+    setDatesPosts: function() {
+
+        var posts = Posts.find({}).fetch();
+        console.log(posts.length);
+
+        var refDate = new Date();
+
+        for (i in posts) {
+
+            refDate.setDate(refDate.getDate() - 7);
+            console.log(refDate);
+
+            Posts.update(posts[i]._id, { $set: { creationDate: refDate } })
+
+        }
+
+    },
     getListTags: function() {
 
         // Get integration
@@ -252,9 +523,11 @@ Meteor.methods({
     },
     editPost: function(post) {
 
+        // Save
         console.log(post);
-
         Posts.update(post._id, post);
+
+        Meteor.call('localisePost', post._id);
 
     },
     createPost: function(post) {

@@ -1,30 +1,118 @@
 var cheerio = Npm.require("cheerio");
+// var request = Npm.require('request');
+Future = Npm.require('fibers/future');
+
+// var amazon = Npm.require("amazon-product-api");
+// const { OperationHelper } = require('apac');
+
+// if (Meteor.settings.awsProduct) {
+
+//     // var amazonClient = amazon.createClient({
+//     //     awsId: Meteor.settings.awsProduct.key,
+//     //     awsSecret: Meteor.settings.awsProduct.secret,
+//     //     awsTag: "openhomeautomation-20"
+//     // });
+
+//     var amazonClient = new OperationHelper({
+//         awsId: Meteor.settings.awsProduct.key,
+//         awsSecret: Meteor.settings.awsProduct.secret,
+//         assocId: Meteor.settings.awsProduct.assocId,
+//         maxRequestsPerSecond: 1
+//     });
+
+// }
 
 Meteor.methods({
 
+    localisePost: function(postId) {
+
+        // Get countries
+        var countryCodes = Meteor.call('getCountryCodes');
+
+        // Get post
+        var post = Posts.findOne(postId);
+
+        console.log('Localising post' + post.url);
+
+        // Render post
+        Meteor.call('renderPost', post.url, 'US', {});
+
+        // Refresh post
+        var post = Posts.findOne(postId);
+
+        // Pre-load localisations
+        localisations = {};
+
+        $ = cheerio.load(post.html['US']);
+
+        // Process links
+        $('a').each(function(i, elem) {
+
+            if (Meteor.call('isAmazonLink', $(elem)[0].attribs.href)) {
+
+                var asin = Meteor.call('extractAsin', $(elem)[0].attribs.href);
+                var answer = HTTP.get('https://localizer.schwartzindustries.com/links/' + asin);
+                link = answer.data;
+
+                localisations[$(elem)[0].attribs.href] = link;
+
+            }
+
+        });
+
+        for (c in countryCodes) {
+
+            // Localise HTML
+            var localisedHtml = Meteor.call('processHTMLAmazon', post.html['US'], countryCodes[c], localisations);
+
+            // Update post
+            var html = post.html;
+            html[countryCodes[c]] = localisedHtml;
+            // console.log(localisedHtml);
+            Posts.update(postId, { $set: { html: html } });
+
+        }
+
+    },
     getLocalisedHtml: function(post, location) {
 
-        console.log(location);
+        var frenchStoreCountries = ['FR', 'BE', 'LU'];
+        var ukStoreCountries = ['LV', 'SE', 'CY', 'EE', 'UK', 'FI', 'NL', 'SK', 'GB', 'PL', 'IE', 'EL', 'LT', 'BG', 'RO', 'CZ', 'HU'];
+        var germanCountries = ['DE', 'AT'];
+        var spanishCountries = ['ES', 'PT'];
 
-        if (location == 'FR') {
+        if (frenchStoreCountries.indexOf(location) != -1) {
             if (post.html['FR']) {
-                console.log('Returning localised HTML');
                 return post.html['FR'];
             } else {
                 return post.html['US'];
             }
-        }
-        if (location == 'GB') {
+        } else if (ukStoreCountries.indexOf(location) != -1) {
             if (post.html['GB']) {
-                console.log('Returning localised HTML');
                 return post.html['GB'];
             } else {
                 return post.html['US'];
             }
-        }
-        if (location == 'CA') {
+        } else if (germanCountries.indexOf(location) != -1) {
+            if (post.html['DE']) {
+                return post.html['DE'];
+            } else {
+                return post.html['US'];
+            }
+        } else if (location == 'IT') {
+            if (post.html['IT']) {
+                return post.html['IT'];
+            } else {
+                return post.html['US'];
+            }
+        } else if (spanishCountries.indexOf(location) != -1) {
+            if (post.html['ES']) {
+                return post.html['ES'];
+            } else {
+                return post.html['US'];
+            }
+        } else if (location == 'CA') {
             if (post.html['CA']) {
-                console.log('Returning localised HTML');
                 return post.html['CA'];
             } else {
                 return post.html['US'];
@@ -42,26 +130,45 @@ Meteor.methods({
             country_code = httpHeaders['cf-ipcountry'];
         } else {
             console.log('Using direct IP location')
-            country_code = 'US';
+            country_code = 'UK';
         }
 
         return country_code;
 
     },
-    localiseAmazonLink: function(url, countryCode) {
+    isAmazonLink: function(link) {
+
+        if (link.indexOf("amazon") != -1) {
+            return true;
+        } else {
+            return false;
+        }
+
+    },
+    extractAsin: function(url) {
+
+        var asinStart = url.indexOf("/dp/");
+        var asinEnd = url.indexOf("/ref=");
+
+        if (asinEnd != -1) {
+            var asin = url.substring(asinStart + 4, asinEnd);
+        } else {
+            var asin = url.substring(asinStart + 4, asinStart + 14);
+        }
+
+        return asin;
+
+    },
+    processAmazonLink: function(url) {
 
         // Check if it's an Amazon link
         if (url.indexOf("https://www.amazon.com/") != -1) {
 
             // Extract ASIN
-            var asinStart = url.indexOf("/dp/");
-            var asinEnd = url.indexOf("/ref=");
-
-            var asin = url.substring(asinStart + 4, asinEnd);
-
-            var result = Meteor.call('addAffiliateCode', asin, countryCode)
-
+            var asin = Meteor.call('extractAsin', url);
+            var result = Meteor.call('addAffiliateCode', asin, 'US');
             return result;
+
         }
         // Check for a-fwd links
         else if (url.indexOf("http://a-fwd.com") != -1) {
@@ -72,15 +179,92 @@ Meteor.methods({
 
             var asin = url.substring(asinStart + 9, asinEnd);
 
-            var result = Meteor.call('addAffiliateCode', asin, countryCode)
+            var result = Meteor.call('addAffiliateCode', asin, 'US')
 
             return result;
-        }
-        else {
+        } else {
             return url;
         }
     },
-    addAffiliateCode: function(asin, countryCode) {
+    localiseAmazonLink: function(url, countryCode, loc) {
+
+        // Check if it's an Amazon link
+        if (url.indexOf("https://www.amazon.com/") != -1) {
+
+            // Extract ASIN
+            var asin = Meteor.call('extractAsin', url);
+            // console.log("Extracted ASIN: " + asin);
+
+            var result = Meteor.call('addAffiliateCode', asin, countryCode, loc);
+
+            return result;
+
+        }
+        // Check for a-fwd links
+        else if (url.indexOf("http://a-fwd.com") != -1) {
+
+            // Extract ASIN
+            var asinStart = url.indexOf("asin-com=");
+            var asinEnd = url.indexOf("&com=");
+
+            var asin = url.substring(asinStart + 9, asinEnd);
+
+            var result = Meteor.call('addAffiliateCode', asin, countryCode, loc);
+
+            return result;
+        } else {
+            return url;
+        }
+    },
+    localiseAsin: function(asin, countryCode, localisations) {
+
+        var url;
+
+        // Base URL
+        if (countryCode == 'FR') {
+            url = 'https://www.amazon.fr/dp/';
+            locale = 'FR';
+        } else if (countryCode == 'GB') {
+            url = 'https://www.amazon.co.uk/dp/';
+            locale = 'UK';
+        } else if (countryCode == 'CA') {
+            url = 'https://www.amazon.ca/dp/';
+            locale = 'CA';
+        } else if (countryCode == 'DE') {
+            url = 'https://www.amazon.de/dp/';
+            locale = 'DE';
+        } else if (countryCode == 'IT') {
+            url = 'https://www.amazon.it/dp/';
+            locale = 'IT';
+        } else if (countryCode == 'ES') {
+            url = 'https://www.amazon.es/dp/';
+            locale = 'ES';
+        }
+
+        if (localisations[locale]) {
+
+            if (localisations[locale].ASIN) {
+
+                return url + localisations[locale].ASIN;
+
+            } else if (localisations[locale].moreLink) {
+
+                return localisations[locale].moreLink;
+
+            } else {
+
+                return url + asin;
+
+            }
+        } else {
+
+            return url + asin;
+        }
+
+    },
+    addAffiliateCode: function(asin, countryCode, localisations) {
+
+        // console.log('Adding affiliate code for country: ' + countryCode + ' and ASIN: ' + asin);
 
         if (countryCode == 'US') {
             var result = 'https://www.amazon.com/dp/' + asin;
@@ -88,19 +272,34 @@ Meteor.methods({
                 result += '?tag=' + Metas.findOne({ type: 'affiliateUS' }).value;
             }
         } else if (countryCode == 'FR') {
-            var result = 'https://www.amazon.fr/dp/' + asin;
+            var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
             if (Metas.findOne({ type: 'affiliateFR' })) {
                 result += '?tag=' + Metas.findOne({ type: 'affiliateFR' }).value;
             }
         } else if (countryCode == 'CA') {
-            var result = 'https://www.amazon.ca/dp/' + asin;
+            var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
             if (Metas.findOne({ type: 'affiliateCA' })) {
                 result += '?tag=' + Metas.findOne({ type: 'affiliateCA' }).value;
             }
         } else if (countryCode == 'GB') {
-            var result = 'https://www.amazon.co.uk/dp/' + asin;
+            var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
             if (Metas.findOne({ type: 'affiliateUK' })) {
                 result += '?tag=' + Metas.findOne({ type: 'affiliateUK' }).value;
+            }
+        } else if (countryCode == 'DE') {
+            var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
+            if (Metas.findOne({ type: 'affiliateDE' })) {
+                result += '?tag=' + Metas.findOne({ type: 'affiliateDE' }).value;
+            }
+        } else if (countryCode == 'IT') {
+            var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
+            if (Metas.findOne({ type: 'affiliateIT' })) {
+                result += '?tag=' + Metas.findOne({ type: 'affiliateIT' }).value;
+            }
+        } else if (countryCode == 'ES') {
+            var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
+            if (Metas.findOne({ type: 'affiliateES' })) {
+                result += '?tag=' + Metas.findOne({ type: 'affiliateES' }).value;
             }
         } else {
             var result = 'https://www.amazon.com/dp/' + asin;
@@ -111,31 +310,83 @@ Meteor.methods({
         return result;
 
     },
-    processHTMLAmazon: function(rawHtml) {
+    getCountryCodes: function() {
+        return ['US', 'FR', 'CA', 'GB', 'DE', 'IT', 'ES'];
+    },
+    getCountryCodeLocation: function(location) {
 
-        // Output
-        var output = {};
+        var countryCode = 'US';
 
-        // Country codes
-        countryCodes = ['US', 'FR', 'CA', 'GB'];
+        // Location by country
+        var frenchStoreCountries = ['FR', 'BE', 'LU'];
+        var ukStoreCountries = ['LV', 'SE', 'CY', 'EE', 'UK', 'FI', 'NL', 'SK', 'GB', 'PL', 'IE', 'EL', 'LT', 'BG', 'RO', 'CZ', 'HU'];
+        var germanCountries = ['DE', 'AT'];
+        var spanishCountries = ['ES', 'PT'];
 
-        for (j = 0; j < countryCodes.length; j++) {
-
-            // Load raw HTML
-            $ = cheerio.load(rawHtml);
-
-            // Process links
-            $('a').each(function(i, elem) {
-                var link = Meteor.call('localiseAmazonLink',
-                    $(elem)[0].attribs.href, countryCodes[j]);
-                $(elem)[0].attribs.href = link;
-            });
-
-            output[countryCodes[j]] = $.html();
-
+        if (frenchStoreCountries.indexOf(location) != -1) {
+            countryCode = 'FR';
+        } else if (ukStoreCountries.indexOf(location) != -1) {
+            countryCode = 'GB';
+        } else if (germanCountries.indexOf(location) != -1) {
+            countryCode = 'DE';
+        } else if (location == 'IT') {
+            countryCode = 'IT';
+        } else if (spanishCountries.indexOf(location) != -1) {
+            countryCode = 'ES';
+        } else if (location == 'CA') {
+            countryCode = 'CA';
+        } else {
+            countryCode = 'US';
         }
 
-        console.log(output);
+        return countryCode;
+
+    },
+    processHTMLAmazon: function(rawHtml, countryCode, localisations) {
+
+        // Output
+        var output = "";
+
+        console.log('Proccessing HTML for country: ' + countryCode);
+
+        // Load raw HTML
+        $ = cheerio.load(rawHtml);
+
+        // Process links
+        $('a').each(function(i, elem) {
+
+            if (Meteor.call('isAmazonLink', $(elem)[0].attribs.href)) {
+                var link = Meteor.call('localiseAmazonLink',
+                    $(elem)[0].attribs.href, countryCode, localisations[$(elem)[0].attribs.href]);
+                $(elem)[0].attribs.href = link;
+            }
+
+        });
+
+        output = $.html();
+
+        // }
+
+        //console.log(output);
+
+        return output;
+    },
+    rawProcessHTMLAmazon: function(rawHtml) {
+
+        // Output
+        var output = "";
+
+        // Load raw HTML
+        $ = cheerio.load(rawHtml);
+
+        // Process links
+        $('a').each(function(i, elem) {
+
+            var link = Meteor.call('processAmazonLink', $(elem)[0].attribs.href);
+            $(elem)[0].attribs.href = link;
+        });
+
+        output = $.html();
 
         return output;
     },
@@ -143,6 +394,13 @@ Meteor.methods({
 
         // Update
         Integrations.update({ type: 'puremail' }, { $set: { list: list } });
+
+    },
+
+    setBrand: function(brand) {
+
+        // Update
+        Integrations.update({ type: 'purepages' }, { $set: { brand: brand } });
 
     },
 

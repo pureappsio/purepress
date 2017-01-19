@@ -132,11 +132,29 @@
                     <button id='publish-posts' class='btn btn-block btn-primary'>Publish All Posts</button>
                 </div>
             </div>
+
             <div class='row'>
+                <div class='col-md-12'>
+                    <button id='spot-dead-links' class='btn btn-block btn-primary'>Spot Dead Links</button>
+                </div>
+            </div>
+
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button id='localise-all-posts' class='btn btn-block btn-primary'>Localise All Posts</button>
+                </div>
+            </div>
+            <!-- <div class='row'>
                 <div class='col-md-12'>
                     <button id='import-posts' class='btn btn-block btn-danger'>Import WordPress Posts</button>
                 </div>
             </div>
+
+            <div class='row'>
+                <div class='col-md-12'>
+                    <button id='set-dates-posts' class='btn btn-block btn-danger'>Set Dates Posts</button>
+                </div>
+            </div> -->
             <h3>Assign Signup Box to Posts</h3>
             <div class='row'>
                 <div class='col-md-3'>
@@ -144,7 +162,7 @@
                     </select>
                 </div>
                 <div class='col-md-3'>
-                    <select id='selected-posts' multiple>
+                    <select id='selected-posts' multiple data-actions-box="true">
                     </select>
                 </div>
                 <div class='col-md-3'>
@@ -439,6 +457,15 @@
                     <button id='set-list' class='btn btn-block btn-primary'>Connect to List</button>
                 </div>
             </div>
+            <h3>Brands</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <select class='form-control' id='pages-brand'></select>
+                </div>
+                <div class='col-md-3'>
+                    <button id='set-brand' class='btn btn-block btn-primary'>Connect to Brand</button>
+                </div>
+            </div>
             <h3>Facebook Pixel</h3>
             <div class='row'>
                 <div class='col-md-3'>
@@ -449,6 +476,7 @@
                 </div>
             </div>
         </div>
+        <div class='voffset30'></div>
     </div>
     {{else}}
     <h2>Access Not Authorized</h2> {{/if}}

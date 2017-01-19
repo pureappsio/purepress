@@ -40,11 +40,12 @@ Template.uploadForm.events({
                     console.log(fileObj);
                     if (imageId != "") {
                         Session.set(imageId, fileObj._id);
+                        Session.set(imageId + 'Link', '/cdn/storage/Images/' + fileObj._id + '/original/' + fileObj._id + '.' + fileObj.ext);
                     } else {
                         Session.set('fileId', fileObj._id);
+                        Session.set('imgLink', '/cdn/storage/Images/' + fileObj._id + '/original/' + fileObj._id + '.' + fileObj.ext);
                     }
 
-                    Session.set('imgLink', '/cdn/storage/Images/' + fileObj._id + '/original/' + fileObj._id + '.' + fileObj.ext);
 
                 }
                 template.currentUpload.set(false);

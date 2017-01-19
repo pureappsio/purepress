@@ -14,9 +14,9 @@ Template.pageEdit.onRendered(function() {
 
 Template.pageEdit.helpers({
 
-  elements: function() {
-    return Elements.find({pageId: this._id}, {sort: {order: 1}});
-  }
+    elements: function() {
+        return Elements.find({ pageId: this._id }, { sort: { order: 1 } });
+    }
 
 });
 
@@ -34,7 +34,15 @@ Template.pageEdit.events({
             type: this.type
         }
 
-        Meteor.call('editPage', page);
+        Meteor.call('editPage', page, function(err, data) {
+
+            // Fade out saved message
+            $("#saved").show();
+            $("#saved").fadeOut("slow", function() {
+                // Animation complete.
+            });
+            
+        });
 
     }
 

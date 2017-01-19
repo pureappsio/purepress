@@ -1,11 +1,18 @@
 <template name='postListing'>
 
   <div class='row'>
-  	<div class="col-md-6"><a href='/posts/{{_id}}'>{{title}}</a></div>
-  	<div class="col-md-4">{{url}}</div>
-  	<div class="col-md-1"><span class="label label-{{statusLabel}}">{{status}}</span></div>
-<!--     <div class="col-md-5">{{content}}</div>
- -->    <div class="col-md-1"><button class='btn btn-danger delete-post'>Delete</button></div>
+  	<div class="col-md-4"><a href='/posts/{{_id}}'>{{title}}</a></div>
+  	<div class="col-md-2">{{postCategoryDisplay}}</div>
+  	<div class="col-md-3">{{url}}</div>
+  
+  	<div class="col-md-2">
+    <span class="label label-{{statusBadLinks}}">{{badLinks}}</span>
+      {{#if isLocalised}}<span class="label label-success">L</span>{{else}}
+      <span class="label label-warning">R</span>
+      {{/if}}
+  		<span class="label label-{{statusLabel}}">{{status}}</span>
+  	</div>
+	<div class="col-md-1"><button class='btn btn-danger delete-post'>Delete</button></div>
   </div>
 
 </template>

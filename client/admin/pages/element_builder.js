@@ -251,6 +251,27 @@ Template.elementBuilder.events({
 
         }
 
+        if (elementType == 'portfoliodetail') {
+
+            // Image
+            Session.set('imageNeeded', false);
+
+            // Build fields
+            var fields = "<div class='row'>";
+            fields += "<div class='col-md-3'>";
+            fields += "<select class='form-control' id='portfolio-type'>";
+            fields += "<option value='p2p'>Peer-to-Peer Lending</option>";
+            fields += "<option value='realestate'>Real Estate</option>";
+            fields += "<option value='stock'>Dividend Paying Stocks</option>";
+            fields += "</select>";
+            fields += "</div>";
+            fields += "</div>";
+
+            // Add fields
+            $('#builder-container').append(fields);
+
+        }
+
         if (elementType == 'store') {
 
             // Image
@@ -306,6 +327,10 @@ Template.elementBuilder.events({
         if (elementType == 'button') {
             element.link = $('#element-link').val();
             element.button = $('#element-button').val();
+        }
+
+        if (elementType == 'portfoliodetail') {
+            element.portfolioType = $('#portfolio-type :selected').val();
         }
 
         if (elementType == 'twopictures') {

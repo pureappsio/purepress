@@ -1,3 +1,5 @@
+var cheerio = Npm.require("cheerio");
+
 Meteor.methods({
 
     renderPosts: function() {
@@ -24,7 +26,7 @@ Meteor.methods({
         Pages.update({}, { $set: { cached: false } }, { multi: true });
 
         // Posts
-        Posts.update({}, { $set: { cached: false }}, { multi: true });
+        Posts.update({}, { $set: { cached: false } }, { multi: true });
 
 
     },
@@ -83,53 +85,53 @@ Meteor.methods({
         return footerHtml;
 
     },
+    // returnHeader: function(parameters) {
+
+    //     if (Meteor.settings.useCache == true) {
+
+    //         if (Caches.findOne({ element: 'header' })) {
+
+    //             // Check status of cache
+    //             var headerCache = Caches.findOne({ element: 'header' });
+
+    //             if (headerCache.cached == true) {
+
+    //                 // console.log('Returning cached header');
+    //                 return headerCache.html;
+
+    //             } else {
+
+    //                 // Render
+    //                 // console.log('Updating header cache');
+    //                 html = Meteor.call('renderHeader');
+
+    //                 // Update cache
+    //                 Caches.update({ element: 'header' }, { $set: { html: html, cached: true } });
+
+    //                 return html;
+
+    //             }
+
+    //         } else {
+
+    //             // Render
+    //             // console.log('Creating header cache');
+    //             html = Meteor.call('renderHeader');
+
+    //             // Create cache
+    //             Caches.insert({ element: 'header', html: html, cached: true });
+
+    //             return html;
+
+    //         }
+
+    //     } else {
+    //         // console.log('Rendering header without caching');
+    //         return Meteor.call('renderHeader');
+    //     }
+
+    // },
     returnHeader: function(parameters) {
-
-        if (Meteor.settings.useCache == true) {
-
-            if (Caches.findOne({ element: 'header' })) {
-
-                // Check status of cache
-                var headerCache = Caches.findOne({ element: 'header' });
-
-                if (headerCache.cached == true) {
-
-                    // console.log('Returning cached header');
-                    return headerCache.html;
-
-                } else {
-
-                    // Render
-                    // console.log('Updating header cache');
-                    html = Meteor.call('renderHeader');
-
-                    // Update cache
-                    Caches.update({ element: 'header' }, { $set: { html: html, cached: true } });
-
-                    return html;
-
-                }
-
-            } else {
-
-                // Render
-                // console.log('Creating header cache');
-                html = Meteor.call('renderHeader');
-
-                // Create cache
-                Caches.insert({ element: 'header', html: html, cached: true });
-
-                return html;
-
-            }
-
-        } else {
-            // console.log('Rendering header without caching');
-            return Meteor.call('renderHeader');
-        }
-
-    },
-    renderHeader: function(parameters) {
 
         // Compile header
         SSR.compileTemplate('header', Assets.getText('header/header_template.html'));
@@ -155,6 +157,61 @@ Meteor.methods({
         // Helpers
         Template.header.helpers({
 
+            twitterLinked: function() {
+
+                if (Networks.findOne({ type: 'twitter' })) {
+
+                    return true;
+
+                } else {
+                    return false;
+                }
+
+            },
+            twitterHandle: function() {
+
+                if (Networks.findOne({ type: 'twitter' })) {
+
+                    var link = Networks.findOne({ type: 'twitter' }).link;
+
+                    var handleIndex = link.indexOf('twitter.com/') + 'twitter.com/'.length;
+
+                    handle = '@' + link.substr(handleIndex);
+
+                    return handle;
+
+                }
+
+            },
+            description: function() {
+
+                if (parameters.description) {
+
+                    $ = cheerio.load(parameters.description);
+
+                    return $.text();
+                }
+
+            },
+            url: function() {
+
+                if (parameters.url) {
+
+                    return parameters.url;
+                }
+
+            },
+            creationDate: function() {
+
+                if (parameters.creationDate) {
+
+                    return parameters.creationDate
+                }
+
+            },
+            updatedTime: function() {
+                return new Date();
+            },
             useChat: function() {
 
                 if (parameters) {
@@ -164,6 +221,19 @@ Meteor.methods({
                         }
                     }
                 }
+
+            },
+            title: function() {
+
+                var brandName = Metas.findOne({ type: "brandName" }).value;
+
+                if (parameters.title) {
+                    title = parameters.title + ' - ' + brandName;
+                } else {
+                    title = brandName;
+                }
+
+                return title;
 
             },
             brandName: function() {
@@ -287,7 +357,18 @@ Meteor.methods({
     renderAllPosts: function(pageNumber, categoryId, url) {
 
         // Render header & navbar
-        headerHtml = Meteor.call('returnHeader');
+        if (categoryId !== undefined) {
+
+            var categoryName = Categories.findOne(categoryId).name;
+
+            headerHtml = Meteor.call('returnHeader', { title: categoryName });
+
+        } else {
+
+            headerHtml = Meteor.call('returnHeader', { title: 'Blog' });
+
+        }
+
         navbarHtml = Meteor.call('returnNavbar');
         footerHtml = Meteor.call('returnFooter');
 
@@ -455,15 +536,18 @@ Meteor.methods({
             } else {
 
                 // Render header & navbar
-                if (Meteor.settings.useChat == true) {
-                    if (post.type) {
-                        headerHtml = Meteor.call('renderHeader', { useChat: true });
-                    } else {
-                        headerHtml = Meteor.call('renderHeader');
-                    }
-                } else {
-                    headerHtml = Meteor.call('returnHeader');
+                var headerParameters = { title: post.title, url: Meteor.absoluteUrl() + postUrl };
+                if (Meteor.settings.useChat == true && post.type) {
+                    headerParameters.useChat = true;
                 }
+                if (post.excerpt) {
+                    headerParameters.description = post.excerpt;
+                }
+                if (post.creationDate) {
+                    headerParameters.creationDate = post.creationDate;
+                }
+
+                headerHtml = Meteor.call('returnHeader', headerParameters);
 
                 navbarHtml = Meteor.call('returnNavbar');
                 footerHtml = Meteor.call('returnFooter');
@@ -852,7 +936,7 @@ Meteor.methods({
                                     if (Metas.findOne({ type: 'disqus' })) {
                                         return Metas.findOne({ type: 'disqus' }).value;
                                     }
-                                    
+
                                 },
                                 origin: function() {
                                     if (query.origin) {
@@ -954,7 +1038,7 @@ Meteor.methods({
                                     if (Metas.findOne({ type: 'disqus' })) {
                                         return Metas.findOne({ type: 'disqus' }).value;
                                     }
-                                    
+
                                 }
                             });
 
@@ -989,8 +1073,7 @@ Meteor.methods({
                         // var cache = post.cached;
                         if (post.html) {
                             var html = post.html;
-                        }
-                        else {
+                        } else {
                             html = {};
                         }
 

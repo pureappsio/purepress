@@ -1,18 +1,36 @@
 <template name='postListing'>
-
-  <div class='row'>
-  	<div class="col-md-4"><a href='/posts/{{_id}}'>{{title}}</a></div>
-  	<div class="col-md-2">{{postCategoryDisplay}}</div>
-  	<div class="col-md-3">{{url}}</div>
-  
-  	<div class="col-md-2">
-    <span class="label label-{{statusBadLinks}}">{{badLinks}}</span>
-      {{#if isLocalised}}<span class="label label-success">L</span>{{else}}
+    <div class='row'>
+        <div class="col-md-4"><a href='/posts/{{_id}}'>{{title}}</a></div>
+        <div class="col-md-2">{{postCategoryDisplay}}</div>
+        <div class="col-md-3">{{url}}</div>
+        <div class="col-md-2">
+            {{#if areBadLinks}}
+            <span class="label label-{{statusBadLinks}}">{{badLinks}}</span> {{/if}}
+            <!--   {{#if isLocalised}}<span class="label label-success">L</span>{{else}}
       <span class="label label-warning">R</span>
-      {{/if}}
-  		<span class="label label-{{statusLabel}}">{{status}}</span>
-  	</div>
-	<div class="col-md-1"><button class='btn btn-danger delete-post'>Delete</button></div>
-  </div>
-
+      {{/if}} -->
+            <span class="label label-{{statusLabel}}">{{status}}</span>
+        </div>
+        <div class="col-md-1">
+            <button class='btn btn-danger delete-post' data-toggle="modal" data-target="#deleteConfirm-{{_id}}">Delete</button>
+        </div>
+    </div>
+    <div id="deleteConfirm-{{_id}}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Delete Post {{title}}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the post {{title}}?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" data-dismiss="modal" class="btn btn-danger delete-post-modal">Delete</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

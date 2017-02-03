@@ -1,22 +1,45 @@
 <template name='affiliateElementListing'>
     <div class='row'>
-        <div class="col-md-1"><input id='rank-{{_id}}' class='rank form-control' value='{{rank}}'></div>
-        <div class="col-md-2"><input id='rating-{{_id}}' class='rating form-control' value='{{rating}}'></div>
-        <div class="col-md-8"><input id='title-{{_id}}' class='title form-control' value='{{title}}'></div>
+        <div class="col-md-1">
+            <input id='rank-{{_id}}' class='rank form-control' value='{{rank}}'>
+        </div>
+        <div class="col-md-2">
+            <input id='rating-{{_id}}' class='rating form-control' value='{{rating}}'>
+        </div>
+        <div class="col-md-8">
+            <input id='title-{{_id}}' class='title form-control' value='{{title}}'>
+        </div>
         <div class="col-md-1">
             <button class='btn btn-danger affiliate-delete'>X</button>
         </div>
     </div>
     <div class='row'>
         <div class="col-md-1"></div>
-        <div class="col-md-11"><input id='link-{{_id}}' class='link form-control' value='{{link}}'></div>
+        <div class="col-md-11">
+            <input id='link-{{_id}}' class='link form-control' value='{{link}}'>
+        </div>
     </div>
     <div class='row'>
         <div class="col-md-1"></div>
-        <div class="col-md-11"><input type="text" id='short-description-{{_id}}' class="short-description summernote" /></div>
+        <div class='col-md-8'>
+            {{> uploadForm imageId="affiliatePictureNew"}}
+        </div>
+        <div class="col-md-3">
+            <button class='btn btn-primary btn-block affiliate-pic-save'>Save</button>
+        </div>
     </div>
     <div class='row'>
         <div class="col-md-1"></div>
-        <div class="col-md-11"><input type="text" id='description-{{_id}}' class="description summernote" /></div>
+        <div class="col-md-11">
+            <input type="text" id='short-description-{{_id}}' class="short-description summernote" />
+        </div>
+        <!--       <div class="col-md-1"><button class='btn btn-primary short-save'>Save</button></div> -->
+    </div>
+    <div class='row'>
+        <div class="col-md-1"></div>
+        <div class="col-md-11">
+            <input type="text" id='description-{{_id}}' class="description summernote" />
+        </div>
+        <!-- <div class="col-md-1"><button class='btn btn-primary long-save'>Save</button></div> -->
     </div>
 </template>

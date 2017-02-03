@@ -5,6 +5,12 @@ Template.postEdit.onRendered(function() {
         var signupBox = this.data.signupBox;
     }
 
+    Meteor.call('areAmazonLinks', this.data._id, function(err, data) {
+
+        Session.set('areAmazonLinks', data);
+
+    });
+
     Meteor.call('getBoxes', function(err, boxes) {
 
         // Empty
@@ -58,25 +64,24 @@ Template.postEdit.onRendered(function() {
 
     // Init editor
     $('#post-content').summernote({
-        popover: {
-            image: [
-                ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-                ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                ['custom', ['imageAttributes', 'imageShape']],
-                ['remove', ['removeMedia']]
-            ],
-        },
-        height: 400 // set editor height
+        minHeight: 400,
+        callbacks: {
+            onChange: function() {
+                var content = $('#post-content').summernote('code');
+                Session.set('wordCount', content.trim().split(/\s+/).length);
+            }
+        }
     });
 
     // Init post content
     if (this.data.content) {
         $('#post-content').summernote('code', this.data.content);
+        Session.set('wordCount', (this.data.content).trim().split(/\s+/).length);
     }
 
     // Init editor
     $('#post-excerpt').summernote({
-        height: 50 // set editor height
+        minHeight: 50 // set editor height
     });
 
     // Init post content
@@ -107,7 +112,7 @@ Template.postEdit.onRendered(function() {
 
     // Init editor
     $('#post-introduction').summernote({
-        height: 100 // set editor height
+        minHeight: 100 // set editor height
     });
 
     // Init post intro affiliate
@@ -117,7 +122,7 @@ Template.postEdit.onRendered(function() {
 
     // Init editor
     $('#post-conclusion').summernote({
-        height: 100 // set editor height
+        minHeight: 100 // set editor height
     });
 
     // Init post intro affiliate
@@ -127,7 +132,7 @@ Template.postEdit.onRendered(function() {
 
     // Init editor
     $('#post-middle').summernote({
-        height: 100 // set editor height
+        minHeight: 100 // set editor height
     });
 
     // Init post intro affiliate
@@ -137,12 +142,12 @@ Template.postEdit.onRendered(function() {
 
     // Init editor
     $('#affiliate-short').summernote({
-        height: 50 // set editor height
+        minHeight: 50 // set editor height
     });
 
     // Init editor
     $('#affiliate-description').summernote({
-        height: 150 // set editor height
+        minHeight: 150 // set editor height
     });
 
 });
@@ -156,7 +161,11 @@ Template.postEdit.events({
     },
     'click #check-links': function() {
 
-        Meteor.call('findDeadLinksPost', this._id);
+        Meteor.call('findDeadLinksPost', this._id, function(err, data) {
+
+            Session.set('badLinks', data);
+
+        });
 
     },
     'click #post-publish': function() {
@@ -297,6 +306,16 @@ Template.postEdit.events({
 
 Template.postEdit.helpers({
 
+    wordCount: function() {
+
+        return Session.get('wordCount');
+
+    },
+    badLinksDetail: function() {
+
+        return Session.get('badLinks');
+
+    },
     areBadLinks: function() {
 
         if (this.badLinks) {
@@ -323,7 +342,7 @@ Template.postEdit.helpers({
         return Session.get('imgLink');
     },
     affiliateListings: function() {
-        return Elements.find({ postId: this._id });
+        return Elements.find({ postId: this._id }, { sort: { rank: 1 } });
     },
     categories: function() {
         return Categories.find({});
@@ -338,6 +357,9 @@ Template.postEdit.helpers({
             }
         }
 
+    },
+    areAmazonLinks: function() {
+        return Session.get('areAmazonLinks');
     }
 
 });

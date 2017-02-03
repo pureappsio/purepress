@@ -79,10 +79,20 @@
     </div>
     <div class='main-content'>
         <h3>Content</h3>
+        {{#if areAmazonLinks}}
         <div class='row'>
             <div class='col-md-6'>
                 {{#if areBadLinks}}
-                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span> {{else if notChecked}}
+
+                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span>
+
+                <div>{{#each link in badLinksDetail}}
+
+                    {{link.text}} ({{link.link}})
+
+                {{/each}}</div>
+
+                {{else if notChecked}}
                 <span class="label label-warning">Warning! You should check Amazon links in this article.</span> {{else}}
                 <span class="label label-success">Everything is ok, all Amazon links in the article are valid :)</span> {{/if}}
             </div>
@@ -93,9 +103,11 @@
                 <button class='btn btn-primary btn-block' id='fix-links'>Fix Amazon Links</button>
             </div>
         </div>
+        {{/if}}
         <div class='row'>
             <div class='col-md-12'>
-                <input type="text" id='post-content' class="summernote" />
+                <input type="text" id='post-content'/>
+                <div>Words: {{wordCount}}</div>
             </div>
         </div>
         <h3>Insert Pictures (Copy link then insert in content)</h3>
@@ -160,10 +172,20 @@
             </div>
         </div>
         <h3>Affiliate Elements</h3>
+        {{#if areAmazonLinks}}
         <div class='row'>
             <div class='col-md-6'>
                 {{#if areBadLinks}}
-                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span> {{else if notChecked}}
+                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span> 
+
+                <div>{{#each link in badLinksDetail}}
+
+                    {{link.text}} ({{link.link}})
+
+                {{/each}}</div>
+
+
+                {{else if notChecked}}
                 <span class="label label-warning">Warning! You should check Amazon links in this article.</span> {{else}}
                 <span class="label label-success">Everything is ok, all Amazon links in the article are valid :)</span> {{/if}}
             </div>
@@ -174,6 +196,7 @@
                 <button class='btn btn-primary btn-block' id='fix-links'>Fix Amazon Links</button>
             </div>
         </div>
+        {{/if}}
         {{#each affiliateListings}} {{> affiliateElementListing}} {{/each}}
         <h3>Post Middle Content (optional)</h3>
         <div class='row'>

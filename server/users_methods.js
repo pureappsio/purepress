@@ -1,26 +1,5 @@
 var cheerio = Npm.require("cheerio");
-// var request = Npm.require('request');
 Future = Npm.require('fibers/future');
-
-// var amazon = Npm.require("amazon-product-api");
-// const { OperationHelper } = require('apac');
-
-// if (Meteor.settings.awsProduct) {
-
-//     // var amazonClient = amazon.createClient({
-//     //     awsId: Meteor.settings.awsProduct.key,
-//     //     awsSecret: Meteor.settings.awsProduct.secret,
-//     //     awsTag: "openhomeautomation-20"
-//     // });
-
-//     var amazonClient = new OperationHelper({
-//         awsId: Meteor.settings.awsProduct.key,
-//         awsSecret: Meteor.settings.awsProduct.secret,
-//         assocId: Meteor.settings.awsProduct.assocId,
-//         maxRequestsPerSecond: 1
-//     });
-
-// }
 
 Meteor.methods({
 
@@ -125,11 +104,11 @@ Meteor.methods({
     getUserLocation: function(httpHeaders) {
 
         if (httpHeaders['cf-ipcountry']) {
-            console.log('Using CloudFlare location')
+            // console.log('Using CloudFlare location')
             var data = {};
             country_code = httpHeaders['cf-ipcountry'];
         } else {
-            console.log('Using direct IP location')
+            // console.log('Using direct IP location')
             country_code = 'UK';
         }
 
@@ -138,11 +117,38 @@ Meteor.methods({
     },
     isAmazonLink: function(link) {
 
-        if (link.indexOf("amazon") != -1) {
+        if (link.indexOf("amazon") != -1 || link.indexOf("a-fwd.com") != -1) {
             return true;
-        } else {
+        } 
+        else {
             return false;
         }
+
+    },
+    areAmazonLinks(postId) {
+
+        // Grab post
+        var post = Posts.findOne(postId);
+
+        var amazonLinks = false;
+
+        if (post.html['US']) {
+
+            // Load HTML
+            $ = cheerio.load(post.html['US']);
+
+            // Find all links
+            $('a').each(function(i, elem) {
+
+                if (Meteor.call('isAmazonLink', $(elem)[0].attribs.href)) {
+                    amazonLinks = true;
+                }
+
+            });
+
+        }
+
+        return amazonLinks;
 
     },
     extractAsin: function(url) {
@@ -175,9 +181,8 @@ Meteor.methods({
 
             // Extract ASIN
             var asinStart = url.indexOf("asin-com=");
-            var asinEnd = url.indexOf("&com=");
 
-            var asin = url.substring(asinStart + 9, asinEnd);
+            var asin = url.substring(asinStart + 9, asinStart + 19);
 
             var result = Meteor.call('addAffiliateCode', asin, 'US')
 
@@ -356,18 +361,21 @@ Meteor.methods({
         $('a').each(function(i, elem) {
 
             if (Meteor.call('isAmazonLink', $(elem)[0].attribs.href)) {
+
+                // Link
                 var link = Meteor.call('localiseAmazonLink',
                     $(elem)[0].attribs.href, countryCode, localisations[$(elem)[0].attribs.href]);
                 $(elem)[0].attribs.href = link;
+
+                // Tracking
+                var clickEvent = "fbq('track', 'InitiateCheckout'); trackOutboundLink('" + $(elem)[0].attribs.href + "'); return false;";
+                $(elem).removeAttr('onclick');
+                $(elem).attr('onclick', clickEvent);
             }
 
         });
 
         output = $.html();
-
-        // }
-
-        //console.log(output);
 
         return output;
     },
@@ -382,8 +390,18 @@ Meteor.methods({
         // Process links
         $('a').each(function(i, elem) {
 
-            var link = Meteor.call('processAmazonLink', $(elem)[0].attribs.href);
-            $(elem)[0].attribs.href = link;
+            if (Meteor.call('isAmazonLink', $(elem)[0].attribs.href)) {
+
+                // Link
+                var link = Meteor.call('processAmazonLink', $(elem)[0].attribs.href);
+                $(elem)[0].attribs.href = link;
+
+                // Tracking
+                var clickEvent = "fbq('track', 'InitiateCheckout'); trackOutboundLink('" + $(elem)[0].attribs.href + "'); return false;";
+                $(elem).attr('onClick', clickEvent);
+
+            }
+
         });
 
         output = $.html();

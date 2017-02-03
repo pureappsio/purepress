@@ -85,52 +85,6 @@ Meteor.methods({
         return footerHtml;
 
     },
-    // returnHeader: function(parameters) {
-
-    //     if (Meteor.settings.useCache == true) {
-
-    //         if (Caches.findOne({ element: 'header' })) {
-
-    //             // Check status of cache
-    //             var headerCache = Caches.findOne({ element: 'header' });
-
-    //             if (headerCache.cached == true) {
-
-    //                 // console.log('Returning cached header');
-    //                 return headerCache.html;
-
-    //             } else {
-
-    //                 // Render
-    //                 // console.log('Updating header cache');
-    //                 html = Meteor.call('renderHeader');
-
-    //                 // Update cache
-    //                 Caches.update({ element: 'header' }, { $set: { html: html, cached: true } });
-
-    //                 return html;
-
-    //             }
-
-    //         } else {
-
-    //             // Render
-    //             // console.log('Creating header cache');
-    //             html = Meteor.call('renderHeader');
-
-    //             // Create cache
-    //             Caches.insert({ element: 'header', html: html, cached: true });
-
-    //             return html;
-
-    //         }
-
-    //     } else {
-    //         // console.log('Rendering header without caching');
-    //         return Meteor.call('renderHeader');
-    //     }
-
-    // },
     returnHeader: function(parameters) {
 
         // Compile header
@@ -698,6 +652,9 @@ Meteor.methods({
 
                         }
 
+                        // Latest posts
+                        var posts = Posts.find({}, { sort: { creationDate: -1 }, limit: 2 });
+
                         // Helpers
                         Template.postTemplate.helpers({
                             langEN: function() {
@@ -746,12 +703,12 @@ Meteor.methods({
                                 return Metas.findOne({ type: 'userName' }).value;
                             },
                             signupBoxContent: function(element) {
-                                if (element.type == 'emailsignup') {
+                                if (element.type == 'emailsignup' || element.type == 'signupbox') {
                                     return Boxes.findOne(element.boxId).boxContent;
                                 }
                             },
                             signupPopupContent: function(element) {
-                                if (element.type == 'emailsignup') {
+                                if (element.type == 'emailsignup' || element.type == 'signupbox') {
                                     return Boxes.findOne(element.boxId).popupContent;
                                 }
                             },
@@ -759,12 +716,12 @@ Meteor.methods({
                                 return Boxes.findOne(element.boxId).tags;
                             },
                             listId: function(element) {
-                                if (element.type == 'emailsignup') {
+                                if (element.type == 'emailsignup' || element.type == 'signupbox') {
                                     return Integrations.findOne({ type: 'puremail' }).list;
                                 }
                             },
                             sequenceId: function(element) {
-                                if (element.type == 'emailsignup') {
+                                if (element.type == 'emailsignup' || element.type == 'signupbox') {
                                     return Boxes.findOne(element.boxId).sequence;
                                 }
                             },
@@ -797,6 +754,18 @@ Meteor.methods({
                             },
                             formatMoney: function(number) {
                                 return parseFloat(number).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                            },
+                            posts: function() {
+                                return posts;
+                            },
+                            postImage: function(featuredPicture) {
+                                var image = Images.findOne(featuredPicture);
+                                if (image) {
+                                    return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                }
+                            },
+                            formatDate: function(date) {
+                                return moment(date).format('MMMM Do YYYY');
                             }
 
                         });
@@ -878,7 +847,7 @@ Meteor.methods({
                                     return Boxes.findOne(this.signupBox).sequence;
                                 },
                                 elements: function() {
-                                    return Elements.find({ postId: this._id });
+                                    return Elements.find({ postId: this._id }, { sort: { rank: 1 } });
                                 },
                                 elementImage: function(element) {
                                     if (element.picture) {
@@ -1097,7 +1066,7 @@ Meteor.methods({
         } else {
 
             // Render header & navbar
-            headerHtml = Meteor.call('returnHeader');
+            headerHtml = Meteor.call('returnHeader', {});
             navbarHtml = Meteor.call('returnNavbar');
             footerHtml = Meteor.call('returnFooter');
 

@@ -1,10 +1,28 @@
 <template name='pageListing'>
-
-  <div class='row'>
-  	<div class="col-md-6"><a href='/pages/{{_id}}'>{{title}}</a></div>
-  	<div class="col-md-3">{{url}}</div>
-    <div class="col-md-2">{{type}}</div>
-    <div class="col-md-1"><button class='btn btn-danger delete-page'>Delete</button></div>
-  </div>
-
+    <div class='row'>
+        <div class="col-md-6"><a href='/pages/{{_id}}'>{{title}}</a></div>
+        <div class="col-md-3">{{url}}</div>
+        <div class="col-md-2">{{type}}</div>
+        <div class="col-md-1">
+            <button class='btn btn-danger delete-page' data-toggle="modal" data-target="#deleteConfirm-{{_id}}">Delete</button>
+        </div>
+    </div>
+    <div id="deleteConfirm-{{_id}}" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Delete Page {{title}}</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the page {{title}}?</p>
+                </div>
+                <div class="modal-footer">
+                	<button type="button" data-dismiss="modal" class="btn btn-danger delete-page-modal">Delete</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

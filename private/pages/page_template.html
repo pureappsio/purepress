@@ -12,10 +12,84 @@
         <img class='img-responsive' src='{{elementImage element}}'>
     </div>
 </div>
+{{/if}} {{#if isElementType element 'latestposts'}}
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-4 post-title'>Latest Posts</div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    {{#each post in posts}}
+    <div class='col-md-4'>
+        <div class='post-page-container'>
+            <a href='/{{post.url}}'>
+                <div class='post-featured'><img class='img-responsive' src='{{postImage post.featuredPicture}}'></div>
+            </a>
+            <div class='post-title all-post-title all-post-title-square'><a href='/{{post.url}}'>{{post.title}}</a></div>
+            <div class='post-info'>{{formatDate post.creationDate}} / by {{userName}}</div>
+        </div>
+    </div>
+    {{/each}}
+</div>
 {{/if}} {{#if isElementType element 'text'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
+        <div class='post-content'>{{{element.content}}}</div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'signupbox'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-title signup-box-title'>{{element.title}}</div>
+    </div>
+</div>
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-5'>
+        <div class='signup-box-content'>{{{element.content}}}</div>
+        <div class='signup-button-container'>
+            <button data-toggle="modal" data-target="#myModal" class='signup-box-button btn btn-block btn-warning'>{{element.button}}</button>
+        </div>
+    </div>
+    <div class='col-md-3'>
+        <img class='img-responsive' src='{{elementImage element}}'>
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header popup-title">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title popup-title" id="myModalLabel">{{#if langEN}}Get Your Free Resource Now!{{else}}Recevez votre ressource gratuite maintenant!{{/if}}</h4>
+            </div>
+            <div class="modal-body popup-content">
+                {{{signupPopupContent element}}}
+                <div class='popup-message'>{{#if langEN}}Simply enter your email below, and you’ll be on your way!{{else}}Pour continuer, entrez votre email ci-dessous!{{/if}}</div>
+                <form accept-charset="utf-8" action="https://email.schwartzindustries.com/subscribe" method="POST">
+                    <div class='popup-input-container'>
+                        <input id='email' name='email' type="email" class="form-control input-lg" placeholder="{{#if langEN}}Your email ...{{else}}Votre email ...{{/if}}">
+                    </div>
+                    <div class='popup-button-container'>
+                        <input value="{{#if langEN}}Click Here to Subscribe{{else}}Cliquez Ici Pour Vous Inscrire{{/if}}" type="submit" class="btn btn-block btn-lg btn-warning">
+                    </div>
+                    <input name="list" type="hidden" value="{{listId element}}" />
+                    <input name="origin" type="hidden" value="blog" />
+                    <input name="sequence" type="hidden" value="{{sequenceId element}}" /> {{#each tag in tags element}}
+                    <input name="tag" type="hidden" value="{{tag}}" /> {{/each}}
+                </form>
+                <div class='popup-disclaimer'>{{#if langEN}}We won’t send you spam. Unsubscribe at any time.{{else}}Je ne vous enverrai jamais de spam. Vous pouvez vous désincrire à tout moment.{{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'textimage'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <img class='img-left' src='{{elementImage element}}'>
         <div class='post-content'>{{{element.content}}}</div>
     </div>
 </div>
@@ -116,8 +190,10 @@
 <div class='row element-container'>
     {{#each product in products}}
     <div class='col-md-4 store-product'>
-        <div class='product-image'><img class='img-responsive' src='{{product.image}}'></div>
-        <div class='product-name'><a href='{{product.salesPageUrl}}'>{{product.name}}</a></div>
+        <div class='product-image'>
+            <a href='{{product.salesPageUrl}}?origin=direct'><img class='img-responsive' src='{{product.image}}'></a>
+        </div>
+        <div class='product-name'><a href='{{product.salesPageUrl}}?origin=direct'>{{product.name}}</a></div>
     </div>
     {{/each}}
 </div>
@@ -168,9 +244,7 @@
         <div class='post-content'>The current value of the portfolio is <b> {{total.value}} Euros</b>, producing an estimated monthly income of <b>{{total.monthlyIncome}} Euros</b>, yielding at <b>{{total.yield}}%</b> annually. This portfolio is updated live, as I update it anytime I make a new addition to the portfolio.</div>
     </div>
 </div>
-{{/if}} 
-
-{{#if isElementType element 'portfoliodetail'}}
+{{/if}} {{#if isElementType element 'portfoliodetail'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
@@ -178,11 +252,11 @@
             <thead>
                 <tr>
                     {{#if isStock element.portfolioType}}
-                        <th>Ticker</th>
+                    <th>Ticker</th>
                     {{/if}}
                     <th>Name</th>
                     {{#if isStock element.portfolioType}}
-                        <th>Shares</th>
+                    <th>Shares</th>
                     {{/if}}
                     <th>Value</th>
                     <th>Yield</th>
@@ -193,11 +267,11 @@
                 {{#each position in positions element.portfolioType}}
                 <tr>
                     {{#if isStock element.portfolioType}}
-                        <td>{{position.ticker}}</td>
+                    <td>{{position.ticker}}</td>
                     {{/if}}
                     <td>{{position.name}}</td>
                     {{#if isStock element.portfolioType}}
-                        <td>{{position.qty}}</td>
+                    <td>{{position.qty}}</td>
                     {{/if}}
                     <td>{{formatMoney position.value}}</td>
                     <td>{{position.positionYield}}</td>
@@ -208,9 +282,7 @@
         </table>
     </div>
 </div>
-{{/if}}
-
-{{#if isElementType element 'emailsignup'}}
+{{/if}} {{#if isElementType element 'emailsignup'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
@@ -249,9 +321,6 @@
                 <div class='popup-disclaimer'>{{#if langEN}}We won’t send you spam. Unsubscribe at any time.{{else}}Je ne vous enverrai jamais de spam. Vous pouvez vous désincrire à tout moment.{{/if}}
                 </div>
             </div>
-            <!-- <div class="modal-footer">
-        
-      </div> -->
         </div>
     </div>
 </div>

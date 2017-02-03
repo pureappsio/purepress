@@ -1,5 +1,9 @@
 Template.affiliateElementListing.events({
 
+    'click .affiliate-pic-save': function(){
+
+        Meteor.call('editElement', this._id, 'picture', Session.get('affiliatePictureNew'));
+    },
     'click .affiliate-delete': function() {
         Meteor.call('removeElement', this._id);
     },
@@ -33,7 +37,7 @@ Template.affiliateElementListing.onRendered(function() {
         var elementId = this.data._id;
 
         // Init editors
-        $('.description').summernote({
+        $('#description-' + elementId).summernote({
             callbacks: {
                 onChange: function() {
                     Meteor.call('editElement', elementId, 'description', $('#description-' + elementId).summernote('code'));
@@ -41,7 +45,7 @@ Template.affiliateElementListing.onRendered(function() {
             }
         });
 
-        $('.short-description').summernote({
+        $('#short-description-' + elementId).summernote({
             callbacks: {
                 onChange: function() {
                     Meteor.call('editElement', elementId, 'shortDescription', $('#short-description-' + elementId).summernote('code'));

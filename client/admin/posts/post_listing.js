@@ -1,7 +1,16 @@
 Template.postListing.events({
 
-    'click .delete-post': function() {
-        Meteor.call('removePost', this._id);
+    // 'click .delete-post': function() {
+    //     // Meteor.call('removePost', this._id);
+    //     $('#deleteConfirm-' + this._id).modal('show');
+    // },
+    'click .delete-post-modal': function() {
+        Meteor.call('removePost', this._id, function(err, data) {
+            $('#deleteConfirm-' + this._id).modal('hide');
+            $('body').removeClass('modal-open');
+            $('.modal-backdrop').remove();
+        });
+
     }
 
 });
@@ -51,6 +60,16 @@ Template.postListing.helpers({
         } else {
             return 'success';
         }
+    },
+    areBadLinks: function() {
+        if (this.badLinks) {
+
+            if (this.badLinks > 0) {
+                return true;
+            }
+
+        }
+
     }
 
 });

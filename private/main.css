@@ -3,6 +3,28 @@ html {
     min-height: 100%;
 }
 
+.img-left {
+    float: left !important;
+    width: 45% !important;
+    margin-right: 20px;
+}
+
+.signup-box-title {
+    margin-bottom: 15px;
+}
+
+.signup-box-content {
+    font-size: 22px;
+    margin-bottom: 20px;
+    line-height: 45px !important;
+}
+
+.signup-box-button {
+    font-size: 24px !important;
+    padding-top: 20px !important;
+    padding-bottom: 20px !important;
+}
+
 body {
     font-size: 18px;
     margin-bottom: 45px;
@@ -22,6 +44,10 @@ h2 {
     padding: 15px;
 }
 
+.post-page-container {
+    
+}
+
 .table > tbody > tr > td {
     vertical-align: middle !important;
 }
@@ -39,8 +65,9 @@ h2 {
 
 .main-container {
     margin-bottom: 45px;
-/*    line-height: 29.7px !important;
-*/}
+    /*    line-height: 29.7px !important;
+*/
+}
 
 .post-featured {
     margin-top: 15px;
@@ -73,9 +100,22 @@ h2 {
 }
 
 .affiliate-img {
-    width: 300px !important;
+    
     float: left;
     display: inline !important;
+}
+
+@media screen and (min-width: 480px) {
+    .affiliate-img {
+        width: 300px !important;
+        margin-right: 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .affiliate-img {
+        margin-bottom: 30px;
+    }
 }
 
 .affiliate-button {

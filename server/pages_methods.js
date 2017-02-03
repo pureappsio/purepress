@@ -215,7 +215,11 @@ Meteor.methods({
 
         for (i in posts) {
 
+            // Update
             Posts.update(posts[i], { $set: { signupBox: boxId, cached: false } });
+
+            // Render
+            Meteor.call('localisePost', posts[i]);
 
         }
 

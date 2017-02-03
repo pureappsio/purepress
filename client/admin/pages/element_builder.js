@@ -48,6 +48,69 @@ Template.elementBuilder.events({
 
         }
 
+        // Fill depending on choice
+        if (elementType == 'textimage') {
+
+            // No image
+            Session.set('imageNeeded', true);
+
+            // Add elements
+            $('#builder-container').append("<div class='row'><div class='col-md-12'><input type='text' id='element-content' class='summernote' /></div></div>")
+
+            // Init editor
+            $('#element-content').summernote({
+                height: 100 // set editor height
+            });
+
+        }
+
+        if (elementType == 'latestposts') {
+
+            // No image
+            Session.set('imageNeeded', false);
+
+        }
+
+        // Fill depending on choice
+        if (elementType == 'signupbox') {
+
+            // No image
+            Session.set('imageNeeded', true);
+
+            // Add elements
+            $('#builder-container').append("<div class='row'><div class='col-md-12'><input class='form-control' type='text' id='element-title'/></div></div>")
+            $('#builder-container').append("<div class='row'><div class='col-md-12'><input type='text' id='element-content' class='summernote' /></div></div>")
+
+            // Init editor
+            $('#element-content').summernote({
+                height: 100 // set editor height
+            });
+
+            // Build signup picker
+            var fields = "<div class='row'>";
+            fields += "<div class='col-md-6'><input class='form-control' type='text' id='button-text'/></div>";
+            fields += "<div class='col-md-6'><select class='form-control' id='box-id'></select></div>";
+            fields += "</div>";
+
+            // Add fields
+            $('#builder-container').append(fields);
+
+            // Fill
+            Meteor.call('getBoxes', function(err, boxes) {
+
+                $('#box-id').empty();
+
+                for (l = 0; l < boxes.length; l++) {
+                    $('#box-id').append($('<option>', {
+                        value: boxes[l]._id,
+                        text: boxes[l].title
+                    }));
+                }
+
+            });
+
+        }
+
         // Title
         if (elementType == 'title') {
 
@@ -295,6 +358,19 @@ Template.elementBuilder.events({
 
         if (elementType == 'text') {
             element.content = $('#element-content').summernote('code');
+        }
+
+        if (elementType == 'textimage') {
+            element.content = $('#element-content').summernote('code');
+            element.image = Session.get('elementPicture');
+        }
+
+        if (elementType == 'signupbox') {
+            element.content = $('#element-content').summernote('code');
+            element.title = $('#element-title').val();
+            element.image = Session.get('elementPicture');
+            element.button = $('#button-text').val();
+            element.boxId = $('#box-id').val();
         }
 
         if (elementType == 'title') {

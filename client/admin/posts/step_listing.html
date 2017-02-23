@@ -1,0 +1,13 @@
+<template name='stepListing'>
+    <div class='row'>
+        <div class="col-md-1">
+            <input id='step-order-{{_id}}' class='step-order form-control' value='{{order}}'>
+        </div>
+        <div class="col-md-10">
+            <input type="text" id='step-description-{{_id}}' class="step-description summernote" />
+        </div>
+        <div class="col-md-1">
+            <button class='btn btn-danger step-delete'>X</button>
+        </div>
+    </div>
+</template>

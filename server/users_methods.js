@@ -14,7 +14,7 @@ Meteor.methods({
         console.log('Localising post' + post.url);
 
         // Render post
-        Meteor.call('renderPost', post.url, 'US', {});
+        Meteor.call('renderPost', post.url, 'US', {preview: true});
 
         // Refresh post
         var post = Posts.findOne(postId);
@@ -101,7 +101,39 @@ Meteor.methods({
         }
 
     },
+    insertVisitor: function(httpHeaders) {
+
+        // console.log(httpHeaders);
+
+        visitor = {};
+
+        if (httpHeaders['cf-connecting-ip']) {
+            visitor.ip = httpHeaders['cf-connecting-ip'];
+            visitor.country = httpHeaders['cf-ipcountry'];
+        }
+        else {
+            visitor.ip = httpHeaders['x-forwarded-for'];
+        }
+
+        // console.log(visitor);
+        Visitors.insert(visitor);
+
+    },
+    removeVisitor: function(httpHeaders) {
+
+        if (httpHeaders['cf-connecting-ip']) {
+           var ip = httpHeaders['cf-connecting-ip'];
+        }
+        else {
+            var ip = httpHeaders['x-forwarded-for'];
+        }
+
+        Visitors.remove({ip: ip});
+
+    },
     getUserLocation: function(httpHeaders) {
+
+        // console.log(httpHeaders);
 
         if (httpHeaders['cf-ipcountry']) {
             // console.log('Using CloudFlare location')
@@ -109,7 +141,7 @@ Meteor.methods({
             country_code = httpHeaders['cf-ipcountry'];
         } else {
             // console.log('Using direct IP location')
-            country_code = 'UK';
+            country_code = 'US';
         }
 
         return country_code;

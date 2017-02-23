@@ -38,11 +38,38 @@ Template.postListing.helpers({
     },
     statusLabel: function() {
         if (this.status) {
+
             if (this.status == 'draft') {
                 return 'warning';
             }
             if (this.status == 'published') {
-                return 'primary';
+
+                var currentDate = new Date();
+                if ((this.creationDate).getTime() < currentDate.getTime()) {
+                    return 'primary';
+                } else {
+                    return 'success';
+                }
+
+            }
+        }
+
+    },
+    statusMessage: function() {
+        if (this.status) {
+
+            if (this.status == 'draft') {
+                return 'DRAFT';
+            }
+            if (this.status == 'published') {
+
+                var currentDate = new Date();
+                if ((this.creationDate).getTime() < currentDate.getTime()) {
+                    return 'PUBLISHED';
+                } else {
+                    return 'SCHEDULED';
+                }
+
             }
         }
 

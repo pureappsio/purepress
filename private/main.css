@@ -3,6 +3,59 @@ html {
     min-height: 100%;
 }
 
+.step-content {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ingredient-content {
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+
+.step-row {
+    margin-bottom: 20px;
+}
+
+.step-row-title {
+    margin-bottom: 20px;
+}
+
+.step-order-container {
+    text-align: center;
+    margin-right: -30px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.step-order {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: gray;
+    border: 2px solid gray;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 25px;
+}
+
+.ingredient-order {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: gray;
+    border: 2px solid gray;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 25px;
+}
+
 .img-left {
     float: left !important;
     width: 45% !important;
@@ -44,12 +97,15 @@ h2 {
     padding: 15px;
 }
 
-.post-page-container {
-    
+.post-page-container {}
+
+.table {
+    border: 1px solid #dddddd;
 }
 
 .table > tbody > tr > td {
     vertical-align: middle !important;
+    border: 1px solid #dddddd;
 }
 
 .table > tbody {
@@ -57,10 +113,29 @@ h2 {
     font-size: 22px;
 }
 
+#mobile-table {
+    text-align: center !important;
+    font-size: 22px;
+}
+
+.affiliate-row {
+    margin-bottom: 35px;
+}
+
+.affiliate-short {
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.affiliate-rating {
+    margin-bottom: 15px;
+}
+
 .table > thead > tr > th {
     text-align: center !important;
     font-size: 22px;
     vertical-align: middle !important;
+    border: 1px solid #dddddd;
 }
 
 .main-container {
@@ -100,7 +175,6 @@ h2 {
 }
 
 .affiliate-img {
-    
     float: left;
     display: inline !important;
 }
@@ -404,4 +478,37 @@ a:active {
 .pricing-feature {
     padding-top: 10px;
     padding-bottom: 10px;
+}
+
+#mobile-table {
+    display: none !important;
+}
+
+@media all and (max-width: 640px) {
+    #desktop-table {
+        display: none !important;
+    }
+    #mobile-table {
+        display: block !important;
+    }
+    /*table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block !important;
+        border: none !important;
+    }
+    tr {
+        margin-bottom: 25px !important;
+    }
+    td {
+        position: relative !important;
+    }
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }*/
 }

@@ -112,7 +112,7 @@ Meteor.methods({
             // Get lists
             var url = "https://" + integration.url + "/api/products/" + productId + "?key=" + integration.key;
             var answer = HTTP.get(url);
-            console.log(answer.data.product);
+            // console.log(answer.data.product);
             return answer.data.product;
 
         } else {
@@ -130,11 +130,11 @@ Meteor.methods({
 
             // Get lists
             var url = "https://" + integration.url + "/api/pages?key=" + integration.key;
-            
+
             // Brand connected?
             if (integration.brand) {
                 url += '&brand=' + integration.brand;
-            } 
+            }
 
             var answer = HTTP.get(url);
             return answer.data.pages;
@@ -178,6 +178,9 @@ Meteor.methods({
             }
             if (query.subscriber) {
                 url += '&subscriber=' + query.subscriber;
+            }
+            if (query.location) {
+                url += '&location=' + query.location;
             }
             if (query.discount) {
                 url += '&discount=' + query.discount;

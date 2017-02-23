@@ -12,7 +12,7 @@
     </div>
     <div class='row'>
         <div class="col-md-4">
-            <span class="label label-{{statusLabel}}">{{status}}</span>
+            <span class="label label-{{statusLabel}}">{{statusMessage}}</span>
         </div>
         <div class="col-md-4">
             <button id='post-publish' class='btn btn-block btn-primary'>Publish</button>
@@ -51,21 +51,22 @@
                 <option value='general'>Generic</option>
                 <option value='affiliate'>Affiliate Reviews</option>
                 <option value='podcast'>Podcast</option>
+                <option value='recipe'>Recipe</option>
             </select>
         </div>
     </div>
     <div class='row podcast-url-selector'>
         <div class="col-md-6">
-            <input id='podcast-url' class='form-control' value='{{podcastUrl}}' placeholder="Podcast file URL">
+            {{> uploadForm imageId="podcastEpisode"}}
         </div>
         <div class="col-md-2">
             <button id='get-data' class='btn btn-primary btn-block'>Get Data</button>
         </div>
         <div class="col-md-2">
-            <input id='podcast-size' class='form-control' value='{{podcastSize}}' placeholder="Podcast size (Ex: 29500)">
+            <input id='podcast-size' class='form-control' value='{{podcastFileSize}}' placeholder="Podcast file size (Ex: 29500)">
         </div>
         <div class="col-md-2">
-            <input id='podcast-duration' class='form-control' value='{{podcastDuration}}' placeholder="Podcast length (Ex: 18:50)">
+            <input id='podcast-duration' class='form-control' value='{{podcastDuration}}' placeholder="Podcast audio length (Ex: 18:50)">
         </div>
     </div>
     <h3>Featured Picture</h3>
@@ -73,25 +74,15 @@
         <div class='col-md-12'>
             {{> uploadForm imageId="featuredPicture"}}
         </div>
-        <!--   <div class='col-md-6'>
-            <input id='featuredPicture' class="form-control" value={{featuredPicture}}>
-        </div> -->
     </div>
     <div class='main-content'>
-        <h3>Content</h3>
-        {{#if areAmazonLinks}}
+        <h3>Content</h3> {{#if areAmazonLinks}}
         <div class='row'>
             <div class='col-md-6'>
                 {{#if areBadLinks}}
-
                 <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span>
-
-                <div>{{#each link in badLinksDetail}}
-
-                    {{link.text}} ({{link.link}})
-
-                {{/each}}</div>
-
+                <div>{{#each link in badLinksDetail}} {{link.text}} ({{link.link}}) {{/each}}
+                </div>
                 {{else if notChecked}}
                 <span class="label label-warning">Warning! You should check Amazon links in this article.</span> {{else}}
                 <span class="label label-success">Everything is ok, all Amazon links in the article are valid :)</span> {{/if}}
@@ -106,7 +97,7 @@
         {{/if}}
         <div class='row'>
             <div class='col-md-12'>
-                <input type="text" id='post-content'/>
+                <input type="text" id='post-content' />
                 <div>Words: {{wordCount}}</div>
             </div>
         </div>
@@ -119,6 +110,40 @@
         <div class='row'>
             <div class='col-md-12'>
                 {{imgLink}}
+            </div>
+        </div>
+    </div>
+    <div class='recipe-content'>
+        <h3>Post Introduction</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                <input type="text" id='post-recipe-introduction' class="summernote" />
+            </div>
+        </div>
+        <h3>Insert Ingredient</h3>
+        <div class='row'>
+            <div class='col-md-6'>
+                <input type="text" id='ingredient-description' class="form-control" />
+            </div>
+            <div class='col-md-6'>
+                <button class='btn btn-primary btn-block' id='ingredient-add'>Add Ingredient</button>
+            </div>
+        </div>
+        {{#each ingredients}} {{> ingredientListing}} {{/each}}
+        <h3>Insert Step</h3>
+        <div class='row'>
+            <div class='col-md-8'>
+                <input type="text" id='step-description' class="summernote" />
+            </div>
+            <div class='col-md-4'>
+                <button class='btn btn-primary btn-block' id='step-add'>Add Step</button>
+            </div>
+        </div>
+        {{#each steps}} {{> stepListing}} {{/each}}
+        <h3>Post Conclusion</h3>
+        <div class='row'>
+            <div class='col-md-12'>
+                <input type="text" id='post-recipe-conclusion' class="summernote" />
             </div>
         </div>
     </div>
@@ -171,20 +196,13 @@
                 <button class='btn btn-primary btn-block' id='affiliate-add'>Add Element</button>
             </div>
         </div>
-        <h3>Affiliate Elements</h3>
-        {{#if areAmazonLinks}}
+        <h3>Affiliate Elements</h3> {{#if areAmazonLinks}}
         <div class='row'>
             <div class='col-md-6'>
                 {{#if areBadLinks}}
-                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span> 
-
-                <div>{{#each link in badLinksDetail}}
-
-                    {{link.text}} ({{link.link}})
-
-                {{/each}}</div>
-
-
+                <span class="label label-danger">Warning! You have {{badLinks}} bad Amazon links in this article.</span>
+                <div>{{#each link in badLinksDetail}} {{link.text}} ({{link.link}}) {{/each}}
+                </div>
                 {{else if notChecked}}
                 <span class="label label-warning">Warning! You should check Amazon links in this article.</span> {{else}}
                 <span class="label label-success">Everything is ok, all Amazon links in the article are valid :)</span> {{/if}}
@@ -196,8 +214,7 @@
                 <button class='btn btn-primary btn-block' id='fix-links'>Fix Amazon Links</button>
             </div>
         </div>
-        {{/if}}
-        {{#each affiliateListings}} {{> affiliateElementListing}} {{/each}}
+        {{/if}} {{#each affiliateListings}} {{> affiliateElementListing}} {{/each}}
         <h3>Post Middle Content (optional)</h3>
         <div class='row'>
             <div class='col-md-12'>
@@ -230,7 +247,7 @@
             <div id='saved'>Saved!</div>
         </div>
         <div class="col-md-4">
-            <a class='btn btn-info btn-block' href='/{{url}}'>Preview</a>
+            <a target="_blank" class='btn btn-info btn-block' href='/{{url}}?preview=true'>Preview</a>
         </div>
         <div class="col-md-4">
             <a class='btn btn-warning btn-block' href='/admin/panel'>Come Back</a>

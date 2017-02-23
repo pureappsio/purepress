@@ -16,123 +16,54 @@
         <div class='post-info post-info-single'>{{formatDate creationDate}} / by {{userName}}</div>
     </div>
 </div>
+<!-- Introduction -->
 <div class='row'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
         <div class='post-content'>{{{introduction}}}</div>
     </div>
 </div>
-<div class='row'>
+<!-- Ingredients -->
+<div class='row step-row-title'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
-        {{#if isAffiliateTheme 'default'}}
-        <table class='table'>
-            <thead>
-                <tr>
-                    <th>Rating</th>
-                    <th>Product</th>
-                    <th>Our Rating</th>
-                    <th>Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each element in elements}}
-                <tr>
-                    <td>
-                        <div class='affiliate-rank'>{{element.rank}}</div>
-                    </td>
-                    <td>
-                        <div class='affiliate-product'>
-                            <a href='{{element.link}}'>{{element.title}}</a>
-                        </div>
-                    </td>
-                    <td>
-                        <div class='affiliate-rating'>{{{rating element}}}</div>
-                    </td>
-                    <td><a href='{{element.link}}' class='affiliate-button btn btn-primary'>CHECK PRICES</a></td>
-                </tr>
-                {{/each}}
-            </tbody>
-        </table>
-        {{/if}} {{#if isAffiliateTheme 'picture'}}
-        <div id='desktop-table'>
-            <table class='table'>
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Summary</th>
-                        <th>Our Rating</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each element in elements}}
-                    <tr>
-                        <td>
-                            <div class='affiliate-product'>
-                                <a href='{{element.link}}'>
-                                {{element.title}}
-                            </a></div>
-                            <a href='{{element.link}}'>
-                                <img class='affiliate-picture-table' src='{{elementImage element}}'>
-                            </a>
-                        </td>
-                        <td>
-                            <div class='affiliate-short'>{{{element.shortDescription}}}
-                            </div>
-                        </td>
-                        <td>
-                            <div class='affiliate-rating'>{{{rating element}}}</div>
-                        </td>
-                        <td><a href='{{element.link}}' class='affiliate-button btn btn-primary'>CHECK PRICES</a></td>
-                    </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-        <div id='mobile-table'>
-            {{#each element in elements}}
-            <div class='row affiliate-row'>
-                <div class='col-md-3 affiliate-product'>
-                    <div class='affiliate-product'>
-                        <a href='{{element.link}}'>
-                                {{element.title}}
-                            </a></div>
-                    <a href='{{element.link}}'>
-                        <img class='affiliate-picture-table' src='{{elementImage element}}'>
-                    </a>
-                </div>
-                <div class='col-md-3 affiliate-short'>
-                    {{{element.shortDescription}}}
-                </div>
-                <div class='col-md-3 affiliate-rating'>
-                    {{{rating element}}}
-                </div>
-                <div class='col-md-3'><a href='{{element.link}}' class='affiliate-button btn btn-block btn-primary'>CHECK PRICES</a></div>
-            </div>
-            {{/each}}
-        </div>
-        {{/if}}
+        <h2>{{#if langEN}}Ingredients{{else}}Ingrédients{{/if}}</h2>
     </div>
 </div>
-{{#if hasMiddleContent}}
-<div class='row'>
+{{#each ingredient in ingredients}}
+<div class='row step-row'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
-        <div class='post-content'>{{{middle}}}</div>
-    </div>
-</div>
-{{/if}} {{#each element in elements}} {{#if hasDescription element}}
-<div class='row'>
-    <div class='col-md-2'></div>
-    <div class='col-md-8'>
-        <div class='affiliate-title'><a href='{{element.link}}'>{{element.title}}</a></div>
         <div class='post-content'>
-            <a href='{{element.link}}'><img class='affiliate-img' src='{{elementImage element}}'></a>{{{element.description}}}
+
+            <div class='ingredient-order'>+</div> 
+
+            <div class='ingredient-content'>{{{ingredient.description}}}</div>
         </div>
     </div>
 </div>
-{{/if}} {{/each}}
+{{/each}}
+<!-- Steps -->
+<div class='row step-row-title'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <h2>{{#if langEN}}Directions{{else}}Préparation{{/if}}</h2>
+    </div>
+</div>
+{{#each step in steps}}
+<div class='row step-row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-1 step-order-container'><div class='step-order'>{{step.order}}</div> </div>
+    <div class='col-md-7'>
+        <div class='post-content'>
+
+            <div class='step-content'>{{{step.description}}}</div>
+
+            </div>
+    </div>
+</div>
+{{/each}}
+<!-- Conclusion -->
 <div class='row'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
@@ -176,8 +107,10 @@
                     </div>
                     <input name="list" type="hidden" value="{{listId}}" />
                     <input name="origin" type="hidden" value="{{origin}}" />
-                    <input name="sequence" type="hidden" value="{{sequenceId}}" /> {{#each tag in tags}}
-                    <input name="tag" type="hidden" value="{{tag}}" /> {{/each}}
+                    <input name="sequence" type="hidden" value="{{sequenceId}}" />
+                    {{#each tag in tags}}
+                        <input name="tag" type="hidden" value="{{tag}}" />
+                    {{/each}}
                 </form>
                 <div class='popup-disclaimer'>{{#if langEN}}We won’t send you spam. Unsubscribe at any time.{{else}}Je ne vous enverrai jamais de spam. Vous pouvez vous désincrire à tout moment.{{/if}}
                 </div>

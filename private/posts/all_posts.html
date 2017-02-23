@@ -15,14 +15,20 @@
 <div class='row'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
-        <div class='post-info'>{{formatDate post.creationDate}} / by {{userName}}</div>
+        <div class='post-info'>
+        {{#if langEN}}{{formatDate post.creationDate}} / by {{userName}} {{else}}
+        {{formatDateFR post.creationDate}} / par {{userName}}
+        {{/if}}
+        </div>
     </div>
 </div>
 <div class='row post-content-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
+        {{#if isExcerpt post}}
         <div class='post-content'>{{{post.excerpt}}}</div>
-        <div class='post-content'><a href='/{{post.url}}'>Read more ...</a></div>
+        {{/if}}
+        <div class='post-content'><a href='/{{post.url}}'>{{#if langEN}}Read more ...{{else}}Lire la suite ...{{/if}}</a></div>
     </div>
 </div>
 {{/each}}

@@ -25,7 +25,8 @@ Template.uploadForm.events({
             var upload = Images.insert({
                 file: e.currentTarget.files[0],
                 streams: 'dynamic',
-                chunkSize: 'dynamic'
+                chunkSize: 'dynamic',
+                transport: 'http'
             }, false);
 
             upload.on('start', function() {
@@ -40,6 +41,7 @@ Template.uploadForm.events({
                     console.log(fileObj);
                     if (imageId != "") {
                         Session.set(imageId, fileObj._id);
+                        Session.set(imageId + 'Length', fileObj.size);
                         Session.set(imageId + 'Link', '/cdn/storage/Images/' + fileObj._id + '/original/' + fileObj._id + '.' + fileObj.ext);
                     } else {
                         Session.set('fileId', fileObj._id);

@@ -53,13 +53,20 @@ Template.postEdit.onRendered(function() {
         if (this.data.category == 'affiliate') {
             $('.main-content').hide();
             $('.affiliate-content').show();
+            $('.recipe-content').hide();
+        } else if (this.data.category == 'recipe') {
+            $('.main-content').hide();
+            $('.affiliate-content').hide();
+            $('.recipe-content').show();
         } else {
             $('.main-content').show();
             $('.affiliate-content').hide();
+            $('.recipe-content').hide();
         }
     } else {
         $('.main-content').show();
         $('.affiliate-content').hide();
+        $('.recipe-content').hide();
     }
 
     // Init editor
@@ -71,6 +78,19 @@ Template.postEdit.onRendered(function() {
                 Session.set('wordCount', content.trim().split(/\s+/).length);
             }
         }
+        // popover: {
+        //     image: [
+        //         ['custom', ['imageAttributes']],
+        //         ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+        //         ['float', ['floatLeft', 'floatRight', 'floatNone']],
+        //         ['remove', ['removeMedia']]
+        //     ]
+        // },
+        // imageAttributes:{
+        //     imageDialogLayout:'default', // default|horizontal
+        //     icon:'<i class="note-icon-pencil"/>',
+        //     removeEmpty:false // true = remove attributes | false = leave empty if present
+        // }
     });
 
     // Init post content
@@ -122,6 +142,28 @@ Template.postEdit.onRendered(function() {
 
     // Init editor
     $('#post-conclusion').summernote({
+        minHeight: 100 // set editor height
+    });
+
+    $('#post-recipe-conclusion').summernote({
+        minHeight: 100 // set editor height
+    });
+
+
+    $('#post-recipe-introduction').summernote({
+        minHeight: 100 // set editor height
+    });
+
+    if (this.data.introduction) {
+        $('#post-recipe-introduction').summernote('code', this.data.introduction);
+    }
+
+    if (this.data.conclusion) {
+        $('#post-recipe-conclusion').summernote('code', this.data.conclusion);
+    }
+
+
+    $('#step-description').summernote({
         minHeight: 100 // set editor height
     });
 
@@ -193,6 +235,7 @@ Template.postEdit.events({
 
         // Create element
         var element = {
+            type: 'affiliate',
             rank: $('#affiliate-rank').val(),
             rating: $('#affiliate-rating').val(),
             title: $('#affiliate-title').val(),
@@ -211,30 +254,59 @@ Template.postEdit.events({
         Meteor.call('createPostElement', element);
 
     },
+    'click #ingredient-add': function() {
+
+        // Create element
+        var element = {
+            type: 'ingredient',
+            description: $('#ingredient-description').val(),
+            postId: this._id
+        }
+
+        // Add element
+        Meteor.call('createPostElement', element);
+
+    },
+    'click #step-add': function() {
+
+        // Create element
+        var element = {
+            type: 'step',
+            description: $('#step-description').summernote('code'),
+            postId: this._id
+        }
+
+        // Add element
+        Meteor.call('createPostElement', element);
+
+    },
     'click #get-data': function() {
 
-        Meteor.call('getMP3Data', $('#podcast-url').val(), function(err, data) {
-
-            $('#podcast-size').val(data.size);
-            $('#podcast-duration').val(data.duration);
-
-        });
+        $('#podcast-size').val(Session.get('podcastEpisodeLength'));
 
     },
     'click #post-category, change #post-category': function() {
 
         if ($('#post-category :selected').val() == 'podcast') {
             $('.podcast-url-selector').show();
-        } else {
-            $('.podcast-url-selector').hide();
-        }
-
-        if ($('#post-category :selected').val() == 'affiliate') {
-            $('.main-content').hide();
-            $('.affiliate-content').show();
-        } else {
             $('.main-content').show();
             $('.affiliate-content').hide();
+            $('.recipe-content').hide();
+        } else if ($('#post-category :selected').val() == 'affiliate') {
+            $('.podcast-url-selector').hide();
+            $('.main-content').hide();
+            $('.affiliate-content').show();
+            $('.recipe-content').hide();
+        } else if ($('#post-category :selected').val() == 'recipe') {
+            $('.podcast-url-selector').hide();
+            $('.main-content').hide();
+            $('.affiliate-content').hide();
+            $('.recipe-content').show();
+        } else {
+            $('.podcast-url-selector').hide();
+            $('.main-content').show();
+            $('.affiliate-content').hide();
+            $('.recipe-content').hide();
         }
 
     },
@@ -258,7 +330,21 @@ Template.postEdit.events({
         }
 
         if ($('#post-category :selected').val() == 'podcast') {
-            post.podcastUrl = $('#podcast-url').val();
+            // post.podcastUrl = $('#podcast-url').val();
+
+            if (this.podcastFileId) {
+                post.podcastFileId = this.podcastFileId;
+            }
+
+            if (this.podcastUrl) {
+                post.podcastUrl = this.podcastUrl;
+            }
+
+            // Get podcast file
+            if (Session.get('podcastEpisode')) {
+                post.podcastFileId = Session.get('podcastEpisode');
+            }
+
             post.podcastDuration = $('#podcast-duration').val();
             post.podcastSize = $('#podcast-size').val();
             post.content = $('#post-content').summernote('code');
@@ -268,6 +354,11 @@ Template.postEdit.events({
             post.introduction = $('#post-introduction').summernote('code');
             post.conclusion = $('#post-conclusion').summernote('code');
             post.middle = $('#post-middle').summernote('code');
+        }
+
+        if ($('#post-category :selected').val() == 'recipe') {
+            post.introduction = $('#post-recipe-introduction').summernote('code');
+            post.conclusion = $('#post-recipe-conclusion').summernote('code');
         }
 
         if (this.featuredPicture) {
@@ -306,6 +397,15 @@ Template.postEdit.events({
 
 Template.postEdit.helpers({
 
+    podcastFileSize: function() {
+
+        if (Session.get('podcastEpisodeLength')) {
+            return Session.get('podcastEpisodeLength')
+        } else if (this.podcastSize) {
+            return this.podcastSize;
+        }
+
+    },
     wordCount: function() {
 
         return Session.get('wordCount');
@@ -341,19 +441,52 @@ Template.postEdit.helpers({
     imgLink: function() {
         return Session.get('imgLink');
     },
+    ingredients: function() {
+        return Elements.find({ postId: this._id, type: 'ingredient' }, { sort: { order: 1 } });
+    },
+    steps: function() {
+        return Elements.find({ postId: this._id, type: 'step' }, { sort: { order: 1 } });
+    },
     affiliateListings: function() {
-        return Elements.find({ postId: this._id }, { sort: { rank: 1 } });
+        return Elements.find({ $or: [{ postId: this._id, type: 'affiliate' }, { postId: this._id, type: { $exists: false } }] }, { sort: { rank: 1 } });
     },
     categories: function() {
         return Categories.find({});
     },
     statusLabel: function() {
         if (this.status) {
+
             if (this.status == 'draft') {
                 return 'warning';
             }
             if (this.status == 'published') {
-                return 'primary';
+
+                var currentDate = new Date();
+                if ((this.creationDate).getTime() < currentDate.getTime()) {
+                    return 'primary';
+                } else {
+                    return 'success';
+                }
+
+            }
+        }
+
+    },
+    statusMessage: function() {
+        if (this.status) {
+
+            if (this.status == 'draft') {
+                return 'DRAFT';
+            }
+            if (this.status == 'published') {
+
+                var currentDate = new Date();
+                if ((this.creationDate).getTime() < currentDate.getTime()) {
+                    return 'PUBLISHED';
+                } else {
+                    return 'SCHEDULED';
+                }
+
             }
         }
 

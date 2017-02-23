@@ -364,11 +364,15 @@ Meteor.methods({
             pages.push({ number: i });
         }
 
+        // Get posts
+        var currentDate = new Date();
+        var postQuery = { status: 'published', creationDate: { $lte: currentDate } };
+
         if (categoryId !== undefined) {
-            var posts = Posts.find({ postCategory: categoryId, status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
-        } else {
-            var posts = Posts.find({ status: 'published' }, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
+            postQuery.postCategory = categoryId;
         }
+
+        var posts = Posts.find(postQuery, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
 
         // Make groups
         var groups = [];
@@ -412,6 +416,13 @@ Meteor.methods({
             pages: function() {
                 return pages;
             },
+            isExcerpt: function(post) {
+                if (post.excerpt == '<p><br></p>' || post.excerpt == '') {
+                    return false;
+                } else {
+                    return true;
+                }
+            },
             isActive: function(page) {
                 if (page.number == pageNumber) {
                     return true;
@@ -432,10 +443,27 @@ Meteor.methods({
                 return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
             },
             formatDate: function(date) {
-                return moment(date).format('MMMM Do YYYY');
+                return moment(date).locale("en").format('LL');
+            },
+            formatDateFR: function(date) {
+                return moment(date).locale("fr").format('LL');
             },
             userName: function() {
                 return Metas.findOne({ type: 'userName' }).value;
+            },
+            langEN: function() {
+
+                if (Metas.findOne({ type: 'language' })) {
+
+                    if (Metas.findOne({ type: 'language' }).value == 'fr') {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+
             }
         });
 
@@ -456,10 +484,20 @@ Meteor.methods({
         // Find post or page
         if (Posts.findOne({ url: postUrl }) || Pages.findOne({ url: postUrl })) {
 
-            // Query
-            if (Posts.findOne({ url: postUrl, status: 'published' })) {
-                var post = Posts.findOne({ url: postUrl });
+            // Look for posts
+            if (query.preview) {
+
+                if (Posts.findOne({ url: postUrl })) {
+                    var post = Posts.findOne({ url: postUrl });
+                }
+
+            } else {
+                if (Posts.findOne({ url: postUrl, status: 'published' })) {
+                    var post = Posts.findOne({ url: postUrl });
+                }
             }
+
+            // Look for pages
             if (Pages.findOne({ url: postUrl })) {
                 var post = Pages.findOne({ url: postUrl });
             }
@@ -471,6 +509,7 @@ Meteor.methods({
                 // console.log('Returning external page');
 
                 // Get page
+                query.location = location;
                 var page = Meteor.call('getPurePage', post.purePageId, query);
 
                 // Get header
@@ -657,6 +696,14 @@ Meteor.methods({
 
                         // Helpers
                         Template.postTemplate.helpers({
+
+                            integrationUrl: function() {
+
+                                if (Integrations.findOne({ type: 'puremail' })) {
+                                    return Integrations.findOne({ type: 'puremail' }).url;
+                                }
+
+                            },
                             langEN: function() {
 
                                 if (Metas.findOne({ type: 'language' })) {
@@ -778,7 +825,99 @@ Meteor.methods({
                         // Get Meteor URL
                         var websiteUrl = Meteor.absoluteUrl();
 
-                        if (post.category == 'affiliate') {
+                        if (post.category == 'recipe') {
+
+                            // Compile
+                            SSR.compileTemplate('postTemplate', Assets.getText('posts/recipe_template.html'));
+
+                            // Helpers
+                            Template.postTemplate.helpers({
+
+                                langEN: function() {
+
+                                    if (Metas.findOne({ type: 'language' })) {
+
+                                        if (Metas.findOne({ type: 'language' }).value == 'fr') {
+                                            return false;
+                                        } else {
+                                            return true;
+                                        }
+                                    } else {
+                                        return true;
+                                    }
+
+                                },
+                                integrationUrl: function() {
+
+                                    if (Integrations.findOne({ type: 'puremail' })) {
+                                        return Integrations.findOne({ type: 'puremail' }).url;
+                                    }
+
+                                },
+                                postImage: function(featuredPicture) {
+
+                                    var image = Images.findOne(featuredPicture);
+                                    if (image) {
+                                        return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
+                                    }
+                                },
+                                formatDate: function(date) {
+                                    return moment(date).format('MMMM Do YYYY');
+                                },
+                                userName: function() {
+                                    return Metas.findOne({ type: 'userName' }).value;
+                                },
+                                isEmailBox: function() {
+                                    if (this.signupBox) {
+                                        if (this.signupBox != 'none') {
+                                            return true;
+                                        } else {
+                                            return false;
+                                        }
+                                    } else {
+                                        return false;
+                                    }
+                                },
+                                signupBoxContent: function() {
+                                    return Boxes.findOne(this.signupBox).boxContent;
+                                },
+                                signupPopupContent: function() {
+                                    return Boxes.findOne(this.signupBox).popupContent;
+                                },
+                                tags: function() {
+                                    return Boxes.findOne(this.signupBox).tags;
+                                },
+                                listId: function() {
+                                    return Integrations.findOne({ type: 'puremail' }).list;
+                                },
+                                sequenceId: function(element) {
+                                    return Boxes.findOne(this.signupBox).sequence;
+                                },
+                                steps: function() {
+                                    return Elements.find({ postId: this._id, type: 'step' }, { sort: { order: 1 } });
+                                },
+                                ingredients: function() {
+                                    return Elements.find({ postId: this._id, type: 'ingredient' }, { sort: { order: 1 } });
+                                },
+                                siteUrl: function() {
+                                    return websiteUrl;
+                                },
+                                disqusId: function() {
+                                    if (Metas.findOne({ type: 'disqus' })) {
+                                        return Metas.findOne({ type: 'disqus' }).value;
+                                    }
+
+                                },
+                                origin: function() {
+                                    if (query.origin) {
+                                        return query.origin;
+                                    } else {
+                                        return 'blog';
+                                    }
+                                }
+                            });
+
+                        } else if (post.category == 'affiliate') {
 
                             // Get theme
                             if (Metas.findOne({ type: 'affiliateTheme' })) {
@@ -804,6 +943,13 @@ Meteor.methods({
                                         }
                                     } else {
                                         return true;
+                                    }
+
+                                },
+                                integrationUrl: function() {
+
+                                    if (Integrations.findOne({ type: 'puremail' })) {
+                                        return Integrations.findOne({ type: 'puremail' }).url;
                                     }
 
                                 },
@@ -847,7 +993,7 @@ Meteor.methods({
                                     return Boxes.findOne(this.signupBox).sequence;
                                 },
                                 elements: function() {
-                                    return Elements.find({ postId: this._id }, { sort: { rank: 1 } });
+                                    return Elements.find({ $or: [{ postId: this._id, type: 'affiliate' }, { postId: this._id, type: { $exists: false } }] }, { sort: { rank: 1 } });
                                 },
                                 elementImage: function(element) {
                                     if (element.picture) {
@@ -930,11 +1076,27 @@ Meteor.methods({
                                     }
                                 },
                                 isPodcast: function() {
-                                    if (this.podcastUrl) {
+                                    if (this.podcastUrl || this.podcastFileId) {
                                         return true;
                                     } else {
                                         return false;
                                     }
+                                },
+                                podcastLink: function() {
+                                    if (this.podcastUrl) {
+                                        return this.podcastUrl;
+                                    }
+                                    if (this.podcastFileId) {
+                                        var file = Images.findOne(this.podcastFileId);
+                                        return '/cdn/storage/Images/' + file._id + '/original/' + file._id + '.' + file.ext;
+                                    }
+                                },
+                                integrationUrl: function() {
+
+                                    if (Integrations.findOne({ type: 'puremail' })) {
+                                        return Integrations.findOne({ type: 'puremail' }).url;
+                                    }
+
                                 },
                                 langEN: function() {
 

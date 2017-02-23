@@ -159,6 +159,7 @@ Template.admin.events({
         var title = $('#post-title').val();
 
         title = title.replace(/ /g, "-");
+        title = title.replace(/:/g, "");
 
         // Fill URL
         $('#post-url').val(title.toLowerCase());

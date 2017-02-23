@@ -32,7 +32,10 @@ Meteor.methods({
         xml += '<generator>PurePress</generator>';
 
         // Items
-        var posts = Posts.find({});
+        var currentDate = new Date();
+        var postQuery = { status: 'published' , creationDate: {$lte: currentDate}};
+        
+        var posts = Posts.find(postQuery);
 
         posts.forEach(function(post) {
 
@@ -109,6 +112,15 @@ Meteor.methods({
 
             posts.forEach(function(post) {
 
+                // Build URL
+                if (post.podcastUrl) {
+                    podcastUrl = post.podcastUrl;
+                }
+                if (post.podcastFileId) {
+                    var file = Images.findOne(post.podcastFileId);
+                    podcastUrl = Meteor.absoluteUrl() + 'cdn/storage/Images/' + file._id + '/original/' + file._id + '.' + file.ext;
+                }
+
                 // Form XML
                 xml += '<item>';
                 xml += '<title><![CDATA[' + post.title + ']]></title>';
@@ -116,7 +128,7 @@ Meteor.methods({
                 xml += '<link>' + Meteor.absoluteUrl() + post.url + '</link>';
                 xml += '<pubDate>' + moment(post.creationDate).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</pubDate>';
                 xml += '<category><![CDATA[Podcast]]></category>';
-                xml += '<enclosure url="' + post.podcastUrl + '" length="' + post.podcastSize + '" type="audio/mpeg" />'
+                xml += '<enclosure url="' + podcastUrl + '" length="' + post.podcastSize + '" type="audio/mpeg" />'
                 xml += '<itunes:subtitle><![CDATA[' + itunesSubtitle + ']]></itunes:subtitle>';
                 xml += '<itunes:summary><![CDATA[' + post.content + ']]></itunes:summary>';
                 xml += '<itunes:author><![CDATA[' + itunesAuthor + ']]></itunes:author>';

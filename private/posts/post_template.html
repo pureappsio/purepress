@@ -23,7 +23,7 @@
         {{#if isPodcast}}
         <div class='post-audio'>
             <audio controls style="width:100%;">
-                <source src="{{podcastUrl}}" type="audio/mpeg">
+                <source src="{{podcastLink}}" type="audio/mpeg">
             </audio>
         </div>
         {{/if}}
@@ -57,7 +57,7 @@
                 <div class='popup-message'>
                     {{#if langEN}}Simply enter your email below, and you’ll be on your way!{{else}}Pour continuer, entrez votre email ci-dessous!{{/if}}
                 </div>
-                <form accept-charset="utf-8" action="https://email.schwartzindustries.com/subscribe" method="POST">
+                <form accept-charset="utf-8" action="https://{{integrationUrl}}/subscribe" method="POST">
                     <div class='popup-input-container'>
                         <input id='email' name='email' type="email" class="form-control input-lg" placeholder="{{#if langEN}}Your email ...{{else}}Votre email ...{{/if}}">
                     </div>

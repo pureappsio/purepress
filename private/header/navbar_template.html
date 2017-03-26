@@ -1,52 +1,29 @@
-  <nav class="navbar navbar-default">
-  <div class="container">
-    <!-- Brand and toggle get grouped for better mobile display -->
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="/">
-        <img alt="PurePress" src="{{logoLink}}">
-      </a>
-    </div>
-
-    <!-- Collect the nav links, forms, and other content for toggling -->
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-
-      <ul class="nav navbar-nav navbar-right">
-
-        {{#each menuElement in menuElements}}
-
-          {{#if isDropdown menuElement}}
-
-            <li class="dropdown">
-            <a href="{{menuElement.link}}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{menuElement.name}}</a>
-            <ul class="dropdown-menu">
-              {{#each subMenuElements menuElement}}
-                <li><a href="{{link}}">{{name}}</a></li>
-              {{/each}}
+<nav style="{{backgroundColor}}" class="navbar navbar-toggleable-md {{navbarStyle}}">
+    <div class="container">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+            <img alt="PurePress" src="{{logoLink}}">
+        </a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto"></ul>
+            <ul class="navbar-nav">
+                {{#each menuElement in menuElements}} {{#if isDropdown menuElement}}
+                <li class="nav-item">
+                    <a href="{{menuElement.link}}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{menuElement.name}}</a>
+                    <ul class="dropdown-menu">
+                        {{#each subMenuElements menuElement}}
+                        <li><a href="{{link}}">{{name}}</a></li>
+                        {{/each}}
+                    </ul>
+                </li>
+                {{else}}
+                <li class='nav-item'><a class="nav-link" href="{{menuElement.link}}">{{menuElement.name}}</a></li>
+                {{/if}} {{/each}} {{#each network in networks}}
+                <li class='nav-item nav-icons'><a class="nav-link" href="{{network.link}}"><span class="fa fa-{{network.type}}"></span></a></li>
+                {{/each}}
             </ul>
-          </li>
-
-          {{else}}
-
-            <li><a href="{{menuElement.link}}">{{menuElement.name}}</a></li>
-
-          {{/if}}
-
-        {{/each}}
-
-        {{#each network in networks}}
-
-          <li><a href="{{network.link}}"><span class="fa fa-{{network.type}}"></span></a></li>
-
-        {{/each}}
-
-      </ul>
-
-    </div><!-- /.navbar-collapse -->
-  </div><!-- /.container-fluid -->
+        </div>
+    </div>
 </nav>

@@ -2,14 +2,14 @@
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
-        <img class='img-responsive' src='{{elementImage element}}'>
+        <img class='img-fluid' src='{{elementImage element}}'>
     </div>
 </div>
 {{/if}} {{#if isElementType element 'imagehalf'}}
 <div class='row element-container'>
     <div class='col-md-4'></div>
     <div class='col-md-4'>
-        <img class='img-responsive' src='{{elementImage element}}'>
+        <img class='img-fluid' src='{{elementImage element}}'>
     </div>
 </div>
 {{/if}} {{#if isElementType element 'latestposts'}}
@@ -23,7 +23,7 @@
     <div class='col-md-4'>
         <div class='post-page-container'>
             <a href='/{{post.url}}'>
-                <div class='post-featured'><img class='img-responsive' src='{{postImage post.featuredPicture}}'></div>
+                <div class='post-featured'><img class='img-fluid' src='{{postImage post.featuredPicture}}'></div>
             </a>
             <div class='post-title all-post-title all-post-title-square'><a href='/{{post.url}}'>{{post.title}}</a></div>
             <div class='post-info'>{{formatDate post.creationDate}} / by {{userName}}</div>
@@ -54,7 +54,7 @@
         </div>
     </div>
     <div class='col-md-3'>
-        <img class='img-responsive' src='{{elementImage element}}'>
+        <img class='img-fluid' src='{{elementImage element}}'>
     </div>
 </div>
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -98,7 +98,7 @@
     <div class='col-md-2'></div>
     {{#if isImage element}}
     <div class='col-md-2'>
-        <a href='{{element.link}}'><img class='img-responsive' src='{{elementImage element}}'></a>
+        <a href='{{element.link}}'><img class='img-fluid' src='{{elementImage element}}'></a>
     </div>
     <div class='col-md-6'>
         <div class='resource-title'><a href='{{element.link}}'>{{element.title}}</a></div>
@@ -126,7 +126,7 @@
 </div>
 {{/if}} {{#if isElementType element 'fullwidthpicture'}}
 <div class='row full-width-image'>
-    <img class='img-responsive' src='{{elementImage element}}'>
+    <img class='img-fluid' src='{{elementImage element}}'>
 </div>
 {{/if}} {{#if isElementType element 'title'}}
 <div class='row element-container'>
@@ -179,11 +179,11 @@
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-4'>
-        <a href='{{element.linkOne}}'><img class='img-responsive' src='{{element.pictureOne}}'></a>
+        <a href='{{element.linkOne}}'><img class='img-fluid' src='{{element.pictureOne}}'></a>
     </div>
     {{#if isPictureTwo element}}
     <div class='col-md-4'>
-        <a href='{{element.linkTwo}}'><img class='img-responsive' src='{{element.pictureTwo}}'></a>
+        <a href='{{element.linkTwo}}'><img class='img-fluid' src='{{element.pictureTwo}}'></a>
     </div>{{/if}}
 </div>
 {{/if}} {{#if isElementType element 'store'}}
@@ -191,7 +191,7 @@
     {{#each product in products}}
     <div class='col-md-4 store-product'>
         <div class='product-image'>
-            <a href='{{product.salesPageUrl}}?origin=direct'><img class='img-responsive' src='{{product.image}}'></a>
+            <a href='{{product.salesPageUrl}}?origin=direct'><img class='img-fluid' src='{{product.image}}'></a>
         </div>
         <div class='product-name'><a href='{{product.salesPageUrl}}?origin=direct'>{{product.name}}</a></div>
     </div>

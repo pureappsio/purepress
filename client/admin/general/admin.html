@@ -133,13 +133,11 @@
                     <button id='publish-posts' class='btn btn-block btn-primary'>Publish All Posts</button>
                 </div>
             </div>
-
             <div class='row'>
                 <div class='col-md-12'>
                     <button id='spot-dead-links' class='btn btn-block btn-primary'>Spot Dead Links</button>
                 </div>
             </div>
-
             <div class='row'>
                 <div class='col-md-12'>
                     <button id='localise-all-posts' class='btn btn-block btn-primary'>Localise All Posts</button>
@@ -285,6 +283,9 @@
                 <div class='col-md-2'>
                     <button id='set-theme' class='btn btn-block btn-primary'>Set Theme</button>
                 </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "theme"}}
+                </div>
             </div>
             <h3>Set Affiliate Theme</h3>
             <div class='row'>
@@ -296,6 +297,9 @@
                 </div>
                 <div class='col-md-2'>
                     <button id='set-affiliate-theme' class='btn btn-block btn-primary'>Set Theme</button>
+                </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "affiliateTheme"}}
                 </div>
             </div>
             <h3>Set Blog Theme</h3>
@@ -309,6 +313,9 @@
                 <div class='col-md-2'>
                     <button id='set-blog-theme' class='btn btn-block btn-primary'>Set Blog Theme</button>
                 </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "blogTheme"}}
+                </div>
             </div>
             <h3>Set Language</h3>
             <div class='row'>
@@ -320,6 +327,9 @@
                 </div>
                 <div class='col-md-2'>
                     <button id='set-language' class='btn btn-block btn-primary'>Set Language</button>
+                </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "language"}}
                 </div>
             </div>
         </div>

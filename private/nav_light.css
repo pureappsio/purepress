@@ -1,0 +1,26 @@
+.navbar-brand {
+    padding: 0px;
+}
+
+.navbar-brand>img {
+    max-width: 225px;
+}
+
+.navbar {
+    border-bottom: 1px solid lightgray;
+}
+
+.navbar-toggler {
+    margin-top: 23px !important;
+    min-height: 40px !important;
+}
+
+.nav-item {
+    font-size: 22px !important;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.nav-icons {
+    padding-top: 4px;
+}

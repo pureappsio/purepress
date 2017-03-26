@@ -206,43 +206,8 @@ h2 {
     height: auto;
 }
 
-.navbar-nav {
-    font-size: 22px;
-    color: black;
-}
-
 .post-content-container {
     margin-bottom: 25px;
-}
-
-.navbar-brand {
-    padding: 0px;
-    margin: 0px;
-}
-
-.navbar-brand img {
-    margin-top: -30px;
-    max-width: 225px;
-}
-
-.navbar {
-    min-height: 90px !important;
-    background-color: white !important;
-    margin: 0px !important;
-    border-radius: 0 !important;
-    -moz-border-radius: 0 !important;
-}
-
-.navbar-nav > li > a,
-.navbar-brand {
-    padding-top: 33px !important;
-    padding-bottom: 33px !important;
-    height: 90px;
-}
-
-.navbar-toggle {
-    margin-top: 23px !important;
-    min-height: 40px !important;
 }
 
 .post-title a {

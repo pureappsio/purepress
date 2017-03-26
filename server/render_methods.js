@@ -1,4 +1,5 @@
 var cheerio = Npm.require("cheerio");
+var minify = Npm.require('html-minifier').minify;
 
 Meteor.methods({
 
@@ -92,7 +93,22 @@ Meteor.methods({
 
         // Load css
         var css = Assets.getText('main.css');
-        var style = Assets.getText('style.css');
+
+        if (Metas.findOne({ type: 'theme' })) {
+
+            var value = Metas.findOne({ type: 'theme' }).value;
+
+            if (value == 'black') {
+                var navStyle = Assets.getText('nav_dark.css');
+
+            } else {
+                var navStyle = Assets.getText('nav_light.css');
+
+            }
+
+        } else {
+            var navStyle = Assets.getText('nav_light.css');
+        }
 
         // Load GA tracking code
         if (Metas.findOne({ type: 'analytics' })) {
@@ -199,30 +215,18 @@ Meteor.methods({
                 var faviconId = Metas.findOne({ type: "favicon" }).value;
                 var image = Images.findOne(faviconId);
                 return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
-            },
-            isBlackTheme: function() {
-
-                // Load theme
-                if (Metas.findOne({ type: 'theme' })) {
-                    theme = Metas.findOne({ type: 'theme' }).value;
-                    if (theme == 'black') {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
-
             }
         });
 
         var headerHtml = SSR.render('header', {
             css: css,
-            style: style,
+            navStyle: navStyle,
             trackingCode: trackingCode,
             pixelId: pixelId
         });
+
+        // Minify
+        headerHtml = minify(headerHtml, { minifyCSS: true, minifyJS: true })
 
         return headerHtml;
 
@@ -299,6 +303,37 @@ Meteor.methods({
             },
             networks: function() {
                 return Networks.find({}, { sort: { order: 1 } });
+            },
+            backgroundColor: function() {
+
+                // Check style
+                if (Metas.findOne({ type: 'theme' })) {
+                    var theme = Metas.findOne({ type: 'theme' }).value;
+
+                    if (theme == 'black') {
+                        return 'background-color: #000000;';
+                    } else {
+                        return 'background-color: #FFFFFF;';
+                    }
+                } else {
+                    return 'background-color: #FFFFFF;';
+                }
+
+            },
+            navbarStyle: function() {
+
+                // Check style
+                if (Metas.findOne({ type: 'theme' })) {
+                    var theme = Metas.findOne({ type: 'theme' }).value;
+
+                    if (theme == 'black') {
+                        return 'navbar-light navbar-inverse';
+                    } else {
+                        return 'navbar-light';
+                    }
+                } else {
+                    return 'navbar-light';
+                }
             }
         });
 
@@ -1178,6 +1213,16 @@ Meteor.methods({
 
                     // Render
                     var rawHtml = SSR.render('postTemplate', post);
+
+                    // Highlight
+                    $ = cheerio.load(rawHtml);
+                    $('pre').each(function(i, elem) {
+
+                        $(elem).removeClass('EnlighterJSRAW');
+
+                    });
+
+                    rawHtml = $.html();
 
                     // Save
                     if (post.type) {

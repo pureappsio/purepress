@@ -111,7 +111,9 @@ Template.admin.events({
     },
     'click #localise-all-posts': function() {
 
-        Meteor.call('localiseAllPosts');
+        Meteor.call('localiseAllPosts', function(err, data) {
+            alert("All posts localised!");
+        });
 
     },
     'click #set-dates-posts': function() {

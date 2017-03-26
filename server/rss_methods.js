@@ -33,8 +33,8 @@ Meteor.methods({
 
         // Items
         var currentDate = new Date();
-        var postQuery = { status: 'published' , creationDate: {$lte: currentDate}};
-        
+        var postQuery = { status: 'published', creationDate: { $lte: currentDate } };
+
         var posts = Posts.find(postQuery);
 
         posts.forEach(function(post) {
@@ -108,7 +108,7 @@ Meteor.methods({
             xml += '</itunes:category>';
 
             // Items
-            var posts = Posts.find({ category: 'podcast' });
+            var posts = Posts.find({ status: 'published', category: 'podcast' });
 
             posts.forEach(function(post) {
 
@@ -141,8 +141,7 @@ Meteor.methods({
             xml += '</channel>'
             xml += '</rss>'
 
-        }
-        else {
+        } else {
             var xml = "";
         }
 

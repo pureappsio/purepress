@@ -1,12 +1,9 @@
 <template name="pricingElement">
-   
-    <div class='row'>
-        <div class='col-md-6'>
-            {{name}}
-        </div>
-        <div class='col-md-3'>
-            <button class='btn btn-block btn-danger pricing-delete'>Delete</button>
-        </div>
+    <div class='col-md-4'>
+        <input id='name-{{_id}}' type='text' value='{{name}}' class='modify-element form-control'>
+        <input id='price-{{_id}}' type='text' value='{{price}}' class='modify-element form-control'>
+        <input id='button-{{_id}}' type='text' value='{{button}}' class='modify-element form-control'>
+        <input id='link-{{_id}}' type='text' value='{{link}}' class='modify-element form-control'>
+        <button class='btn btn-block btn-danger pricing-delete'>Delete</button>
     </div>
-
 </template>

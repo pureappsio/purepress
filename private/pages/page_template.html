@@ -126,7 +126,9 @@
 </div>
 {{/if}} {{#if isElementType element 'fullwidthpicture'}}
 <div class='row full-width-image'>
-    <img class='img-fluid' src='{{elementImage element}}'>
+    <div class='col-md-12 full-width-image-col'>
+        <img class='img-fluid' src='{{elementImage element}}'>
+    </div>
 </div>
 {{/if}} {{#if isElementType element 'title'}}
 <div class='row element-container'>
@@ -198,23 +200,47 @@
     {{/each}}
 </div>
 {{/if}} {{#if isElementType element 'pricing'}}
-<div class='row element-container'>
-    <div class='col-md-2'></div>
-    <div class='col-md-8'>
-        {{#each pricing in pricingElements}}
-        <div class='col-md-4'>
-            <div class='pricing-element'>
-                <div class='pricing-name'>{{pricing.name}}</div>
-                <div class='pricing-price'>{{pricing.price}}</div>
-                {{#each pricingFeature in pricing.features}}
-                <div class='pricing-feature'>{{pricingFeature}}</div>
-                {{/each}}
-                <div class='pricing-button-container'>
-                    <a href='{{pricing.link}}' class='pricing-button btn btn-primary'>{{pricing.button}}</a>
+<div class='row voffset30 element-container'>
+    <div class='col-md-1'></div>
+    <div class='col-md-10'>
+        <div class='row'>
+            <div class='col-md-3'></div>
+            {{#each pricing in pricingElements}}
+            <div class='col-md-3'>
+                <div class='pricing-element'>
+                    <div class='pricing-name'>{{pricing.name}}</div>
+                    <div class='pricing-price'>{{pricing.price}}</div>
+                    <div class='pricing-button-container'>
+                        <a href='{{pricing.link}}' class='pricing-button btn btn-warning outline'>{{pricing.button}}</a>
+                    </div>
                 </div>
             </div>
+            {{/each}}
+        </div>
+        {{#each structure in pricingData}}
+        <div class='row row-pricing-data'>
+            <div class='col-md-3 pricing-structure'>
+                <a data-toggle="tooltip" title="{{structure.explainer}}">
+                    <span class='pricing-structure-text'>{{structure.name}}</span>
+                </a>
+            </div>
+            {{#each data in structure.data}}
+            <div class='col-md-3 pricing-data'>
+                {{data}}
+            </div>
+            {{/each}}
         </div>
         {{/each}}
+        <div class='row voffset30'>
+            <div class='col-md-3'></div>
+            {{#each pricing in pricingElements}}
+            <div class='col-md-3 pricing-data'>
+                <div class='pricing-button-container'>
+                    <a href='{{pricing.link}}' class='pricing-button btn btn-warning outline'>{{pricing.button}}</a>
+                </div>
+            </div>
+            {{/each}}
+        </div>
     </div>
 </div>
 {{/if}} {{#if isElementType element 'portfolio'}}
@@ -295,13 +321,13 @@
         </div>
     </div>
 </div>
-<!-- Modal -->
+<!-- Signup Modal -->
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header popup-title">
+                <h5 class="modal-title popup-title" id="myModalLabel">{{#if langEN}}Get Your Free Resource Now!{{else}}Recevez votre ressource gratuite maintenant!{{/if}}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title popup-title" id="myModalLabel">{{#if langEN}}Get Your Free Resource Now!{{else}}Recevez votre ressource gratuite maintenant!{{/if}}</h4>
             </div>
             <div class="modal-body popup-content">
                 {{{signupPopupContent element}}}

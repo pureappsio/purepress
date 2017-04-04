@@ -5,10 +5,10 @@ Template.pageEdit.onRendered(function() {
         height: 400 // set editor height
     });
 
-    // Init post content
-    if (this.data.content) {
-        $('#page-content').summernote('code', this.data.content);
-    }
+    // // Init post content
+    // if (this.data.content) {
+    //     $('#page-content').summernote('code', this.data.content);
+    // }
 
 });
 
@@ -28,7 +28,6 @@ Template.pageEdit.events({
             title: $('#page-title').val(),
             url: $('#page-url').val(),
             cached: false,
-            content: $('#page-content').summernote('code'),
             userId: Meteor.user()._id,
             _id: this._id,
             type: this.type

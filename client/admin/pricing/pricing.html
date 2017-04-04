@@ -1,43 +1,40 @@
 <template name="pricing">
-    <h3>Pricing</h3>
+    <h3>Pricing Structure</h3>
     <div class='row'>
         <div class='col-md-3'>
-             <label>Option Name</label>
+            <label>Element Name</label>
+            <input class='form-control' id='element-name' placeholder="Element name ...">
+        </div>
+        <div class='col-md-3'>
+            <label>Element explainer</label>
+            <input class='form-control' id='element-explainer' placeholder="Element explainer ...">
+        </div>
+        <div class='col-md-3'>
+            <label>Add</label>
+            <button id='create-pricing-element' class='btn btn-block btn-primary'>Create Pricing Element</button>
+        </div>
+    </div>
+    {{#each pricingStructures}} {{> pricingStructure}} {{/each}}
+    <h3>Pricing Elements</h3>
+    <div class='row'>
+        <div class='col-md-3'>
+            <label>Option Name</label>
             <input class='form-control' id='option-name' placeholder="Option name ...">
         </div>
         <div class='col-md-3'>
-             <label>Option Price</label>
+            <label>Option Price</label>
             <input class='form-control' id='option-price' placeholder="Option price ...">
         </div>
-         <div class='col-md-3'>
-             <label>Option Button</label>
+        <div class='col-md-3'>
+            <label>Option Button</label>
             <input class='form-control' id='option-button' placeholder="Option button ...">
         </div>
-         <div class='col-md-3'>
-             <label>Option Link</label>
+        <div class='col-md-3'>
+            <label>Option Link</label>
             <input class='form-control' id='option-link' placeholder="Option link ...">
         </div>
     </div>
-    <div class='row'>
-        <div class='col-md-2'>
-            <input class='form-control' id='feature-1' placeholder="Feature ...">
-        </div>
-        <div class='col-md-2'>
-            <input class='form-control' id='feature-2' placeholder="Feature ...">
-        </div>
-        <div class='col-md-2'>
-            <input class='form-control' id='feature-3' placeholder="Feature ...">
-        </div>
-        <div class='col-md-2'>
-            <input class='form-control' id='feature-4' placeholder="Feature ...">
-        </div>
-        <div class='col-md-2'>
-            <input class='form-control' id='feature-5' placeholder="Feature ...">
-        </div>
-        <div class='col-md-2'>
-            <input class='form-control' id='feature-6' placeholder="Feature ...">
-        </div>
-    </div>
+    {{#each pricingStructures}} {{> pricingStructureDisplay}} {{/each}}
     <div class='row'>
         <div class='col-md-12'>
             <button id='create-pricing' class='btn btn-block btn-lg btn-primary'>Create Pricing Row</button>

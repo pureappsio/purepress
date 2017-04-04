@@ -19,8 +19,20 @@
                     </ul>
                 </li>
                 {{else}}
-                <li class='nav-item'><a class="nav-link" href="{{menuElement.link}}">{{menuElement.name}}</a></li>
-                {{/if}} {{/each}} {{#each network in networks}}
+                <li class='nav-item'>
+                    {{#if isTextLink menuElement}}
+                    <a class="nav-link" href="{{menuElement.link}}">{{menuElement.name}}</a>{{/if}}
+                </li>
+                {{/if}} {{/each}}
+            </ul>
+            {{#if areButtons menuElements}}
+            <form class="menu-form form-inline my-2 my-lg-0">
+                {{#each menuElement in menuElements}} {{#if isTextLink menuElement}} {{else}}
+                <a href='{{menuElement.link}}' class="btn btn-secondary small-outline">{{menuElement.name}}</a> {{/if}} {{/each}}
+            </form>
+            {{/if}}
+            <ul class="navbar-nav">
+                {{#each network in networks}}
                 <li class='nav-item nav-icons'><a class="nav-link" href="{{network.link}}"><span class="fa fa-{{network.type}}"></span></a></li>
                 {{/each}}
             </ul>

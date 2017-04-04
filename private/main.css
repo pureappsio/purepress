@@ -3,6 +3,46 @@ html {
     min-height: 100%;
 }
 
+.btn {
+    cursor: pointer;
+}
+
+.menu-form {
+    margin-right: 10px;
+}
+
+.btn.outline {
+    background: none;
+    padding: 12px 22px;
+}
+
+.btn-warning.outline {
+    border: 2px solid orange;
+    color: orange;
+}
+
+.btn.small-outline {
+    font-size: 22px !important;
+    background: none;
+    padding: 6px 22px;
+}
+
+.btn-secondary.small-outline {
+    border: 2px solid black;
+    color: black;
+}
+
+.btn-secondary.small-outline:hover {
+    border: 2px solid black;
+    color: white;
+    background-color: #ffbb33;
+    border: 2px solid #ffbb33;
+}
+
+.voffset30 {
+    margin-top: 30px !important;
+}
+
 .step-content {
     display: inline-block;
     vertical-align: middle;
@@ -326,8 +366,13 @@ a:active {
 }
 
 .full-width-image {
-    text-align: center;
-    margin-top: 0px !important;
+/*    text-align: center;
+*/    /*margin: 0 !important;
+    padding: 0 !important;
+*/}
+
+.full-width-image-col {
+    padding: 0 !important;
 }
 
 .signup-container {
@@ -410,34 +455,54 @@ a:active {
     margin-top: 15px;
 }
 
+.row-pricing-data {
+    margin-top: 25px;
+}
+
+.pricing-structure {
+    text-align: right;
+}
+
+.pricing-structure-text {
+    border-bottom: 1px dotted #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.pricing-data {
+    text-align: center;
+}
+
 .pricing-element {
     text-align: center;
-    border: 1px solid gray;
+    border: 1px solid lightgray;
+    border-radius: 10px;
     font-size: 20px;
+    box-shadow: 0px 2px 8px 0px rgba(0,0,0,0.08);
 }
 
 .pricing-name {
-    font-size: 24px;
-    background-color: #CCCCCC;
+    font-size: 18px;
+
     padding-top: 10px;
-    padding-bottom: 10px;
+    text-transform: uppercase;
 }
 
 .pricing-price {
-    font-size: 26px;
-    background-color: #EEEEEE;
+    font-size: 34px;
+
     padding-top: 10px;
     padding-bottom: 10px;
 }
 
 .pricing-button-container {
-    background-color: #EEEEEE;
     padding-top: 10px;
-    padding-bottom: 10px;
+    padding-bottom: 20px;
+    text-transform: uppercase;
 }
 
 .pricing-button {
-    font-size: 22px !important;
+    font-size: 18px !important;
 }
 
 .pricing-feature {

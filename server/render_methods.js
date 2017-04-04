@@ -283,6 +283,37 @@ Meteor.methods({
 
         // Helpers
         Template.navbar.helpers({
+
+            areButtons: function(menuElements) {
+
+                var areButtons = false;
+
+                for (i in menuElements) {
+                    if (menuElements[i].style) {
+                        if (menuElements[i].style == 'secondary') {
+                            areButtons = true;
+                        }
+                    }
+                }
+
+                return areButtons;
+
+            },
+            isTextLink: function(menuElement) {
+
+                if (menuElement.style) {
+
+                    if (menuElement.style == 'text') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+
+                } else {
+                    return true;
+                }
+
+            },
             menuElements: function() {
                 return Menus.find({ parent: { $exists: false } }, { sort: { order: 1 } });
             },
@@ -341,6 +372,32 @@ Meteor.methods({
         var navbarHtml = SSR.render('navbar');
 
         return navbarHtml;
+
+    },
+    renderExitModal: function(boxId) {
+
+        // Compile navbar
+        SSR.compileTemplate('modal', Assets.getText('modals/exit_modal_template.html'));
+
+        // Find box 
+        var box = Boxes.findOne(boxId);
+
+        // Helpers
+        Template.modal.helpers({
+
+            listId: function() {
+                return Integrations.findOne({ type: 'puremail' }).list;
+            },
+            integrationUrl: function() {
+                return Integrations.findOne({ type: 'puremail' }).url;
+            }
+
+        });
+
+        // Render
+        var html = SSR.render('modal', box);
+
+        return html;
 
     },
     renderAllPosts: function(pageNumber, categoryId, url) {
@@ -478,10 +535,14 @@ Meteor.methods({
                 return '/cdn/storage/Images/' + image._id + '/original/' + image._id + '.' + image.ext;
             },
             formatDate: function(date) {
-                return moment(date).locale("en").format('LL');
+                var localLocale = moment(date);
+                localLocale.locale('en');
+                return localLocale.format('LL');
             },
             formatDateFR: function(date) {
-                return moment(date).locale("fr").format('LL');
+                var localLocale = moment(date);
+                localLocale.locale('fr');
+                return localLocale.format('LL');
             },
             userName: function() {
                 return Metas.findOne({ type: 'userName' }).value;
@@ -547,11 +608,29 @@ Meteor.methods({
                 query.location = location;
                 var page = Meteor.call('getPurePage', post.purePageId, query);
 
-                // Get header
-                var header = Meteor.call('getPurePageHeader', post.purePageId);
+                // Choose header
+                if (page.model == 'saas') {
 
-                // Return
-                return header.html + "<body><div class='container-fluid main-container'>" + page.html + "</div></body>";
+                    // Render header & navbar
+                    var headerParameters = { title: page.title, url: Meteor.absoluteUrl() + postUrl };
+                    if (Meteor.settings.useChat == true) {
+                        headerParameters.useChat = true;
+                    }
+
+                    headerHtml = Meteor.call('returnHeader', headerParameters);
+
+                    navbarHtml = Meteor.call('returnNavbar');
+                    footerHtml = Meteor.call('returnFooter');
+
+                    return headerHtml + "<body>" + navbarHtml + "<div>" + page.html + "</div>" + footerHtml + "</body>";
+
+                } else {
+
+                    // Get header
+                    var header = Meteor.call('getPurePageHeader', post.purePageId);
+                    return header.html + "<body><div class='container-fluid main-container'>" + page.html + "</div></body>";
+
+                }
 
             } else if (post.type == 'category') {
 
@@ -628,6 +707,7 @@ Meteor.methods({
                                 var storeProduct = Meteor.call('getProductData', allProducts[i].productId);
 
                                 if (storeProduct) {
+
                                     // Get sales page
                                     var salesPageUrl = Pages.findOne(allProducts[i].pageId).url;
                                     storeProduct.salesPageUrl = salesPageUrl;
@@ -718,13 +798,49 @@ Meteor.methods({
                             var positions = {};
                         }
 
-                        // Build pricing elements for pricing page
-                        var pricingElements = [];
-                        if (Pricing.find({}).fetch().length > 0) {
+                        // Pricing
+                        if (Meteor.call('hasElement', post._id, 'pricing')) {
 
-                            pricingElements = Pricing.find({}).fetch();
+                            // Get all elements
+                            var pricingElements = Pricing.find({ type: 'element' }, { sort: { order: 1 } }).fetch();
+                            var pricingStructures = Pricing.find({ type: 'structure' }, { sort: { order: 1 } }).fetch();
 
+                            // Combine
+                            pricingData = [];
+                            for (i in pricingStructures) {
+                                var pricingLine = pricingStructures[i];
+
+                                var data = [];
+                                for (j in pricingElements) {
+                                    data.push(pricingElements[j].features[pricingLine._id]);
+                                }
+                                pricingLine.data = data;
+                                pricingData.push(pricingLine);
+                            }
+
+                            console.log(pricingData);
+
+
+                        } else {
+                            var pricingElements = [];
+                            var pricingStructures = [];
+                            var pricingData = [];
                         }
+
+                        // Exit intent
+                        // if (Meteor.call('hasElement', post._id, 'signupbox')) {
+
+                        //     var element = Meteor.call('getElement', post._id, 'signupbox');
+                        //     var exitIntentHtml = Meteor.call('renderExitModal', element.boxId);
+
+                        // }
+
+                        // if (Meteor.call('hasElement', post._id, 'emailsignup')) {
+
+                        //     var element = Meteor.call('getElement', post._id, 'emailsignup');
+                        //     var exitIntentHtml = Meteor.call('renderExitModal', element.boxId);
+
+                        // }
 
                         // Latest posts
                         var posts = Posts.find({}, { sort: { creationDate: -1 }, limit: 2 });
@@ -786,16 +902,25 @@ Meteor.methods({
                             },
                             signupBoxContent: function(element) {
                                 if (element.type == 'emailsignup' || element.type == 'signupbox') {
-                                    return Boxes.findOne(element.boxId).boxContent;
+                                    if (Boxes.findOne(element.boxId)) {
+                                        return Boxes.findOne(element.boxId).boxContent;
+                                    }
+
                                 }
                             },
                             signupPopupContent: function(element) {
                                 if (element.type == 'emailsignup' || element.type == 'signupbox') {
-                                    return Boxes.findOne(element.boxId).popupContent;
+                                    if (Boxes.findOne(element.boxId)) {
+                                        return Boxes.findOne(element.boxId).popupContent;
+                                    }
+
                                 }
                             },
                             tags: function(element) {
-                                return Boxes.findOne(element.boxId).tags;
+                                if (Boxes.findOne(element.boxId)) {
+                                    return Boxes.findOne(element.boxId).tags;
+                                }
+
                             },
                             listId: function(element) {
                                 if (element.type == 'emailsignup' || element.type == 'signupbox') {
@@ -804,7 +929,10 @@ Meteor.methods({
                             },
                             sequenceId: function(element) {
                                 if (element.type == 'emailsignup' || element.type == 'signupbox') {
-                                    return Boxes.findOne(element.boxId).sequence;
+                                    if (Boxes.findOne(element.boxId)) {
+                                        return Boxes.findOne(element.boxId).sequence;
+                                    }
+
                                 }
                             },
                             products: function() {
@@ -812,6 +940,12 @@ Meteor.methods({
                             },
                             pricingElements: function() {
                                 return pricingElements;
+                            },
+                            pricingStructures: function() {
+                                return pricingStructures;
+                            },
+                            pricingData: function() {
+                                return pricingData;
                             },
                             isPictureTwo: function(element) {
                                 if (element.pictureTwo != "") {
@@ -1148,7 +1282,14 @@ Meteor.methods({
 
                                 },
                                 formatDate: function(date) {
-                                    return moment(date).format('MMMM Do YYYY');
+                                    var localLocale = moment(date);
+                                    localLocale.locale('en');
+                                    return localLocale.format('LL');
+                                },
+                                formatDateFR: function(date) {
+                                    var localLocale = moment(date);
+                                    localLocale.locale('fr');
+                                    return localLocale.format('LL');
                                 },
                                 userName: function() {
                                     return Metas.findOne({ type: 'userName' }).value;
@@ -1168,6 +1309,14 @@ Meteor.methods({
                                         }
                                     } else {
                                         return false;
+                                    }
+                                },
+                                signupBoxTitle: function() {
+                                    if (Boxes.findOne(this.signupBox)) {
+                                        if (Boxes.findOne(this.signupBox).displayTitle) {
+                                            return Boxes.findOne(this.signupBox).displayTitle;
+                                        }
+
                                     }
                                 },
                                 signupBoxContent: function() {
@@ -1227,6 +1376,11 @@ Meteor.methods({
                     // Save
                     if (post.type) {
 
+                        // Add modal?
+                        // if (exitIntentHtml) {
+                        //     rawHtml += exitIntentHtml;
+                        // }
+
                         if (query.origin) {
                             Pages.update({ url: postUrl }, { $set: { cached: false, html: rawHtml } })
                         } else {
@@ -1238,15 +1392,9 @@ Meteor.methods({
                     } else {
 
                         // Process for affiliate links
-                        // var countryCode = Meteor.call('getCountryCodeLocation', location);
                         var renderedHtml = Meteor.call('rawProcessHTMLAmazon', rawHtml);
 
-                        // if (query.origin) {
-                        //     Posts.update({ url: postUrl }, { $set: { cached: {}, html: html } })
-                        // } else {
-
                         // Get cache & html
-                        // var cache = post.cached;
                         if (post.html) {
                             var html = post.html;
                         } else {

@@ -362,8 +362,9 @@ Template.admin.events({
         // Element
         var menuElement = {
             userId: Meteor.user()._id,
-            name: $(' #menu-name').val(),
-            type: $(' #menu-type :selected').val()
+            name: $('#menu-name').val(),
+            type: $('#menu-type :selected').val(),
+            style: $('#menu-style :selected').val()
         }
 
         // Get type

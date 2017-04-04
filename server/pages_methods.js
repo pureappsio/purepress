@@ -12,6 +12,18 @@ Meteor.methods({
         }
 
     },
+    getElement: function(pageId, elementType) {
+
+        // Get all elements with type
+        if (Elements.findOne({ pageId: pageId, type: elementType })) {
+            console.log('has element');
+            return Elements.findOne({ pageId: pageId, type: elementType });
+        } else {
+            console.log('no element');
+            return false;
+        }
+
+    },
     changeOrderPage: function(elementId, change) {
 
         // Get elements
@@ -39,16 +51,60 @@ Meteor.methods({
         }
 
     },
+    changeOrderPricing: function(elementId, change) {
 
+        // Get elements
+        var pageElement = Pricing.findOne(elementId);
+        var elements = Pricing.find({ type: pageElement.type, order: { $exists: true } }, { sort: { order: -1 } }).fetch();
+        console.log('Pricing lements: ' + elements.length);
+
+        if ((change == -1 && pageElement.order != 1) || (change == 1 && pageElement.order != elements.length)) {
+
+            console.log('Changing order of page element');
+
+            // Update element
+            Pricing.update(elementId, { $inc: { order: change } });
+
+            // Update other element
+            Pricing.update({ type: pageElement.type, order: pageElement.order + change }, { $inc: { order: -1 * change } });
+
+            // Flush cache
+            Meteor.call('flushCache');
+
+        } else {
+
+            console.log('Doing nothing');
+
+        }
+
+    },
     createPricing: function(pricing) {
+
+        // Add order
+        var elements = Pricing.find({ type: pricing.type }).fetch();
+        var order = elements.length + 1;
+        pricing.order = order;
 
         console.log(pricing);
         Pricing.insert(pricing);
+
+        // Flush cache
+        Meteor.call('flushCache');
+
+    },
+    updatePricing: function(pricing) {
+
+        console.log(pricing);
+
+        Pricing.update(pricing._id, { $set: pricing });
 
     },
     deletePricing: function(pricing) {
 
         Pricing.remove(pricing);
+
+        // Flush cache
+        Meteor.call('flushCache');
 
     },
     copyPage: function(data) {
@@ -295,6 +351,16 @@ Meteor.methods({
 
         // Remove
         Elements.remove(elementId);
+
+        // Set page as not cached anymore
+        Pages.update(element.pageId, { $set: { cached: false } });
+
+    },
+    editPageElement: function(element) {
+
+        // Remove
+        console.log(element);
+        Elements.update(element._id, { $set: element });
 
         // Set page as not cached anymore
         Pages.update(element.pageId, { $set: { cached: false } });

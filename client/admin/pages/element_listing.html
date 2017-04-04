@@ -7,7 +7,14 @@
             </div>
         </div>
         <div class="col-md-2">{{type}}</div>
-        <div class="col-md-8">{{content}}</div>
+        <div class="col-md-7">
+            <div id='content-{{_id}}'>{{content}}</div>
+        </div>
+        <div class="col-md-1">
+            {{#if isText}}
+            <button class='btn btn-warning element-edit'>Edit</button>
+            {{/if}}
+        </div>
         <div class="col-md-1">
             <button class='btn btn-danger element-delete'>X</button>
         </div>

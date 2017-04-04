@@ -13,6 +13,7 @@ Template.boxes.events({
             boxContent: $('#box-content').summernote('code'),
             popupContent: $('#popup-content').summernote('code'),
             tags: $('#tags-id').val(),
+            displayTitle: $('#box-display-title').val()
         }
 
         // Save

@@ -1,9 +1,9 @@
 .navbar-brand {
-    padding: 0px;
+    padding: 0px !important;
 }
 
 .navbar-brand>img {
-    max-width: 225px;
+    max-width: 225px !important;
 }
 
 .navbar {
@@ -17,10 +17,10 @@
 
 .nav-item {
     font-size: 22px !important;
-    margin-right: 5px;
-    margin-left: 5px;
+    margin-right: 5px !important;
+    margin-left: 5px !important;
 }
 
 .nav-icons {
-    padding-top: 4px;
+    padding-top: 4px !important;
 }

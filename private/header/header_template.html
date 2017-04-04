@@ -37,8 +37,6 @@
     {{navStyle}}
     </style>
 
-    
-
     {{#if useChat}}
 
 <!-- 
@@ -128,13 +126,12 @@ var trackOutboundLink = function(url) {
     });
   </script>
 
- <!-- <script type="text/javascript">
+ <script type="text/javascript">
     $(document).ready(function() {
-        // Leaving
-        $(window).bind('beforeunload', function() {
-            $.get("/api/leaving");
-        });
+        $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
     });
-</script> -->
+</script>
 
 </head>

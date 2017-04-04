@@ -1,13 +1,13 @@
 .navbar-brand {
-    padding: 0px;
+    padding: 0px !important;
 }
 
 .nav {
-	color: white !important;
+    color: white !important;
 }
 
 .navbar-brand>img {
-    max-width: 225px;
+    max-width: 225px !important;
 }
 
 .navbar-toggler {
@@ -26,5 +26,5 @@
 }
 
 .nav-link {
-	color: white !important;
+    color: white !important;
 }

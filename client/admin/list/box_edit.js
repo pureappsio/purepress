@@ -13,7 +13,8 @@ Template.boxEdit.events({
             boxContent: $('#box-content').summernote('code'),
             popupContent: $('#popup-content').summernote('code'),
             tags: $('#tags-id').val(),
-            _id: this._id
+            _id: this._id,
+            displayTitle: $('#box-display-title').val()
         }
 
         // Save

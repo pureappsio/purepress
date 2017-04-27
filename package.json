@@ -6,6 +6,7 @@
   "dependencies": {
     "babel-runtime": "*",
     "bcrypt": "*",
+    "chart.js": "^2.5.0",
     "cheerio": "*",
     "html-minifier": "^3.3.3",
     "jsmediatags": "*",

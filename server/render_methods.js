@@ -127,6 +127,11 @@ Meteor.methods({
         // Helpers
         Template.header.helpers({
 
+            appUrl: function() {
+
+                return Meteor.absoluteUrl();
+
+            },
             twitterLinked: function() {
 
                 if (Networks.findOne({ type: 'twitter' })) {
@@ -575,10 +580,15 @@ Meteor.methods({
 
 
     },
+
+
     renderPost: function(postUrl, location, query) {
 
         // Find post or page
         if (Posts.findOne({ url: postUrl }) || Pages.findOne({ url: postUrl })) {
+
+            // Get Meteor URL
+            var websiteUrl = Meteor.absoluteUrl();
 
             // Look for posts
             if (query.preview) {
@@ -597,6 +607,35 @@ Meteor.methods({
             if (Pages.findOne({ url: postUrl })) {
                 var post = Pages.findOne({ url: postUrl });
             }
+
+            // Insert stat
+            var stat = {
+
+                type: 'visit',
+                date: new Date()
+
+            };
+
+            // Type
+            if (post.type) {
+                stat.pageId = post._id;
+            } else {
+                stat.postId = post._id;
+            }
+
+            // Source
+            if (query.origin) {
+                stat.origin = query.origin;
+            } else {
+                stat.origin = 'organic';
+            }
+
+            // Type
+            if (query.medium) {
+                stat.medium = query.medium;
+            }
+
+            Meteor.call('insertStat', stat);
 
             // Calling another page?
             if (post.type == 'purepages') {
@@ -678,6 +717,28 @@ Meteor.methods({
 
                         // Return cached HTML
                         var postHtml = Meteor.call('getLocalisedHtml', post, location);
+
+                        // Add email box?
+                        if (post.signupBox) {
+
+                            if (post.signupBox != 'none') {
+                                console.log('Adding signup');
+                                var boxHtml = Meteor.call('renderEmailBox', post, query);
+                                postHtml += boxHtml;
+                            }
+                        }
+
+                        // Add disqus?
+                        if (Metas.findOne({ type: 'disqus' })) {
+                            console.log('Adding disqus');
+                            parameters = {
+                                url: post.url,
+                                websiteUrl: websiteUrl
+                            };
+                            var commentHtml = Meteor.call('renderDisqus', parameters);
+                            console.log(commentHtml);
+                            postHtml += commentHtml;
+                        }
 
                     }
 
@@ -989,11 +1050,6 @@ Meteor.methods({
 
                     } else {
 
-                        // console.log('Post not cached, rendering');
-
-                        // Get Meteor URL
-                        var websiteUrl = Meteor.absoluteUrl();
-
                         if (post.category == 'recipe') {
 
                             // Compile
@@ -1016,13 +1072,7 @@ Meteor.methods({
                                     }
 
                                 },
-                                integrationUrl: function() {
 
-                                    if (Integrations.findOne({ type: 'puremail' })) {
-                                        return Integrations.findOne({ type: 'puremail' }).url;
-                                    }
-
-                                },
                                 postImage: function(featuredPicture) {
 
                                     var image = Images.findOne(featuredPicture);
@@ -1047,42 +1097,11 @@ Meteor.methods({
                                         return false;
                                     }
                                 },
-                                signupBoxContent: function() {
-                                    return Boxes.findOne(this.signupBox).boxContent;
-                                },
-                                signupPopupContent: function() {
-                                    return Boxes.findOne(this.signupBox).popupContent;
-                                },
-                                tags: function() {
-                                    return Boxes.findOne(this.signupBox).tags;
-                                },
-                                listId: function() {
-                                    return Integrations.findOne({ type: 'puremail' }).list;
-                                },
-                                sequenceId: function(element) {
-                                    return Boxes.findOne(this.signupBox).sequence;
-                                },
                                 steps: function() {
                                     return Elements.find({ postId: this._id, type: 'step' }, { sort: { order: 1 } });
                                 },
                                 ingredients: function() {
                                     return Elements.find({ postId: this._id, type: 'ingredient' }, { sort: { order: 1 } });
-                                },
-                                siteUrl: function() {
-                                    return websiteUrl;
-                                },
-                                disqusId: function() {
-                                    if (Metas.findOne({ type: 'disqus' })) {
-                                        return Metas.findOne({ type: 'disqus' }).value;
-                                    }
-
-                                },
-                                origin: function() {
-                                    if (query.origin) {
-                                        return query.origin;
-                                    } else {
-                                        return 'blog';
-                                    }
                                 }
                             });
 
@@ -1115,13 +1134,7 @@ Meteor.methods({
                                     }
 
                                 },
-                                integrationUrl: function() {
 
-                                    if (Integrations.findOne({ type: 'puremail' })) {
-                                        return Integrations.findOne({ type: 'puremail' }).url;
-                                    }
-
-                                },
                                 postImage: function(featuredPicture) {
 
                                     var image = Images.findOne(featuredPicture);
@@ -1135,32 +1148,7 @@ Meteor.methods({
                                 userName: function() {
                                     return Metas.findOne({ type: 'userName' }).value;
                                 },
-                                isEmailBox: function() {
-                                    if (this.signupBox) {
-                                        if (this.signupBox != 'none') {
-                                            return true;
-                                        } else {
-                                            return false;
-                                        }
-                                    } else {
-                                        return false;
-                                    }
-                                },
-                                signupBoxContent: function() {
-                                    return Boxes.findOne(this.signupBox).boxContent;
-                                },
-                                signupPopupContent: function() {
-                                    return Boxes.findOne(this.signupBox).popupContent;
-                                },
-                                tags: function() {
-                                    return Boxes.findOne(this.signupBox).tags;
-                                },
-                                listId: function() {
-                                    return Integrations.findOne({ type: 'puremail' }).list;
-                                },
-                                sequenceId: function(element) {
-                                    return Boxes.findOne(this.signupBox).sequence;
-                                },
+
                                 elements: function() {
                                     return Elements.find({ $or: [{ postId: this._id, type: 'affiliate' }, { postId: this._id, type: { $exists: false } }] }, { sort: { rank: 1 } });
                                 },
@@ -1191,9 +1179,7 @@ Meteor.methods({
                                         return false;
                                     }
                                 },
-                                tags: function() {
-                                    return Boxes.findOne(this.signupBox).tags;
-                                },
+
                                 rating: function(element) {
                                     var answer = "";
                                     var fullStars = Math.trunc(element.rating);
@@ -1215,19 +1201,6 @@ Meteor.methods({
                                 },
                                 siteUrl: function() {
                                     return websiteUrl;
-                                },
-                                disqusId: function() {
-                                    if (Metas.findOne({ type: 'disqus' })) {
-                                        return Metas.findOne({ type: 'disqus' }).value;
-                                    }
-
-                                },
-                                origin: function() {
-                                    if (query.origin) {
-                                        return query.origin;
-                                    } else {
-                                        return 'blog';
-                                    }
                                 }
                             });
 
@@ -1300,60 +1273,8 @@ Meteor.methods({
 
                                     }
                                 },
-                                isEmailBox: function() {
-                                    if (this.signupBox) {
-                                        if (this.signupBox != 'none') {
-                                            return true;
-                                        } else {
-                                            return false;
-                                        }
-                                    } else {
-                                        return false;
-                                    }
-                                },
-                                signupBoxTitle: function() {
-                                    if (Boxes.findOne(this.signupBox)) {
-                                        if (Boxes.findOne(this.signupBox).displayTitle) {
-                                            return Boxes.findOne(this.signupBox).displayTitle;
-                                        }
-
-                                    }
-                                },
-                                signupBoxContent: function() {
-                                    if (Boxes.findOne(this.signupBox)) {
-                                        return Boxes.findOne(this.signupBox).boxContent;
-                                    }
-
-                                },
-                                signupPopupContent: function() {
-                                    if (Boxes.findOne(this.signupBox)) {
-                                        return Boxes.findOne(this.signupBox).popupContent;
-                                    }
-                                },
-                                origin: function() {
-                                    if (query.origin) {
-                                        return query.origin;
-                                    } else {
-                                        return 'blog';
-                                    }
-                                },
-                                listId: function() {
-                                    return Integrations.findOne({ type: 'puremail' }).list;
-                                },
-                                sequenceId: function(element) {
-                                    if (Boxes.findOne(this.signupBox)) {
-                                        return Boxes.findOne(this.signupBox).sequence;
-                                    }
-
-                                },
                                 siteUrl: function() {
                                     return websiteUrl;
-                                },
-                                disqusId: function() {
-                                    if (Metas.findOne({ type: 'disqus' })) {
-                                        return Metas.findOne({ type: 'disqus' }).value;
-                                    }
-
                                 }
                             });
 
@@ -1410,11 +1331,33 @@ Meteor.methods({
                         // Get localised HTML
                         var postHtml = Meteor.call('getLocalisedHtml', { html: html }, location);
 
+                        // Add email box?
+                        if (post.signupBox) {
+
+                            if (post.signupBox != 'none') {
+                                console.log('Adding signup');
+                                var boxHtml = Meteor.call('renderEmailBox', post, query);
+                                postHtml += boxHtml;
+                            }
+                        }
+
+                        // Add disqus?
+                        if (Metas.findOne({ type: 'disqus' })) {
+                            console.log('Adding disqus');
+                            parameters = {
+                                url: post.url,
+                                websiteUrl: websiteUrl
+                            };
+                            var commentHtml = Meteor.call('renderDisqus', parameters);
+                            postHtml += commentHtml;
+                        }
+
+
                     }
 
-                    return headerHtml + "<body>" + navbarHtml + "<div class='container-fluid main-container'>" + postHtml + "</div>" + footerHtml + "</body>";
-
                 }
+
+                return headerHtml + "<body>" + navbarHtml + "<div class='container-fluid main-container'>" + postHtml + "</div>" + footerHtml + "</body>";
 
             }
 

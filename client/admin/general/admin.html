@@ -14,8 +14,10 @@
                 <li><a class='section-selector' id="store">Store</a></li>
                 <li><a class='section-selector' id="pricing">Pricing</a></li>
                 <li><a class='section-selector' id="affiliate">Affiliate</a></li>
-                <li><a class='section-selector' id="theme">Theme</a></li>
-                <li><a class='section-selector' id="integrations">Integrations</a></li>
+                <!--                 <li><a class='section-selector' id="theme">Theme</a></li>
+ -->
+                <li><a class='section-selector' id="stats">Stats</a></li>
+                <li><a class='section-selector' id="integrations">Admin</a></li>
             </ul>
         </nav>
         <div style='display: {{showSection "brand"}}'>
@@ -79,6 +81,7 @@
                 </div>
                 <div class='col-md-3'>
                     <select id='home-page' class='form-control'>
+                        {{#each pages}} {{> pageSelect}} {{/each}}
                     </select>
                 </div>
                 <div class='col-md-2'>
@@ -86,6 +89,7 @@
                 </div>
                 <div class='col-md-3'>
                     <select id='blog-page' class='form-control'>
+                        {{#each pages}} {{> pageSelect}} {{/each}}
                     </select>
                 </div>
                 <div class='col-md-2'>
@@ -102,6 +106,66 @@
                 </div>
                 <div class='col-md-3'>
                     <button id='save-analytics' class='btn btn-block btn-primary'>Save Analytics</button>
+                </div>
+            </div>
+            <h3>Set General Theme</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='theme-value'>
+                        <option value='white'>White</option>
+                        <option value='black'>Black</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-theme' class='btn btn-block btn-primary'>Set Theme</button>
+                </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "theme"}}
+                </div>
+            </div>
+            <h3>Set Affiliate Theme</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='affiliate-theme-value'>
+                        <option value='default'>Default</option>
+                        <option value='picture'>Big Pictures</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-affiliate-theme' class='btn btn-block btn-primary'>Set Theme</button>
+                </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "affiliateTheme"}}
+                </div>
+            </div>
+            <h3>Set Blog Theme</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='blog-theme-value'>
+                        <option value='big'>Big Pictures</option>
+                        <option value='square'>Squares</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-blog-theme' class='btn btn-block btn-primary'>Set Blog Theme</button>
+                </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "blogTheme"}}
+                </div>
+            </div>
+            <h3>Set Language</h3>
+            <div class='row'>
+                <div class='col-md-2'>
+                    <select class='form-control' id='language'>
+                        <option value='en'>English</option>
+                        <option value='fr'>French</option>
+                    </select>
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-language' class='btn btn-block btn-primary'>Set Language</button>
+                </div>
+                <div class='col-md-3'>
+                    Current theme: {{getMeta "language"}}
                 </div>
             </div>
             <h3>Cache</h3>
@@ -209,6 +273,7 @@
             <div class='row'>
                 <div class='col-md-2'>
                     <select class='form-control' id='origin-page'>
+                        {{#each pages}} {{> pageSelect}} {{/each}}
                     </select>
                 </div>
                 <div class='col-md-4'>
@@ -277,100 +342,11 @@
         <div style='display: {{showSection "pricing"}}'>
             {{> pricing}}
         </div>
-        <div style='display: {{showSection "theme"}}'>
-            <h3>Set General Theme</h3>
-            <div class='row'>
-                <div class='col-md-2'>
-                    <select class='form-control' id='theme-value'>
-                        <option value='white'>White</option>
-                        <option value='black'>Black</option>
-                    </select>
-                </div>
-                <div class='col-md-2'>
-                    <button id='set-theme' class='btn btn-block btn-primary'>Set Theme</button>
-                </div>
-                <div class='col-md-3'>
-                    Current theme: {{getMeta "theme"}}
-                </div>
-            </div>
-            <h3>Set Affiliate Theme</h3>
-            <div class='row'>
-                <div class='col-md-2'>
-                    <select class='form-control' id='affiliate-theme-value'>
-                        <option value='default'>Default</option>
-                        <option value='picture'>Big Pictures</option>
-                    </select>
-                </div>
-                <div class='col-md-2'>
-                    <button id='set-affiliate-theme' class='btn btn-block btn-primary'>Set Theme</button>
-                </div>
-                <div class='col-md-3'>
-                    Current theme: {{getMeta "affiliateTheme"}}
-                </div>
-            </div>
-            <h3>Set Blog Theme</h3>
-            <div class='row'>
-                <div class='col-md-2'>
-                    <select class='form-control' id='blog-theme-value'>
-                        <option value='big'>Big Pictures</option>
-                        <option value='square'>Squares</option>
-                    </select>
-                </div>
-                <div class='col-md-2'>
-                    <button id='set-blog-theme' class='btn btn-block btn-primary'>Set Blog Theme</button>
-                </div>
-                <div class='col-md-3'>
-                    Current theme: {{getMeta "blogTheme"}}
-                </div>
-            </div>
-            <h3>Set Language</h3>
-            <div class='row'>
-                <div class='col-md-2'>
-                    <select class='form-control' id='language'>
-                        <option value='en'>English</option>
-                        <option value='fr'>French</option>
-                    </select>
-                </div>
-                <div class='col-md-2'>
-                    <button id='set-language' class='btn btn-block btn-primary'>Set Language</button>
-                </div>
-                <div class='col-md-3'>
-                    Current theme: {{getMeta "language"}}
-                </div>
-            </div>
+        <div style='display: {{showSection "stats"}}'>
+            {{> stats}}
         </div>
         <div style='display: {{showSection "podcast"}}'>
-            <h3>General Settings</h3>
-            <div class='row'>
-                <div class='col-md-6'>
-                    <input type='text' id='podcast-title' class='form-control' placeholder="Podcast title ..." value='{{getMeta "podcastTitle"}}'>
-                </div>
-                <div class='col-md-6'>
-                    <input type='text' id='podcast-description' class='form-control' placeholder="Podcast description ..." value='{{getMeta "podcastDescription"}}'>
-                </div>
-            </div>
-            <h3>iTunes Settings</h3>
-            <div class='row'>
-                <div class='col-md-6'>
-                    <input type='text' id='itunes-summary' class='form-control' placeholder="Podcast itunes summary ..." value='{{getMeta "itunesSummary"}}'>
-                </div>
-                <div class='col-md-6'>
-                    <input type='text' id='itunes-author' class='form-control' placeholder="Podcast itunes author ..." value='{{getMeta "itunesAuthor"}}'>
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-md-6'>
-                    <input type='text' id='itunes-image' class='form-control' placeholder="Podcast itunes image ..." value='{{getMeta "itunesImage"}}'>
-                </div>
-                <div class='col-md-6'>
-                    <input type='text' id='itunes-subtitle' class='form-control' placeholder="Podcast itunes subtitle ..." value='{{getMeta "itunesSubtitle"}}'>
-                </div>
-            </div>
-            <div class='row'>
-                <div class='col-md-12'>
-                    <button class='btn btn-block btn-primary' id='save-podcast'>Save Podcast Data</button>
-                </div>
-            </div>
+            {{> podcast}}
         </div>
         <div style='display: {{showSection "store"}}'>
             <h3>Store</h3>
@@ -381,6 +357,7 @@
                 </div>
                 <div class='col-md-4'>
                     <select class='form-control' id='page-id'>
+                        {{#each pages}} {{> pageSelect}} {{/each}}
                     </select>
                 </div>
                 <div class='col-md-4'>

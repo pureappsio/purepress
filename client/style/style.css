@@ -7,6 +7,15 @@ body {
 	margin-bottom: 25px;
 }
 
+.stats-title {
+	text-align: center;
+	font-size: 50px;
+}
+
+.col-center {
+	text-align: center;
+}
+
 .post-content {
 	text-align: justify;
 	font-size: 18px;
@@ -14,6 +23,10 @@ body {
 
 .row {
 	margin-top: 15px;
+}
+
+.row-title {
+	font-weight: bold;
 }
 
 .section-selector {

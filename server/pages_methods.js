@@ -232,6 +232,9 @@ Meteor.methods({
             if (query.origin) {
                 url += '&origin=' + query.origin;
             }
+            if (query.medium) {
+                url += '&medium=' + query.medium;
+            }
             if (query.subscriber) {
                 url += '&subscriber=' + query.subscriber;
             }

@@ -1,0 +1,34 @@
+<template name='podcast'>
+    <h3>General Settings</h3>
+    <div class='row'>
+        <div class='col-md-6'>
+            <input type='text' id='podcast-title' class='form-control' placeholder="Podcast title ..." value='{{getMeta "podcastTitle"}}'>
+        </div>
+        <div class='col-md-6'>
+            <input type='text' id='podcast-description' class='form-control' placeholder="Podcast description ..." value='{{getMeta "podcastDescription"}}'>
+        </div>
+    </div>
+    <h3>iTunes Settings</h3>
+    <div class='row'>
+        <div class='col-md-6'>
+            <input type='text' id='itunes-summary' class='form-control' placeholder="Podcast itunes summary ..." value='{{getMeta "itunesSummary"}}'>
+        </div>
+        <div class='col-md-6'>
+            <input type='text' id='itunes-author' class='form-control' placeholder="Podcast itunes author ..." value='{{getMeta "itunesAuthor"}}'>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-6'>
+            <input type='text' id='itunes-image' class='form-control' placeholder="Podcast itunes image ..." value='{{getMeta "itunesImage"}}'>
+        </div>
+        <div class='col-md-6'>
+            <input type='text' id='itunes-subtitle' class='form-control' placeholder="Podcast itunes subtitle ..." value='{{getMeta "itunesSubtitle"}}'>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-12'>
+            <button class='btn btn-block btn-primary' id='save-podcast'>Save Podcast Data</button>
+        </div>
+    </div>
+    
+</template>

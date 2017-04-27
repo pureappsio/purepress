@@ -9,4 +9,6 @@ Meteor.startup(function() {
     // Create users if needed
     Meteor.call('createUsers');
 
+    // Meteor.call('resetStats');
+
 });

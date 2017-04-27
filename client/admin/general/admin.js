@@ -1,41 +1,5 @@
 Template.admin.onRendered(function() {
 
-    // // Default
-    // Session.set('view', 'brand');
-
-    // Pages
-    Meteor.call('getAllPages', function(err, pages) {
-
-        for (i = 0; i < pages.length; i++) {
-            $('#home-page').append($('<option>', {
-                value: pages[i]._id,
-                text: pages[i].url
-            }));
-        }
-
-        for (i = 0; i < pages.length; i++) {
-            $('#blog-page').append($('<option>', {
-                value: pages[i]._id,
-                text: pages[i].url
-            }));
-        }
-
-        for (i = 0; i < pages.length; i++) {
-            $('#origin-page').append($('<option>', {
-                value: pages[i]._id,
-                text: pages[i].url
-            }));
-        }
-
-        for (i = 0; i < pages.length; i++) {
-            $('#page-id').append($('<option>', {
-                value: pages[i]._id,
-                text: pages[i].url
-            }));
-        }
-
-    });
-
     // Init lists
     Meteor.call('getEmailLists', function(err, lists) {
 
@@ -267,39 +231,7 @@ Template.admin.events({
         }
 
     },
-    'click #save-podcast': function() {
-
-        Meteor.call('insertMeta', {
-            value: $('#podcast-title').val(),
-            type: 'podcastTitle'
-        });
-
-        Meteor.call('insertMeta', {
-            value: $('#podcast-description').val(),
-            type: 'podcastDescription'
-        });
-
-        Meteor.call('insertMeta', {
-            value: $('#itunes-summary').val(),
-            type: 'itunesSummary'
-        });
-
-        Meteor.call('insertMeta', {
-            value: $('#itunes-author').val(),
-            type: 'itunesAuthor'
-        });
-
-        Meteor.call('insertMeta', {
-            value: $('#itunes-image').val(),
-            type: 'itunesImage'
-        });
-
-        Meteor.call('insertMeta', {
-            value: $('#itunes-subtitle').val(),
-            type: 'itunesSubtitle'
-        });
-
-    },
+    
     'click #save-analytics': function() {
 
         // Insert Meta

@@ -46,6 +46,10 @@ Meteor.publish("userIntegrations", function() {
     return Integrations.find({});
 });
 
+Meteor.publish("userStats", function() {
+    return Stats.find({});
+});
+
 Meteor.publish("allUsers", function() {
     return Meteor.users.find({});
 });

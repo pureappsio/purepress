@@ -1,0 +1,2 @@
+import 'chart.js';
+

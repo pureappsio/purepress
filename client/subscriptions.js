@@ -12,6 +12,7 @@ Tracker.autorun(function() {
     Meteor.subscribe('userCategories');
     Meteor.subscribe('userPricing');
     Meteor.subscribe('allUsers');
+    Meteor.subscribe('userStats');
     Meteor.subscribe('userIntegrations');
     Meteor.subscribe('files.images.all');
     // Meteor.subscribe('allJobs');

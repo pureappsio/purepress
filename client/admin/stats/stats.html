@@ -1,0 +1,36 @@
+<template name='stats'>
+    <h3>General Statistics</h3>
+    <div class='row voffset15'>
+        <div class='col-md-3'></div>
+        <div class='col-md-6 col-center'>
+            <div>Last 30 Days Page Views</div>
+            <div class='stats-title'>{{visitors}}</div>
+        </div>
+        <div class='row voffset30'>
+            <div class='col-md-8 col-center'>
+                <canvas id='views-chart'></canvas>
+            </div>
+             <div class='col-md-4 col-center'>
+                <canvas id='origin-chart'></canvas>
+            </div>
+        </div>
+    </div>
+    <h3>Email List Conversions</h3>
+    {{#each postsWithBox}} {{> postStats}} {{/each}}
+    <h3>Affiliate Posts Conversions</h3>
+    {{#each affiliatePosts}} {{> postStats}} {{/each}}
+    {{#if arePodcasts}}
+    <h3>Podcast Statistics</h3>
+    <div class='row row-title'>
+        <div class='col-md-6'>
+            Title
+        </div>
+        <div class='col-md-1'>
+            Views
+        </div>
+    </div>
+    {{#each podcastEpisodes}} {{> podcastEpisode}} {{/each}}
+
+    {{/if}}
+    
+</template>

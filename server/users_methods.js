@@ -14,7 +14,7 @@ Meteor.methods({
         console.log('Localising post' + post.url);
 
         // Render post
-        Meteor.call('renderPost', post.url, 'US', {preview: true});
+        Meteor.call('renderPost', post.url, 'US', { preview: true });
 
         // Refresh post
         var post = Posts.findOne(postId);
@@ -110,8 +110,7 @@ Meteor.methods({
         if (httpHeaders['cf-connecting-ip']) {
             visitor.ip = httpHeaders['cf-connecting-ip'];
             visitor.country = httpHeaders['cf-ipcountry'];
-        }
-        else {
+        } else {
             visitor.ip = httpHeaders['x-forwarded-for'];
         }
 
@@ -122,13 +121,12 @@ Meteor.methods({
     removeVisitor: function(httpHeaders) {
 
         if (httpHeaders['cf-connecting-ip']) {
-           var ip = httpHeaders['cf-connecting-ip'];
-        }
-        else {
+            var ip = httpHeaders['cf-connecting-ip'];
+        } else {
             var ip = httpHeaders['x-forwarded-for'];
         }
 
-        Visitors.remove({ip: ip});
+        Visitors.remove({ ip: ip });
 
     },
     getUserLocation: function(httpHeaders) {
@@ -151,8 +149,7 @@ Meteor.methods({
 
         if (link.indexOf("amazon") != -1 || link.indexOf("a-fwd.com") != -1) {
             return true;
-        } 
-        else {
+        } else {
             return false;
         }
 
@@ -403,6 +400,9 @@ Meteor.methods({
                 var clickEvent = "fbq('track', 'InitiateCheckout'); trackOutboundLink('" + $(elem)[0].attribs.href + "'); return false;";
                 $(elem).removeAttr('onclick');
                 $(elem).attr('onclick', clickEvent);
+
+                $(elem).addClass("affiliate-click");
+
             }
 
         });

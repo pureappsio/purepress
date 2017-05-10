@@ -4,10 +4,8 @@ Meteor.methods({
 
         // Get all elements with type
         if (Elements.findOne({ pageId: pageId, type: elementType })) {
-            console.log('has element');
             return true;
         } else {
-            console.log('no element');
             return false;
         }
 
@@ -16,10 +14,8 @@ Meteor.methods({
 
         // Get all elements with type
         if (Elements.findOne({ pageId: pageId, type: elementType })) {
-            console.log('has element');
             return Elements.findOne({ pageId: pageId, type: elementType });
         } else {
-            console.log('no element');
             return false;
         }
 

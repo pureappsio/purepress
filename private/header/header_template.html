@@ -77,14 +77,14 @@ window.__lc.license = 7653841;
 
 </script>
 
-<script>
+<!-- <script>
 var trackOutboundLink = function(url) {
    ga('send', 'event', 'outbound', 'click', url, {
      'transport': 'beacon',
      'hitCallback': function(){document.location = url;}
    });
 }
-</script>
+</script> -->
 
 <!-- Facebook Pixel Code -->
   <script>
@@ -189,5 +189,17 @@ var trackOutboundLink = function(url) {
 })
     });
 </script>
+
+<!-- <script type="text/javascript">
+
+   $(window).on('beforeunload', function() {
+   $.ajax({
+            url: "{{appUrl}}api/leaving",
+            type: "GET",
+            async: false
+          });
+});
+
+  </script> -->
 
 </head>

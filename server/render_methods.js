@@ -3,6 +3,34 @@ var minify = Npm.require('html-minifier').minify;
 
 Meteor.methods({
 
+    getOrigin: function(referer) {
+
+        var origin = 'organic';
+
+        if (referer.includes('youtube') || referer.includes('facebook') || referer.includes('twitter')) {
+            origin = 'social';
+        }
+
+        return origin;
+
+    },
+    getMedium: function(referer) {
+
+        var medium = 'google';
+
+        if (referer.includes('youtube')) {
+            medium = 'youtube';
+        }
+        if (referer.includes('facebook')) {
+            medium = 'facebook';
+        }
+        if (referer.includes('twitter')) {
+            medium = 'twitter';
+        }
+
+        return medium;
+
+    },
     renderPosts: function() {
 
         var countryCodes = Meteor.call('getCountryCodes');
@@ -163,8 +191,13 @@ Meteor.methods({
                 if (parameters.description) {
 
                     $ = cheerio.load(parameters.description);
+                    var text = $.text();
 
-                    return $.text();
+                    if (text.length >= 155) {
+                        text = text.substring(0, 150) + ' ...';
+                    }
+
+                    return text;
                 }
 
             },
@@ -405,12 +438,12 @@ Meteor.methods({
         return html;
 
     },
-    renderAllPosts: function(pageNumber, categoryId, url) {
+    renderAllPosts: function(parameters) {
 
         // Render header & navbar
-        if (categoryId !== undefined) {
+        if (parameters.categoryId !== undefined) {
 
-            var categoryName = Categories.findOne(categoryId).name;
+            var categoryName = Categories.findOne(parameters.categoryId).name;
 
             headerHtml = Meteor.call('returnHeader', { title: categoryName });
 
@@ -420,8 +453,21 @@ Meteor.methods({
 
         }
 
+        // Footer
         navbarHtml = Meteor.call('returnNavbar');
         footerHtml = Meteor.call('returnFooter');
+
+        // Insert stat
+        if (parameters.url) {
+            var page = Pages.findOne({ url: parameters.url });
+            Meteor.call('insertSession', {
+                type: 'visit',
+                postId: page._id,
+                postType: 'page',
+                query: parameters.query,
+                headers: parameters.headers
+            });
+        }
 
         // Get theme
         if (Metas.findOne({ type: 'blogTheme' })) {
@@ -442,15 +488,16 @@ Meteor.methods({
             var theme = 'big';
             var nbPosts = 3;
             SSR.compileTemplate('allPosts', Assets.getText('posts/all_posts.html'));
+
         }
 
         // Build pages
         pages = [];
         var pagesLimit = 8;
-        if (categoryId !== undefined) {
-            nbPages = Math.ceil(Posts.find({ postCategory: categoryId, status: 'published' }).fetch().length / nbPosts);
+        if (parameters.categoryId !== undefined) {
+            nbPages = Math.ceil(Posts.find({ postCategory: parameters.categoryId, status: 'published' }).count() / nbPosts);
         } else {
-            nbPages = Math.ceil(Posts.find({ status: 'published' }).fetch().length / nbPosts);
+            nbPages = Math.ceil(Posts.find({ status: 'published' }).count() / nbPosts);
         }
 
         if (nbPages > pagesLimit) {
@@ -465,11 +512,11 @@ Meteor.methods({
         var currentDate = new Date();
         var postQuery = { status: 'published', creationDate: { $lte: currentDate } };
 
-        if (categoryId !== undefined) {
-            postQuery.postCategory = categoryId;
+        if (parameters.categoryId !== undefined) {
+            postQuery.postCategory = parameters.categoryId;
         }
 
-        var posts = Posts.find(postQuery, { sort: { creationDate: -1 }, skip: (pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
+        var posts = Posts.find(postQuery, { sort: { creationDate: -1 }, skip: (parameters.pageNumber - 1) * nbPosts, limit: nbPosts }).fetch();
 
         // Make groups
         var groups = [];
@@ -493,7 +540,7 @@ Meteor.methods({
             },
             blogPage: function() {
 
-                if (categoryId !== undefined) {
+                if (parameters.categoryId !== undefined) {
 
                     return url;
 
@@ -521,7 +568,7 @@ Meteor.methods({
                 }
             },
             isActive: function(page) {
-                if (page.number == pageNumber) {
+                if (page.number == parameters.pageNumber) {
                     return true;
                 }
             },
@@ -580,9 +627,7 @@ Meteor.methods({
 
 
     },
-
-
-    renderPost: function(postUrl, location, query) {
+    renderPost: function(postUrl, location, query, headers) {
 
         // Find post or page
         if (Posts.findOne({ url: postUrl }) || Pages.findOne({ url: postUrl })) {
@@ -609,39 +654,28 @@ Meteor.methods({
             }
 
             // Insert stat
-            var stat = {
-
-                type: 'visit',
-                date: new Date()
-
-            };
-
-            // Type
             if (post.type) {
-                stat.pageId = post._id;
-            } else {
-                stat.postId = post._id;
+                postType = 'page';
             }
-
-            // Source
-            if (query.origin) {
-                stat.origin = query.origin;
-            } else {
-                stat.origin = 'organic';
+            else {
+                postType = 'post';
             }
-
-            // Type
-            if (query.medium) {
-                stat.medium = query.medium;
-            }
-
-            Meteor.call('insertStat', stat);
+            Meteor.call('insertSession', {
+                type: 'visit',
+                postId: post._id,
+                postType: postType,
+                query: query,
+                headers: headers
+            });
 
             // Calling another page?
             if (post.type == 'purepages') {
 
                 // Grab page
                 // console.log('Returning external page');
+
+                // Remove visitor
+                // Meteor.call('removeVisitor', headers);
 
                 // Get page
                 query.location = location;
@@ -713,7 +747,7 @@ Meteor.methods({
 
                     } else {
 
-                        // console.log('Post cached, returning cached version');
+                        console.log('Post cached, returning cached version');
 
                         // Return cached HTML
                         var postHtml = Meteor.call('getLocalisedHtml', post, location);
@@ -722,7 +756,7 @@ Meteor.methods({
                         if (post.signupBox) {
 
                             if (post.signupBox != 'none') {
-                                console.log('Adding signup');
+                                // console.log('Adding signup');
                                 var boxHtml = Meteor.call('renderEmailBox', post, query);
                                 postHtml += boxHtml;
                             }
@@ -730,13 +764,12 @@ Meteor.methods({
 
                         // Add disqus?
                         if (Metas.findOne({ type: 'disqus' })) {
-                            console.log('Adding disqus');
+                            // console.log('Adding disqus');
                             parameters = {
                                 url: post.url,
                                 websiteUrl: websiteUrl
                             };
                             var commentHtml = Meteor.call('renderDisqus', parameters);
-                            console.log(commentHtml);
                             postHtml += commentHtml;
                         }
 
@@ -1315,7 +1348,7 @@ Meteor.methods({
                         // Process for affiliate links
                         var renderedHtml = Meteor.call('rawProcessHTMLAmazon', rawHtml);
 
-                        // Get cache & html
+                        // Get cache & HTML
                         if (post.html) {
                             var html = post.html;
                         } else {
@@ -1323,10 +1356,8 @@ Meteor.methods({
                         }
 
                         // Update
-                        // cache[countryCode] = true;
                         html['US'] = renderedHtml;
                         Posts.update({ url: postUrl }, { $set: { cached: true, html: html } })
-                            // }
 
                         // Get localised HTML
                         var postHtml = Meteor.call('getLocalisedHtml', { html: html }, location);
@@ -1335,7 +1366,6 @@ Meteor.methods({
                         if (post.signupBox) {
 
                             if (post.signupBox != 'none') {
-                                console.log('Adding signup');
                                 var boxHtml = Meteor.call('renderEmailBox', post, query);
                                 postHtml += boxHtml;
                             }
@@ -1343,7 +1373,6 @@ Meteor.methods({
 
                         // Add disqus?
                         if (Metas.findOne({ type: 'disqus' })) {
-                            console.log('Adding disqus');
                             parameters = {
                                 url: post.url,
                                 websiteUrl: websiteUrl

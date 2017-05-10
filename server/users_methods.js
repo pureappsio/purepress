@@ -55,6 +55,9 @@ Meteor.methods({
     },
     getLocalisedHtml: function(post, location) {
 
+        // console.log('Location: ' + location);
+        // console.log(post);
+
         var frenchStoreCountries = ['FR', 'BE', 'LU'];
         var ukStoreCountries = ['LV', 'SE', 'CY', 'EE', 'UK', 'FI', 'NL', 'SK', 'GB', 'PL', 'IE', 'EL', 'LT', 'BG', 'RO', 'CZ', 'HU'];
         var germanCountries = ['DE', 'AT'];
@@ -101,34 +104,7 @@ Meteor.methods({
         }
 
     },
-    insertVisitor: function(httpHeaders) {
-
-        // console.log(httpHeaders);
-
-        visitor = {};
-
-        if (httpHeaders['cf-connecting-ip']) {
-            visitor.ip = httpHeaders['cf-connecting-ip'];
-            visitor.country = httpHeaders['cf-ipcountry'];
-        } else {
-            visitor.ip = httpHeaders['x-forwarded-for'];
-        }
-
-        // console.log(visitor);
-        Visitors.insert(visitor);
-
-    },
-    removeVisitor: function(httpHeaders) {
-
-        if (httpHeaders['cf-connecting-ip']) {
-            var ip = httpHeaders['cf-connecting-ip'];
-        } else {
-            var ip = httpHeaders['x-forwarded-for'];
-        }
-
-        Visitors.remove({ ip: ip });
-
-    },
+    
     getUserLocation: function(httpHeaders) {
 
         // console.log(httpHeaders);
@@ -139,7 +115,7 @@ Meteor.methods({
             country_code = httpHeaders['cf-ipcountry'];
         } else {
             // console.log('Using direct IP location')
-            country_code = 'US';
+            country_code = 'GB';
         }
 
         return country_code;
@@ -400,7 +376,6 @@ Meteor.methods({
                 var clickEvent = "fbq('track', 'InitiateCheckout'); trackOutboundLink('" + $(elem)[0].attribs.href + "'); return false;";
                 $(elem).removeAttr('onclick');
                 $(elem).attr('onclick', clickEvent);
-
                 $(elem).addClass("affiliate-click");
 
             }
@@ -431,6 +406,7 @@ Meteor.methods({
                 // Tracking
                 var clickEvent = "fbq('track', 'InitiateCheckout'); trackOutboundLink('" + $(elem)[0].attribs.href + "'); return false;";
                 $(elem).attr('onClick', clickEvent);
+                $(elem).addClass("affiliate-click");
 
             }
 

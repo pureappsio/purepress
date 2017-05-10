@@ -6,9 +6,10 @@ Meteor.startup(function() {
     // Remove all visitors
     Visitors.remove({});
 
+    // Cron
+    SyncedCron.start();
+
     // Create users if needed
     Meteor.call('createUsers');
-
-    // Meteor.call('resetStats');
 
 });

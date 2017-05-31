@@ -68,6 +68,16 @@ Template.admin.onRendered(function() {
 
 Template.admin.events({
 
+    'click #create-tag': function() {
+
+        var tag = {
+            name: $('#tag-name').val(),
+            userId: Meteor.user()._id
+        }
+
+        Meteor.call('createTag', tag);
+
+    },
     'click #spot-dead-links': function() {
 
         Meteor.call('spotDeadAmazonLinks');
@@ -136,6 +146,15 @@ Template.admin.events({
         // Publish
         Meteor.call('publishAllPosts');
 
+    },
+    'click #save-conversion': function() {
+
+        // Insert Metas
+        Meteor.call('insertMeta', {
+            value: parseFloat($('#affiliate-conversion').val()),
+            type: 'affiliateConversion',
+            userId: Meteor.user()._id
+        });
     },
     'click #save-affiliate': function() {
 
@@ -231,7 +250,7 @@ Template.admin.events({
         }
 
     },
-    
+
     'click #save-analytics': function() {
 
         // Insert Meta
@@ -616,6 +635,9 @@ Template.admin.helpers({
     },
     posts: function() {
         return Posts.find({}, { sort: { creationDate: -1 } });
+    },
+    tags: function() {
+        return Tags.find({});
     },
     pages: function() {
         return Pages.find({});

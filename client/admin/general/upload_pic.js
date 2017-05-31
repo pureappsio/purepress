@@ -1,3 +1,5 @@
+import Images from '/imports/api/files';
+
 Template.uploadForm.onCreated(function() {
     this.currentUpload = new ReactiveVar(false);
 });

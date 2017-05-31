@@ -6,10 +6,8 @@
         <div class="col-md-2">
             {{#if areBadLinks}}
             <span class="label label-{{statusBadLinks}}">{{badLinks}}</span> {{/if}}
-            <!--   {{#if isLocalised}}<span class="label label-success">L</span>{{else}}
-      <span class="label label-warning">R</span>
-      {{/if}} -->
             <span class="label label-{{statusLabel}}">{{statusMessage}}</span>
+            {{#each tagsName}} {{> tagDisplay}} {{/each}}
         </div>
         <div class="col-md-1">
             <button class='btn btn-danger delete-post' data-toggle="modal" data-target="#deleteConfirm-{{_id}}">Delete</button>

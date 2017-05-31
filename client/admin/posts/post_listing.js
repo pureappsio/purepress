@@ -17,6 +17,18 @@ Template.postListing.events({
 
 Template.postListing.helpers({
 
+    tagsName: function() {
+
+        var tags = this.tags;
+        tagsName = [];
+        for (i in tags) {
+            tagsName.push(Tags.findOne(tags[i]));
+        }
+
+        return tagsName;
+
+    },
+
     isLocalised: function() {
 
         var localised = true;

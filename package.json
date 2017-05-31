@@ -4,14 +4,17 @@
   "description": "Open-source website building framework",
   "main": "index.js",
   "dependencies": {
+    "aws-sdk": "^2.54.0",
     "babel-runtime": "*",
     "bcrypt": "*",
     "chart.js": "^2.5.0",
     "cheerio": "*",
+    "file-type": "^4.3.0",
+    "fs-extra": "^3.0.1",
     "html-minifier": "^3.3.3",
     "jsmediatags": "*",
-    "knox": "*",
-    "mp3-duration": "*"
+    "meteor-node-stubs": "^0.2.5",
+    "throttle": "^1.0.3"
   },
   "devDependencies": {},
   "scripts": {

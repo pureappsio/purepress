@@ -164,6 +164,7 @@ Meteor.methods({
             // Get lists
             var url = "https://" + integration.url + "/api/products/" + productId + "?key=" + integration.key;
             var answer = HTTP.get(url);
+            
             // console.log(answer.data.product);
             return answer.data.product;
 

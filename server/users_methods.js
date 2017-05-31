@@ -3,6 +3,91 @@ Future = Npm.require('fibers/future');
 
 Meteor.methods({
 
+    checkDisplayModal: function(headers) {
+
+        // Find IP & country
+        var ip;
+        if (headers['cf-connecting-ip']) {
+            ip = headers['cf-connecting-ip'];
+        } else {
+            ip = headers['x-forwarded-for'];
+        }
+
+        console.log('Checking to show exit intent modal');
+
+        // Check for visitor
+        if (Visitors.findOne({ ip: ip })) {
+
+            var visitor = Visitors.findOne({ ip: ip });
+
+            if (visitor.modalDisplayed) {
+
+                return false;
+
+            } else {
+
+                // Update
+                Visitors.update(visitor._id, { $set: { modalDisplayed: true } });
+
+                // Return
+                var subscriber = Meteor.call('getSubscriberData', ip);
+                if (subscriber.email) {
+
+                    return false;
+                }
+                else {
+                    return true;
+                }
+                
+            }
+
+        } else {
+
+            return false;
+        }
+
+    },
+    getAmazonProductData: function(asin) {
+
+        try {
+
+            var answer = HTTP.get('https://localizer.schwartzindustries.com/links/' + asin);
+
+            if (answer.data.asin) {
+                return answer.data;
+            } else {
+                return {
+                    message: 'Error getting Amazon product data'
+                };
+            }
+
+        } catch (e) {
+
+            return {
+                message: 'Error getting Amazon product data'
+            };
+        }
+
+    },
+    getSubscriberData: function(ip) {
+
+       // Get integration
+        if (Integrations.findOne({ type: 'puremail' })) {
+
+            var integration = Integrations.findOne({ type: 'puremail' });
+
+            // Get lists
+            var url = "http://" + integration.url + "/api/subscribers/" + ip + "?key=" + integration.key;
+            console.log(url);
+            var answer = HTTP.get(url);
+            console.log(answer);
+            return answer.data;
+
+        } else {
+            return {};
+        }
+
+    },
     localisePost: function(postId) {
 
         // Get countries
@@ -104,7 +189,7 @@ Meteor.methods({
         }
 
     },
-    
+
     getUserLocation: function(httpHeaders) {
 
         // console.log(httpHeaders);
@@ -115,7 +200,7 @@ Meteor.methods({
             country_code = httpHeaders['cf-ipcountry'];
         } else {
             // console.log('Using direct IP location')
-            country_code = 'GB';
+            country_code = 'US';
         }
 
         return country_code;
@@ -123,8 +208,12 @@ Meteor.methods({
     },
     isAmazonLink: function(link) {
 
-        if (link.indexOf("amazon") != -1 || link.indexOf("a-fwd.com") != -1) {
-            return true;
+        if (link) {
+            if (link.indexOf("amazon") != -1 || link.indexOf("a-fwd.com") != -1) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
@@ -158,6 +247,7 @@ Meteor.methods({
     },
     extractAsin: function(url) {
 
+        // Extract
         var asinStart = url.indexOf("/dp/");
         var asinEnd = url.indexOf("/ref=");
 
@@ -168,6 +258,55 @@ Meteor.methods({
         }
 
         return asin;
+
+    },
+    extractAsinStats: function(url) {
+
+        if (url.indexOf('redirect.html') != -1 || url.indexOf('search') != -1) {
+
+            // No ASIN
+            return 'none';
+
+        } else {
+
+            // Extract
+            var asinStart = url.indexOf("/dp/");
+            var asinEnd = url.indexOf("/ref=");
+
+            if (asinEnd != -1) {
+                var asin = url.substring(asinStart + 4, asinEnd);
+            } else {
+                var asin = url.substring(asinStart + 4, asinStart + 14);
+            }
+        }
+
+        return asin;
+
+    },
+    extractLocale: function(url) {
+
+        var localeStart = url.indexOf("amazon.");
+        var localeEnd = url.indexOf("/dp/");
+
+        var locale = url.substring(localeStart + 7, localeEnd);
+
+        if (locale == 'co.uk') {
+            return 'UK';
+        } else if (locale == 'com') {
+            return 'US';
+        } else if (locale == 'it') {
+            return 'IT';
+        } else if (locale == 'es') {
+            return 'ES';
+        } else if (locale == 'fr') {
+            return 'FR';
+        } else if (locale == 'de') {
+            return 'DE';
+        } else if (locale == 'ca') {
+            return 'CA';
+        } else {
+            return 'US';
+        }
 
     },
     processAmazonLink: function(url) {

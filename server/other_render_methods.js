@@ -1,6 +1,8 @@
 var cheerio = Npm.require("cheerio");
 var minify = Npm.require('html-minifier').minify;
 
+import Images from '../imports/api/files';
+
 Meteor.methods({
 
     renderEmailBox: function(post, query) {
@@ -81,6 +83,134 @@ Meteor.methods({
         boxHtml = minify(boxHtml, { minifyCSS: true, minifyJS: true })
 
         return boxHtml;
+
+    },
+    renderExitModal: function(parameters) {
+
+        console.log('Rendering modal');
+
+        // Compile navbar
+        SSR.compileTemplate('modal', Assets.getText('modals/exit_modal_template.html'));
+
+        // Helpers
+        Template.modal.helpers({
+
+            listId: function() {
+                return Integrations.findOne({ type: 'puremail' }).list;
+            },
+            integrationUrl: function() {
+                return Integrations.findOne({ type: 'puremail' }).url;
+            },
+            origin: function() {
+
+                if (parameters.query.origin) {
+                    return parameters.query.origin;
+                } else {
+                    return 'blog';
+                }
+
+            },
+            buttonText: function() {
+                if (Metas.findOne({ type: 'exitButton' })) {
+                    return Metas.findOne({ type: 'exitButton' }).value;
+                }
+            },
+            langEN: function() {
+
+                if (Metas.findOne({ type: 'language' })) {
+
+                    if (Metas.findOne({ type: 'language' }).value == 'fr') {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+
+            },
+            boxContent: function() {
+                if (Metas.findOne({ type: 'exitContent' })) {
+                    return Metas.findOne({ type: 'exitContent' }).value;
+                }
+            },
+            sequenceId: function() {
+                if (Metas.findOne({ type: 'exitSequence' })) {
+                    return Metas.findOne({ type: 'exitSequence' }).value;
+                }
+            },
+            displayTitle: function() {
+                if (Metas.findOne({ type: 'exitTitle' })) {
+                    return Metas.findOne({ type: 'exitTitle' }).value;
+                }
+            }
+
+        });
+
+        // Render
+        var html = SSR.render('modal');
+        html = html.replace("inferior", "<");
+
+        return html;
+
+    },
+    renderSocialShare: function(parameters) {
+
+        // Compile header
+        SSR.compileTemplate('social', Assets.getText('posts/share_template.html'));
+
+        // Helpers
+        Template.social.helpers({
+
+            shareNumber: function() {
+
+                if (parameters.post.socialShare) {
+                    return parameters.post.socialShare;
+                } else {
+                    return 0;
+                }
+
+            },
+            title: function() {
+                return parameters.post.title;
+            },
+            description: function() {
+                var html = cheerio.load(parameters.post.excerpt);
+                return html.text();
+            },
+            imageUrl: function() {
+                return Images.findOne(parameters.post.featuredPicture).link();
+            },
+            postUrl: function() {
+                return parameters.postUrl;
+            },
+            twitterUsername: function() {
+
+                if (Networks.findOne({ type: 'twitter' })) {
+
+                    var link = Networks.findOne({ type: 'twitter' }).link;
+
+                    var handleIndex = link.indexOf('twitter.com/') + 'twitter.com/'.length;
+
+                    handle = link.substr(handleIndex);
+
+                    return handle;
+
+                } else {
+                    return false;
+                }
+
+            },
+            email: function() {
+                if (Networks.findOne({ type: 'envelope-o' })) {
+                    return Networks.findOne({ type: 'envelope-o' }).link;
+                }
+            }
+        });
+
+        var outputHTML = SSR.render('social');
+
+        return outputHTML;
 
     },
     renderDisqus: function(parameters) {

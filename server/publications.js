@@ -1,3 +1,5 @@
+import Images from '../imports/api/files';
+
 Meteor.publish("userPosts", function() {
     return Posts.find({});
 });
@@ -38,6 +40,10 @@ Meteor.publish("userCategories", function() {
     return Categories.find({});
 });
 
+Meteor.publish("userTags", function() {
+    return Tags.find({});
+});
+
 Meteor.publish("userPricing", function() {
     return Pricing.find({});
 });
@@ -48,6 +54,10 @@ Meteor.publish("userIntegrations", function() {
 
 Meteor.publish("userVisitors", function() {
     return Visitors.find({});
+});
+
+Meteor.publish("userStatistics", function() {
+    return Statistics.find({});
 });
 
 // Meteor.publish("userStats", function() {

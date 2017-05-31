@@ -1,3 +1,5 @@
+import Images from '/imports/api/files';
+
 // Tracker
 Tracker.autorun(function() {
     Meteor.subscribe('userPosts');
@@ -11,8 +13,9 @@ Tracker.autorun(function() {
     Meteor.subscribe('userProducts');
     Meteor.subscribe('userCategories');
     Meteor.subscribe('userPricing');
+    Meteor.subscribe('userTags');
     Meteor.subscribe('allUsers');
-    // Meteor.subscribe('userStats');
+    Meteor.subscribe('userStatistics');
     Meteor.subscribe('userVisitors');
     Meteor.subscribe('userIntegrations');
     Meteor.subscribe('files.images.all');

@@ -8,14 +8,13 @@
                 <li><a class='section-selector' id="posts">Posts</a></li>
                 <li><a class='section-selector' id="comments">Comments</a></li>
                 <li><a class='section-selector' id="pages">Pages</a></li>
-                <li><a class='section-selector' id="boxes">Boxes</a></li>
+                <li><a class='section-selector' id="exit">Exit Intent</a></li>
+                <li><a class='section-selector' id="boxes">Signup Boxes</a></li>
                 <li><a class='section-selector' id="menu">Menu</a></li>
                 <li><a class='section-selector' id="podcast">Podcast</a></li>
                 <li><a class='section-selector' id="store">Store</a></li>
                 <li><a class='section-selector' id="pricing">Pricing</a></li>
                 <li><a class='section-selector' id="affiliate">Affiliate</a></li>
-                <!--                 <li><a class='section-selector' id="theme">Theme</a></li>
- -->
                 <li><a class='section-selector' id="stats">Stats</a></li>
                 <li><a class='section-selector' id="integrations">Admin</a></li>
             </ul>
@@ -184,9 +183,6 @@
                 <div class='col-md-4'>
                     <input class='form-control' id='post-url' placeholder="Post url ...">
                 </div>
-                <!--  <div class='col-md-2'>
-    <input class='form-control' id='post-content' placeholder="Post content ...">
-  </div> -->
                 <div class='col-md-2'>
                     <button id='create-post' class='btn btn-block btn-primary'>Create New Post</button>
                 </div>
@@ -207,17 +203,6 @@
                     <button id='localise-all-posts' class='btn btn-block btn-primary'>Localise All Posts</button>
                 </div>
             </div>
-            <!-- <div class='row'>
-                <div class='col-md-12'>
-                    <button id='import-posts' class='btn btn-block btn-danger'>Import WordPress Posts</button>
-                </div>
-            </div>
-
-            <div class='row'>
-                <div class='col-md-12'>
-                    <button id='set-dates-posts' class='btn btn-block btn-danger'>Set Dates Posts</button>
-                </div>
-            </div> -->
             <h3>Assign Signup Box to Posts</h3>
             <div class='row'>
                 <div class='col-md-3'>
@@ -232,6 +217,19 @@
                     <button id='assign-box' class='btn btn-block btn-primary'>Assign Box</button>
                 </div>
             </div>
+            <h3>Categories & Tags</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <input id='tag-name' class='form-control' placeholder="New tag name ...">
+                </div>
+                <div class='col-md-3'>
+                    <button id='create-tag' class='btn btn-block btn-primary'>Create New Tag</button>
+                </div>
+                <div class='col-md-6'>
+                    {{#each tags}} {{> tagDisplay}} {{/each}}
+                </div>
+            </div>
+            
         </div>
         <div style='display: {{showSection "comments"}}'>
             <h3>Comments</h3>
@@ -339,6 +337,9 @@
         <div style='display: {{showSection "boxes"}}'>
             {{> boxes}}
         </div>
+         <div style='display: {{showSection "exit"}}'>
+            {{> exit}}
+        </div>
         <div style='display: {{showSection "pricing"}}'>
             {{> pricing}}
         </div>
@@ -403,6 +404,15 @@
             <div class='row'>
                 <div class='col-md-12'>
                     <button id='save-affiliate' class='btn btn-lg btn-block btn-primary'>Save Affiliate IDs</button>
+                </div>
+            </div>
+            <h3>Estimated Affiliate Conversion Rate</h3>
+            <div class='row'>
+                <div class='col-md-3'>
+                    <input placeholder='Estimated conversion rate ...' value='{{getMeta "affiliateConversion"}}' class='form-control' id='affiliate-conversion'>
+                </div>
+                <div class='col-md-3'>
+                    <button id='save-conversion' class='btn btn-block btn-primary'>Save Affiliate Conversion</button>
                 </div>
             </div>
         </div>

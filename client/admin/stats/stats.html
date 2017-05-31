@@ -1,9 +1,12 @@
 <template name='stats'>
     <h3>General Statistics</h3>
-    <div class='row voffset15'>
-        <div class='col-md-3 col-center'>
+    <div class='row voffset15 justify-content-center'>
+        <div class='col-md-2 col-center'>
             <div>Last 30 Days Page Views</div>
-            <div class='stats-title'>{{visitors}}</div>
+            <div class='stats-title'>{{allVisits}}
+                <span class="stats-variation {{variationColor visitsVariation}}">
+                <i class="fa fa-arrow-circle-o-{{variationDirection visitsVariation}}" aria-hidden="true"></i> {{visitsVariation}}
+            </span></div>
         </div>
         <div class='col-md-2 col-center'>
             <div>Current Visitors</div>
@@ -15,8 +18,13 @@
         </div>
         {{#if areAffiliates}}
         <div class='col-md-2 col-center'>
-            <div>Affiliate Conversions</div>
-            <div class='stats-title'>{{affConversions}}</div>
+            <div>Affiliate Earnings</div>
+            <div class='stats-title'>{{affEarnings}}</div>
+        </div>
+        {{/if}} {{#if areSales}}
+        <div class='col-md-2 col-center'>
+            <div>Sales</div>
+            <div class='stats-title'>{{sales}}</div>
         </div>
         {{/if}} {{#if areConversions}}
         <div class='col-md-2 col-center'>
@@ -42,30 +50,49 @@
         </div>
     </div>
     <div class='row voffset30'>
+        <div class='col-md-4 col-center'>
+            <canvas id='category-chart' height="200"></canvas>
+        </div>
+        <div class='col-md-4 col-center'>
+            <canvas id='tags-chart' height="200"></canvas>
+        </div>
+    </div>
+    <div class='row voffset30'>
         <div class="col-md-6">
             <h3>Most Visited Posts</h3> {{#each posts}} {{> postStats}} {{/each}}
+        </div>
+        <div class="col-md-6">
+            <h3>Most Visited Pages</h3> {{#each pages}} {{> postStats}} {{/each}}
         </div>
     </div>
     <!--     {{#if areConversions}}
  -->
     <div class='row voffset30'>
-        <div class="col-md-6">
-            <h3>Email List Conversions</h3> {{#each postsWithBox}} {{> postStats}} {{/each}}
+        <div class="col-md-4">
+            <h3>Email List Conversions</h3>
         </div>
     </div>
-    <div class='row voffset30'>
-        <div class='col-md-8 col-center'>
-            <canvas id='subscribed-chart' height="150"></canvas>
+    <div class='row'>
+        <div class='col-md-12 col-center'>
+            <canvas id='subscribed-chart' height="100"></canvas>
+        </div>
+    </div>
+    <div class="row voffset30">
+        <div class='col-md-4 col-center'>
+            <canvas id='list-conversions' height="250"></canvas>
         </div>
         <div class='col-md-4 col-center'>
-            <canvas id='list-conversions' height="150"></canvas>
+            <canvas id='box-conversions' height="250"></canvas>
+        </div>
+        <div class='col-md-4 col-center'>
+            <h3>Most Converting Posts</h3> {{#each postsWithBox}} {{> postStats}} {{/each}}
         </div>
     </div>
     <!-- {{/if}} -->
     <!-- {{#if areAffiliates}} -->
     <div class='row'>
         <div class="col-md-6">
-            <h3>Affiliate Conversions</h3> {{#each affiliatePosts}} {{> postStats}} {{/each}}
+            <h3>Affiliate Conversions</h3>
         </div>
     </div>
     <div class='row voffset30'>
@@ -76,7 +103,26 @@
             <canvas id='affiliate-conversions' height="250"></canvas>
         </div>
     </div>
-    <!--  {{/if}} -->{{#if arePodcasts}}
+    <div class="row voffset30">
+        <div class='col-md-6'>
+            <h3>Most Converting Posts</h3> {{#each affiliatePosts}} {{> postStats}} {{/each}}
+        </div>
+        <div class='col-md-6'>
+            <h3>Revenue per Post</h3> {{#each postsEarnings}} {{> postStats}} {{/each}}
+        </div>
+    </div>
+    <!--  {{/if}} -->
+    <div class='row'>
+        <div class="col-md-6">
+            <h3>Social Shares</h3>
+        </div>
+    </div>
+    <div class="row voffset30">
+        <div class='col-md-6'>
+            <h3>Most Shared Posts</h3> {{#each postsShared}} {{> postStatsSocial}} {{/each}}
+        </div>
+    </div>
+    {{#if arePodcasts}}
     <h3>Podcast Statistics</h3>
     <div class='row row-title'>
         <div class='col-md-6'>
@@ -87,5 +133,10 @@
         </div>
     </div>
     {{#each podcastEpisodes}} {{> podcastEpisode}} {{/each}} {{/if}}
-    <button id='harmonize'>Harmonize</button>
+    <div class='row voffset30'>
+        <div class='col-md-4'></div>
+        <div class='col-md-4'>
+            <button class='btn btn-block btn-primary' id='harmonize'>Refresh Statistics Now</button>
+        </div>
+    </div>
 </template>

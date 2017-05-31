@@ -30,18 +30,30 @@
         </div>
     </div>
     <!-- Category -->
+    <h3>Category & Tags</h3>
     <div class='row'>
-        <div class="col-md-6">
+        <div class="col-md-3">
             <select class='form-control' id='blog-post-category'>
                 <option value='general'>General</option>
                 {{#each categories}} {{> categoryOption}} {{/each}}
             </select>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <input id='new-category' class='form-control' placeholder="New category ...">
         </div>
+        <div class="col-md-1">
+            <button id='create-category' class='btn btn-primary btn-block'>Create</button>
+        </div>
         <div class="col-md-2">
-            <button id='create-category' class='btn btn-primary btn-block'>Create Category</button>
+            <select class='form-control' id='blog-post-tags-select'>
+                {{#each allTags}} {{> categoryOption}} {{/each}}
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button id='add-tag' class='btn btn-primary btn-block'>Add Tag</button>
+        </div>
+        <div class="col-md-3">
+            {{#each tagsName}} {{> tagDisplay}} {{/each}}
         </div>
     </div>
     <h3>Type</h3>

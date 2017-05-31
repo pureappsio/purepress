@@ -196,6 +196,13 @@ Template.postEdit.onRendered(function() {
 
 Template.postEdit.events({
 
+    'click #add-tag': function() {
+
+        var tagId = $('#blog-post-tags-select :selected').val();
+
+        Meteor.call('addPostTag', this._id, tagId);
+
+    },
     'click #fix-links': function() {
 
         Meteor.call('fixDeadAmazonLinks', this._id);
@@ -325,6 +332,10 @@ Template.postEdit.events({
             status: this.status
         }
 
+        if (this.tags) {
+            post.tags = this.tags;
+        }
+
         if ($('#post-category :selected').val() == 'general') {
             post.content = $('#post-content').summernote('code');
         }
@@ -387,6 +398,12 @@ Template.postEdit.events({
             // var job = new Job(myJobs, 'localisePost', {postId: post._id});
             // job.priority('normal').save();
 
+            Meteor.call('findDeadLinksPost', post._id, function(err, data) {
+
+                Session.set('badLinks', data);
+
+            });
+
             // Remove pic
             delete Session.keys['featuredPicture'];
         });
@@ -409,6 +426,22 @@ Template.postEdit.helpers({
     wordCount: function() {
 
         return Session.get('wordCount');
+
+    },
+    allTags: function() {
+
+        return Tags.find({});
+
+    },
+    tagsName: function() {
+
+        var tags = this.tags;
+        tagsName = [];
+        for (i in tags) {
+            tagsName.push(Tags.findOne(tags[i]));
+        }
+
+        return tagsName;
 
     },
     badLinksDetail: function() {

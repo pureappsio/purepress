@@ -9,6 +9,11 @@
   <meta property="og:title" content="{{title}}"> 
   {{#if description}}
   <meta property="og:description" content="{{description}}"> {{/if}} 
+  {{#if featuredPicture}}
+  <meta property="og:image" content="{{featuredPicture}}">
+  <meta property="og:image:width" content="2620">
+  <meta property="og:image:height" content="1000">
+  {{/if}} 
   {{#if url}}
   <meta property="og:url" content="{{url}}"> {{/if}}
   <meta property="og:site_name" content="{{brandName}}"> 
@@ -66,6 +71,8 @@ window.__lc.license = 7653841;
 
   {{/if}}
 
+<!--   <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
+ -->
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -128,6 +135,50 @@ var trackOutboundLink = function(url) {
   <script type="text/javascript">
 
   $(document).ready(function() {
+
+    $("a.social_share_link").on("click", function(event) {
+       event.preventDefault();
+       var share_link = $(this).prop('href');
+
+       window.open(share_link, "_blank",  "width=600,height=500");
+
+       data = {
+            url: "{{url}}",
+            date: new Date(),
+            type: 'socialShare',
+            link: share_link
+        }
+
+         $.ajax({
+            url: "{{appUrl}}api/stats",
+            type: "POST",
+            crossDomain: true,
+            data: data,
+            dataType: "json"
+          });
+
+    });
+
+   $("a.social_share_icon_link").on("click", function(event) {
+
+    var share_link = $(this).prop('href');
+
+      data = {
+            url: "{{url}}",
+            date: new Date(),
+            type: 'socialShare',
+            link: share_link
+        }
+
+         $.ajax({
+            url: "{{appUrl}}api/stats",
+            type: "POST",
+            crossDomain: true,
+            data: data,
+            dataType: "json"
+          });
+
+    });
     
     $( ".action" ).click(function() {
 
@@ -156,7 +207,8 @@ var trackOutboundLink = function(url) {
           data = {
             url: "{{url}}",
             date: new Date(),
-            type: 'affiliateClick'
+            type: 'affiliateClick',
+            link: $(this).attr('href')
         }
 
          $.ajax({

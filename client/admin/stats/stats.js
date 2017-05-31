@@ -1,13 +1,23 @@
 Template.stats.events({
 
     'click #harmonize': function() {
-        Meteor.call('harmonizeDates');
+        Meteor.call('updateStatistics');
     }
 
 });
 
 Template.stats.helpers({
 
+    visitsVariation: function() {
+
+        var variation = Statistics.findOne({ type: 'visitsVariation' }).value;
+        variation = parseInt(variation);
+        if (variation > 999) {
+            variation = 999;
+        }
+        return variation.toFixed(0) + '%';
+
+    },
     liveVisitors: function() {
 
         return Visitors.find({ date: { $gte: Session.get("limitDate") } }).count();
@@ -23,96 +33,94 @@ Template.stats.helpers({
             return false;
         }
     },
-    visitors: function() {
-        return Session.get('visits');
+    areSales: function() {
+
+        if (Integrations.findOne({ type: 'purecart' })) {
+            return true;
+        }
+
     },
     mobile: function() {
-        return (Session.get('mobileVisits') / Session.get('visits') * 100).toFixed(1) + '%';
+        return (Statistics.findOne({ type: 'totalMobile' }).value / Statistics.findOne({ type: 'allVisits' }).value * 100).toFixed(1) + '%';
     },
-    affConversions: function() {
+    affEarnings: function() {
 
-        return (Session.get('affVisits') / Session.get('visits') * 100).toFixed(1) + '%';
+        return '$' + (Statistics.findOne({ type: 'totalAmazonEarnings' }).value).toFixed(2);
+
+    },
+    sales: function() {
+
+        return '$' + Statistics.findOne({ type: 'sales' }).value;
 
     },
     listConversions: function() {
 
-        return (Session.get('subscribed') / Session.get('visits') * 100).toFixed(1) + '%';
+        return (Statistics.findOne({ type: 'totalSubscribed' }).value / Statistics.findOne({ type: 'allVisits' }).value * 100).toFixed(1) + '%';
 
     },
     postsWithBox: function() {
 
-        return Session.get('posts');
+        return Statistics.findOne({ type: 'convertingPosts' }).value;
 
     },
     areConversions: function() {
 
-        if (Session.get('posts')) {
-
-            if (Session.get('posts').length > 0) {
-                return true;
-            }
-
-        }
+        return true;
 
     },
     areAffiliates: function() {
 
-        if (Session.get('affiliatePosts')) {
+        return true;
 
-            if (Session.get('affiliatePosts').length > 0) {
-                return true;
-            }
+    },
+    allVisits: function() {
 
+        var visits = Statistics.findOne({ type: 'allVisits' }).value;
+        visits = parseInt(visits);
+
+        if (visits > 1000 && visits < 100000) {
+            visits = (visits / 1000).toFixed(1) + 'k'
+        }
+        if (visits > 100000) {
+            visits = (visits / 1000).toFixed(0) + 'k'
         }
 
+        return visits;
     },
     affiliatePosts: function() {
 
-        return Session.get('affiliatePosts');
+        return Statistics.findOne({ type: 'affiliatePosts' }).value;
+
+    },
+    postsEarnings: function() {
+
+        var posts = Statistics.findOne({ type: 'postsEarnings' }).value;
+
+        return posts.slice(0, 7);
 
     },
     posts: function() {
 
-        return Session.get('bestPosts');
+        return (Statistics.findOne({ type: 'visitedPosts' }).value).slice(0, 7);
 
+    },
+    pages: function() {
+
+        return (Statistics.findOne({ type: 'visitedPages' }).value).slice(0, 7);
+
+    },
+    postsShared: function() {
+        return Posts.find({ socialShare: { $exists: true } }, { sort: { socialShare: -1 } });
     }
 
 });
 
 Template.stats.onRendered(function() {
 
-    Meteor.call('getBestConvertingPosts', function(err, data) {
-        Session.set('posts', data);
-    });
-
-    Meteor.call('getBestVisitedPosts', function(err, data) {
-        Session.set('bestPosts', data);
-    });
-
-    Meteor.call('getBestAffiliatePosts', function(err, data) {
-        Session.set('affiliatePosts', data);
-    });
-
     Session.set("limitDate", new Date(new Date().getTime() - 60 * 1000));
     Meteor.setInterval(function() {
         Session.set("limitDate", new Date(new Date().getTime() - 60 * 1000));
     }, 10000);
-
-    Meteor.call('getAllVisits', function(err, data) {
-        Session.set('visits', data);
-    });
-
-    Meteor.call('getMobileVisits', function(err, data) {
-        Session.set('mobileVisits', data);
-    });
-
-    Meteor.call('getAffVisits', function(err, data) {
-        Session.set('affVisits', data);
-    });
-
-    Meteor.call('getSubscribed', function(err, data) {
-        Session.set('subscribed', data);
-    });
 
     Meteor.call('getGraphData', 'visit', function(err, graphData) {
 
@@ -150,6 +158,15 @@ Template.stats.onRendered(function() {
                         time: {
                             unit: 'day'
                         }
+                    }],
+                    yAxes: [{
+                        id: 'A',
+                        type: 'linear',
+                        position: 'left',
+                    }, {
+                        id: 'B',
+                        type: 'linear',
+                        position: 'right'
                     }]
                 }
             }
@@ -212,6 +229,40 @@ Template.stats.onRendered(function() {
 
     });
 
+    Meteor.call('getCategoryGraphData', function(err, graphData) {
+
+        var categoryChart = document.getElementById("category-chart");
+
+        var myPieChart = new Chart(categoryChart, {
+            type: 'bar',
+            data: graphData,
+            options: {
+                title: {
+                    display: true,
+                    text: 'Visits by Categories'
+                }
+            }
+        });
+
+    });
+
+    Meteor.call('getTagsGraphData', function(err, graphData) {
+
+        var tagsChart = document.getElementById("tags-chart");
+
+        var myPieChart = new Chart(tagsChart, {
+            type: 'bar',
+            data: graphData,
+            options: {
+                title: {
+                    display: true,
+                    text: 'Visits by Tags'
+                }
+            }
+        });
+
+    });
+
     Meteor.call('getCountryGraph', function(err, graphData) {
 
         var countriesChart = document.getElementById("countries-chart");
@@ -263,26 +314,21 @@ Template.stats.onRendered(function() {
 
     });
 
-    // Meteor.call('getPostsGraphData', function(err, graphData) {
+    Meteor.call('getBoxGraphData', function(err, graphData) {
 
-    //     var postChart = document.getElementById("best-posts-chart");
+        var boxConvChart = document.getElementById("box-conversions");
 
-    //     var myPieChart = new Chart(postChart, {
-    //         type: 'bar',
-    //         data: graphData,
-    //         options: {
-    //             title: {
-    //                 display: true,
-    //                 text: 'Most Visited Posts'
-    //             },
-    //             scales: {
-    //                 xAxes: [{
-    //                     display: false
-    //                 }]
-    //             }
-    //         }
-    //     });
+        var myPieChart = new Chart(boxConvChart, {
+            type: 'bar',
+            data: graphData,
+            options: {
+                title: {
+                    display: true,
+                    text: 'Box Conversions'
+                }
+            }
+        });
 
-    // });
+    });
 
 });

@@ -3,8 +3,22 @@ html {
     min-height: 100%;
 }
 
+.fixed {
+    position: fixed;
+    top: 50%;
+    z-index: 1;
+    width: 50px;
+    height: 350px;
+    margin-top: -175px;
+    /* minus half the height */
+}
+
 .btn {
     cursor: pointer;
+}
+
+.signup-row {
+    margin-top: 25px !important;
 }
 
 .menu-form {
@@ -133,11 +147,38 @@ h2 {
     margin-bottom: 25px;
 }
 
+.square-share {
+    padding-top: 1px;
+    width: 50px;
+    height: 50px;
+    background-color: gray;
+    text-align: center;
+    vertical-align: middle;
+    color: white;
+    font-size: 12px;
+}
+
+.share-number {
+    text-align: center;
+    font-size: 18px;
+}
+
 .post-square-container {
     padding: 15px;
 }
 
-.post-page-container {}
+.post-page-container {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.post-page-container:hover {
+    filter: opacity(33%);
+}
+
+.social_share_icon:hover {
+    filter: opacity(66%);
+}
 
 .table {
     border: 1px solid #dddddd;
@@ -178,12 +219,6 @@ h2 {
     border: 1px solid #dddddd;
 }
 
-.main-container {
-    margin-bottom: 45px;
-    /*    line-height: 29.7px !important;
-*/
-}
-
 .post-featured {
     margin-top: 15px;
 }
@@ -191,6 +226,15 @@ h2 {
 .post-title {
     font-size: 36px;
     font-weight: 600;
+}
+
+.latest-post-title {
+    margin-top: 15px;
+    font-size: 30px;
+}
+
+.row-posts {
+    margin-bottom: 15px;
 }
 
 .post-content {
@@ -263,6 +307,11 @@ h2 {
     margin-top: 5px;
 }
 
+.all-post-center {
+    margin-top: 15px !important;
+    text-align: center;
+}
+
 .all-post-title-square {
     margin-top: 5px;
     font-size: 22px !important;
@@ -315,15 +364,18 @@ img {
     position: absolute;
     bottom: 0;
     width: 100%;
-    /* Set the fixed height of the footer here */
     height: 45px;
-    padding-top: 12px;
+    line-height: 45px;
     color: white;
     background-color: #333333;
 }
 
+.main-container {
+    padding-bottom: 60px;
+}
+
 .full-width-container {
-    min-height: 100%;
+    min-height: 75%;
     margin-top: 0px !important;
     background-size: cover;
     background-repeat: no-repeat;
@@ -366,10 +418,12 @@ a:active {
 }
 
 .full-width-image {
-/*    text-align: center;
-*/    /*margin: 0 !important;
+    /*    text-align: center;
+*/
+    /*margin: 0 !important;
     padding: 0 !important;
-*/}
+*/
+}
 
 .full-width-image-col {
     padding: 0 !important;
@@ -478,19 +532,17 @@ a:active {
     border: 1px solid lightgray;
     border-radius: 10px;
     font-size: 20px;
-    box-shadow: 0px 2px 8px 0px rgba(0,0,0,0.08);
+    box-shadow: 0px 2px 8px 0px rgba(0, 0, 0, 0.08);
 }
 
 .pricing-name {
     font-size: 18px;
-
     padding-top: 10px;
     text-transform: uppercase;
 }
 
 .pricing-price {
     font-size: 34px;
-
     padding-top: 10px;
     padding-bottom: 10px;
 }

@@ -12,26 +12,57 @@
         <img class='img-fluid' src='{{elementImage element}}'>
     </div>
 </div>
-{{/if}} {{#if isElementType element 'latestposts'}}
+{{/if}} 
+
+{{#if isElementType element 'latestposts'}}
 <div class='row'>
-    <div class='col-md-2'></div>
-    <div class='col-md-4 post-title'>Latest Posts</div>
+    <div class='col-md-1'></div>
+    <div class='col-md-10 latest-post-title'>{{#if langEN}}Latest Posts{{else}}Derniers Articles{{/if}}</div>
 </div>
-<div class='row'>
-    <div class='col-md-2'></div>
-    {{#each post in posts}}
-    <div class='col-md-4'>
-        <div class='post-page-container'>
-            <a href='/{{post.url}}'>
-                <div class='post-featured'><img class='img-fluid' src='{{postImage post.featuredPicture}}'></div>
-            </a>
-            <div class='post-title all-post-title all-post-title-square'><a href='/{{post.url}}'>{{post.title}}</a></div>
-            <div class='post-info'>{{formatDate post.creationDate}} / by {{userName}}</div>
+<div class='row row-posts'>
+    <div class='col-md-1'></div>
+    <div class='col-md-10'>
+        <div class='row'>
+            {{#each post in posts}}
+            <div class='col-md-4'>
+                <div class='post-page-container'>
+                    <a href='/{{post.url}}'>
+                        <div class='post-featured'><img class='img-fluid' src='{{postImage post.featuredPicture}}'></div>
+                    </a>
+                    <div class='post-title all-post-center all-post-title all-post-title-square'><a href='/{{post.url}}'>{{post.title}}</a></div>
+                </div>
+            </div>
+            {{/each}}
         </div>
     </div>
-    {{/each}}
 </div>
-{{/if}} {{#if isElementType element 'text'}}
+{{/if}} 
+
+{{#if isElementType element 'bestposts'}}
+<div class='row'>
+    <div class='col-md-1'></div>
+    <div class='col-md-10 latest-post-title'>{{#if langEN}}Some of our most popular content:{{else}}Nos meilleurs articles:{{/if}}</div>
+</div>
+<div class='row row-posts'>
+    <div class='col-md-1'></div>
+    <div class='col-md-10'>
+        <div class='row'>
+            {{#each post in bestPosts}}
+            <div class='col-md-4'>
+                <div class='post-page-container'>
+                    <a href='/{{post.url}}'>
+                        <div class='post-featured'><img class='img-fluid' src='{{postImage post.featuredPicture}}'></div>
+                    </a>
+                    <div class='post-title all-post-center all-post-title all-post-title-square'><a href='/{{post.url}}'>{{post.title}}</a></div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
+{{/if}} 
+
+{{#if isElementType element 'text'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>

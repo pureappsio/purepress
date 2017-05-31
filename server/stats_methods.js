@@ -1,5 +1,149 @@
 Meteor.methods({
 
+    updateStatistics: function() {
+
+        console.log('Updating site statistics');
+
+        // Limit
+        var now = new Date();
+        var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        var beforeDate = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+        // Amazon earnings
+        var amazonData = Meteor.call('getEstimatedAmazonEarnings');
+        var amazonEarnings = amazonData[0];
+        Meteor.call('updateStatistic', 'amazonEarnings', amazonEarnings);
+
+        var totalAmazonEarnings = 0;
+        for (i in amazonEarnings) {
+            totalAmazonEarnings += parseFloat(amazonEarnings[i].y);
+        }
+        Meteor.call('updateStatistic', 'totalAmazonEarnings', totalAmazonEarnings);
+
+        // Posts earnings
+        var postsEarnings = amazonData[1];
+        Meteor.call('updateStatistic', 'postsEarnings', postsEarnings);
+
+        // Store ?
+        if (Integrations.findOne({ type: 'purecart' })) {
+            var sales = Meteor.call('getSalesSummary', limitDate);
+            Meteor.call('updateStatistic', 'sales', sales);
+        }
+
+        // Summary stats
+        var allVisits = Stats.find({ type: 'visit', date: { $gte: limitDate } }).count();
+        Meteor.call('updateStatistic', 'allVisits', allVisits);
+        var allVisitsPast = Stats.find({ type: 'visit', date: { $gte: beforeDate, $lte: limitDate } }).count();
+
+        if (allVisitsPast != 0) {
+            variation = ((allVisits - allVisitsPast) / allVisitsPast * 100).toFixed(2);
+        } else {
+            variation = 0;
+        }
+
+        Meteor.call('updateStatistic', 'visitsVariation', variation);
+
+        var totalAffiliate = Stats.find({ type: 'affiliateClick', date: { $gte: limitDate } }).count();
+        Meteor.call('updateStatistic', 'totalAffiliate', totalAffiliate);
+
+        var totalMobile = Stats.find({ type: 'visit', date: { $gte: limitDate }, browser: 'mobile' }).count();
+        Meteor.call('updateStatistic', 'totalMobile', totalMobile);
+
+        var totalSubscribed = Stats.find({ type: 'subscribe', date: { $gte: limitDate } }).count();
+        Meteor.call('updateStatistic', 'totalSubscribed', totalSubscribed);
+
+        // Origin
+        var social = Stats.find({ origin: 'social', date: { $gte: limitDate } }).count();
+        Meteor.call('updateStatistic', 'social', social);
+        var ads = Stats.find({ origin: 'ads', date: { $gte: limitDate } }).count();
+        Meteor.call('updateStatistic', 'ads', ads);
+        var organic = Stats.find({ origin: 'organic', date: { $gte: limitDate } }).count();
+        Meteor.call('updateStatistic', 'organic', organic);
+
+        // Social
+        var facebook = Stats.find({ medium: 'facebook' }).count();
+        Meteor.call('updateStatistic', 'facebook', facebook);
+        var youtube = Stats.find({ medium: 'youtube' }).count();
+        Meteor.call('updateStatistic', 'youtube', youtube);
+        var twitter = Stats.find({ medium: 'twitter' }).count();
+        Meteor.call('updateStatistic', 'twitter', twitter);
+
+        // Countries
+        var countriesStats = Meteor.call('getCountryStats');
+        Meteor.call('updateStatistic', 'countries', countriesStats[0]);
+        Meteor.call('updateStatistic', 'countriesSessions', countriesStats[1]);
+
+        // Best posts
+        var convertingPosts = Meteor.call('getBestConvertingPosts');
+        Meteor.call('updateStatistic', 'convertingPosts', convertingPosts);
+        var visitedPosts = Meteor.call('getBestVisitedPosts');
+        Meteor.call('updateStatistic', 'visitedPosts', visitedPosts);
+        var affiliatePosts = Meteor.call('getBestAffiliatePosts');
+        Meteor.call('updateStatistic', 'affiliatePosts', affiliatePosts);
+        var bestBoxes = Meteor.call('getBestConvertingBoxes');
+        Meteor.call('updateStatistic', 'bestBoxes', bestBoxes);
+
+        // Categories & tags
+        var bestCategories = Meteor.call('getBestCategories');
+        Meteor.call('updateStatistic', 'bestCategories', bestCategories);
+
+        var bestTags = Meteor.call('getBestTags');
+        Meteor.call('updateStatistic', 'bestTags', bestTags);
+
+        // Best pages
+        var visitedPages = Meteor.call('getBestVisitedPages');
+        Meteor.call('updateStatistic', 'visitedPages', visitedPages);
+
+        // Conversions
+        var affiliateClickConv = Meteor.call('getConvData', 'affiliateClick');
+        Meteor.call('updateStatistic', 'affiliateClickConv', affiliateClickConv);
+        var subscribeConv = Meteor.call('getConvData', 'subscribe');
+        Meteor.call('updateStatistic', 'subscribeConv', subscribeConv);
+
+        // Sessions graph
+        var visits = Meteor.call('getGraphSessions', 'visit');
+        Meteor.call('updateStatistic', 'visit', visits);
+
+        var subscribed = Meteor.call('getGraphSessions', 'subscribe');
+        Meteor.call('updateStatistic', 'subscribe', subscribed);
+
+        var affiliateClicks = Meteor.call('getGraphSessions', 'affiliateClick');
+        Meteor.call('updateStatistic', 'affiliateClick', affiliateClicks);
+
+        var endDate = new Date();
+        console.log('Time to update stats: ' + (endDate.getTime() - now.getTime()) + ' ms')
+
+    },
+    updateStatistic: function(statisticType, statisticValue) {
+
+        if (Statistics.findOne({ type: statisticType })) {
+
+            // Update
+            console.log('Updating stastistic ' + statisticType);
+            Statistics.update({ type: statisticType }, {
+                $set: {
+                    value: statisticValue,
+                    date: new Date()
+                }
+            });
+
+
+        } else {
+
+            // Update
+            console.log('New stastistic ' + statisticType);
+
+            var statistic = {
+                type: statisticType,
+                value: statisticValue,
+                date: new Date()
+            }
+
+            Statistics.insert(statistic);
+
+        }
+
+    },
     getAffVisits: function() {
 
         // Limit
@@ -46,7 +190,7 @@ Meteor.methods({
             var newDate = new Date(affiliateClicks[i].date);
             Stats.update(affiliateClicks[i]._id, { $set: { date: newDate } });
         }
-        console.log(affiliateClicks);
+        // console.log(affiliateClicks);
 
         // Get all subscribed
         var subscribed = Stats.find({ type: 'subscribe' }).fetch();
@@ -59,24 +203,23 @@ Meteor.methods({
         console.log(' done');
 
     },
-    getPostsGraphData: function() {
+    getBoxGraphData: function() {
 
-        // Get posts
-        var bestPosts = Meteor.call('getBestVisitedPosts');
+        var bestBoxes = Statistics.findOne({ type: 'bestBoxes' }).value;
 
-        var postsName = [];
-        var postsVisits = [];
+        var boxesName = [];
+        var boxesConversions = [];
 
-        for (i in bestPosts) {
-            postsName.push(bestPosts[i].title);
-            postsVisits.push(bestPosts[i].visits);
+        for (i in bestBoxes) {
+            boxesName.push(bestBoxes[i].title);
+            boxesConversions.push(bestBoxes[i].conversion);
         }
 
         var data = {
-            labels: postsName,
+            labels: boxesName,
             datasets: [{
-                label: 'Most Visited Posts',
-                data: postsVisits,
+                label: 'Most Converting Boxes',
+                data: boxesConversions,
                 backgroundColor: [
                     "#FF6384",
                     "#36A2EB",
@@ -97,6 +240,44 @@ Meteor.methods({
         return data;
 
     },
+    // getPostsGraphData: function() {
+
+    //     // Get posts
+    //     var bestPosts = Meteor.call('getBestVisitedPosts');
+
+    //     var postsName = [];
+    //     var postsVisits = [];
+
+    //     for (i in bestPosts) {
+    //         postsName.push(bestPosts[i].title);
+    //         postsVisits.push(bestPosts[i].visits);
+    //     }
+
+    //     var data = {
+    //         labels: postsName,
+    //         datasets: [{
+    //             label: 'Most Visited Posts',
+    //             data: postsVisits,
+    //             backgroundColor: [
+    //                 "#FF6384",
+    //                 "#36A2EB",
+    //                 "#FFCE56",
+    //                 "#36A2EB",
+    //                 "#FFCE56"
+    //             ],
+    //             hoverBackgroundColor: [
+    //                 "#FF6384",
+    //                 "#36A2EB",
+    //                 "#FFCE56",
+    //                 "#36A2EB",
+    //                 "#FFCE56"
+    //             ]
+    //         }]
+    //     };
+
+    //     return data;
+
+    // },
     removeInactiveVisitors: function() {
 
         console.log('Removing inactive visitors');
@@ -171,11 +352,16 @@ Meteor.methods({
 
         var browser = 'desktop';
 
-        if (httpHeaders['user-agent']) {
-            var agent = httpHeaders['user-agent'];
-        }
-        if (agent.includes('Mobile')) {
-            browser = 'mobile';
+        if (httpHeaders) {
+
+            if (httpHeaders['user-agent']) {
+
+                var agent = httpHeaders['user-agent'];
+
+                if (agent.includes('Mobile')) {
+                    browser = 'mobile';
+                }
+            }
         }
 
         return browser;
@@ -223,12 +409,57 @@ Meteor.methods({
 
             // Check if page or post
             if (Posts.findOne({ url: postUrl })) {
+
                 var post = Posts.findOne({ url: postUrl });
 
                 if (stat.type == 'subscribe') {
                     stat.boxId = post.signupBox;
                 }
                 stat.postId = post._id;
+            }
+
+        }
+
+        // Process Amazon link
+        if (parameters.link && parameters.type == 'affiliateClick') {
+
+            // Asin
+            var asin = Meteor.call('extractAsinStats', parameters.link);
+            if (asin != 'none') {
+                stat.asin = asin;
+                stat.locale = Meteor.call('extractLocale', parameters.link);
+            }
+
+        }
+
+        // Social shares
+        if (parameters.link && parameters.type == 'socialShare') {
+
+            // Link
+            var link = parameters.link;
+
+            var network = 'facebook';
+
+            if (link.indexOf('twitter') != -1) {
+                network = 'twitter';
+            }
+            if (link.indexOf('facebook') != -1) {
+                network = 'facebook';
+            }
+             if (link.indexOf('mailto') != -1) {
+                network = 'email';
+            }
+            if (link.indexOf('linkedin') != -1) {
+                network = 'linkedin';
+            }
+            if (link.indexOf('pinterest') != -1) {
+                network = 'pinterest';
+            }
+
+            stat.network = network;
+
+            if (post) {
+                Posts.update(post._id, { $inc: { socialShare: 1 } });
             }
 
         }
@@ -267,14 +498,83 @@ Meteor.methods({
 
 
     },
+    getBestCategories: function() {
+
+        // Get best posts
+        var bestPosts = Statistics.findOne({ type: 'visitedPosts' }).value;
+
+        var categories = Categories.find({}).fetch();
+
+        // Fill
+        for (i in categories) {
+            categories[i].visits = 0;
+        }
+
+        // Count
+        for (i in categories) {
+
+            for (p in bestPosts) {
+
+                if (bestPosts[p].postCategory) {
+                    if (bestPosts[p].postCategory == categories[i]._id) {
+                        categories[i].visits += bestPosts[p].visits;
+                    }
+                }
+
+            }
+
+        }
+
+        return categories;
+
+    },
+    getBestTags: function() {
+
+        // Get best posts
+        var bestPosts = Statistics.findOne({ type: 'visitedPosts' }).value;
+
+        var tags = Tags.find({}).fetch();
+
+        // Fill
+        for (i in tags) {
+            tags[i].visits = 0;
+        }
+
+        // Count
+        for (i in tags) {
+
+            for (p in bestPosts) {
+
+                if (bestPosts[p].tags) {
+
+                    console.log(bestPosts[p].tags)
+
+                    if ((bestPosts[p].tags).indexOf(tags[i]._id) != -1) {
+                        tags[i].visits += bestPosts[p].visits;
+                    }
+                }
+
+            }
+
+        }
+
+        console.log(tags);
+
+        return tags;
+
+    },
     getBestVisitedPosts: function() {
 
         // Get posts
         var posts = Posts.find({}).fetch();
 
+        // Limit
+        var now = new Date();
+        var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
         // Calculate visits
         for (i in posts) {
-            posts[i].visits = Stats.find({ type: 'visit', postId: posts[i]._id }).count();
+            posts[i].visits = Stats.find({ date: { $gte: limitDate }, type: 'visit', postId: posts[i]._id }).count();
         }
 
         goodPosts = [];
@@ -291,10 +591,89 @@ Meteor.methods({
             return parseFloat(b.visits) - parseFloat(a.visits);
         });
 
-        return goodPosts.slice(0, 5);
+        return goodPosts;
+
+    },
+    getBestVisitedPages: function() {
+
+        // Get pages
+        var pages = Pages.find({}).fetch();
+
+        // Limit
+        var now = new Date();
+        var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // Calculate visits
+        for (i in pages) {
+            pages[i].visits = Stats.find({ date: { $gte: limitDate }, type: 'visit', pageId: pages[i]._id }).count();
+        }
+
+        goodPages = [];
+        for (i in pages) {
+
+            if (pages[i].visits != 0) {
+                goodPages.push(pages[i]);
+            }
+
+        }
+
+        // Sort
+        goodPages.sort(function(a, b) {
+            return parseFloat(b.visits) - parseFloat(a.visits);
+        });
+
+        return goodPages;
+
+    },
+    getBestConvertingBoxes: function() {
+
+        // Limit
+        var now = new Date();
+        var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+        // Get boxes
+        var boxes = Boxes.find({}).fetch();
+
+        // Calculate visits
+        for (i in boxes) {
+
+            var posts = Posts.find({ signupBox: boxes[i]._id }).fetch();
+            postsIds = [];
+            for (p in posts) {
+                postsIds.push(posts[p]._id);
+            }
+
+            boxes[i].visits = Stats.find({ date: { $gte: limitDate }, type: 'visit', postId: { $in: postsIds } }).count();
+        }
+
+        goodBoxes = [];
+        for (i in boxes) {
+
+            if (boxes[i].visits != 0) {
+                goodBoxes.push(boxes[i]);
+            }
+
+        }
+
+        // Calculate conversions
+        for (i in goodBoxes) {
+            subscriptions = Stats.find({ date: { $gte: limitDate }, type: 'subscribe', boxId: goodBoxes[i]._id }).count();
+            goodBoxes[i].conversion = Meteor.call('calculateConversion', subscriptions, goodBoxes[i].visits);
+        }
+
+        // Sort
+        goodBoxes.sort(function(a, b) {
+            return parseFloat(b.conversion) - parseFloat(a.conversion);
+        });
+
+        return goodBoxes.slice(0, 5);
 
     },
     getBestConvertingPosts: function() {
+
+        // Limit
+        var now = new Date();
+        var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
         // Get posts
         var posts = Posts.find({ signupBox: { $exists: true } }).fetch();
@@ -303,8 +682,8 @@ Meteor.methods({
         for (i in posts) {
 
             if (Stats.findOne({ type: 'subscribe', postId: posts[i]._id }) && Stats.findOne({ type: 'visit', postId: posts[i]._id })) {
-                var subscriptions = Stats.find({ type: 'subscribe', postId: posts[i]._id }).count();
-                var visits = Stats.find({ type: 'visit', postId: posts[i]._id }).count();
+                var subscriptions = Stats.find({ date: { $gte: limitDate }, type: 'subscribe', postId: posts[i]._id }).count();
+                var visits = Stats.find({ date: { $gte: limitDate }, type: 'visit', postId: posts[i]._id }).count();
 
                 if (visits > 10) {
                     posts[i].conversion = (subscriptions / visits * 100).toFixed(0);
@@ -339,12 +718,16 @@ Meteor.methods({
         // Get posts
         var posts = Posts.find({}).fetch();
 
+        // Limit
+        var now = new Date();
+        var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
         // Calculate conversions
         for (i in posts) {
 
-            if (Stats.findOne({ type: 'affiliateClick', postId: posts[i]._id }) && Stats.findOne({ type: 'visit', postId: posts[i]._id })) {
+            if (Stats.findOne({ date: { $gte: limitDate }, type: 'affiliateClick', postId: posts[i]._id }) && Stats.findOne({ type: 'visit', postId: posts[i]._id })) {
                 var affiliateClicks = Stats.find({ type: 'affiliateClick', postId: posts[i]._id }).count();
-                var visits = Stats.find({ type: 'visit', postId: posts[i]._id }).count();
+                var visits = Stats.find({ date: { $gte: limitDate }, type: 'visit', postId: posts[i]._id }).count();
                 if (visits > 10) {
                     posts[i].conversion = (affiliateClicks / visits * 100).toFixed(0);
                 } else {
@@ -371,15 +754,15 @@ Meteor.methods({
             return parseFloat(b.conversion) - parseFloat(a.conversion);
         });
 
-        return goodPosts.slice(0, 5);
+        return goodPosts.slice(0, 7);
 
     },
     getOriginGraphData: function() {
 
         // Get sessions
-        var social = Stats.find({ origin: 'social' }).count();
-        var ads = Stats.find({ origin: 'ads' }).count();
-        var organic = Stats.find({ origin: 'organic' }).count();
+        var social = Statistics.findOne({ type: 'social' }).value;
+        var ads = Statistics.findOne({ type: 'ads' }).value;
+        var organic = Statistics.findOne({ type: 'organic' }).value;
 
         var data = {
             labels: [
@@ -428,7 +811,7 @@ Meteor.methods({
         return [A, B];
 
     },
-    getCountryGraph: function() {
+    getCountryStats: function() {
 
         // Get sessions
         var now = new Date();
@@ -451,6 +834,14 @@ Meteor.methods({
         var sortedArray = Meteor.call('sortArrays', countriesSessions, countries);
         countries = sortedArray[1].slice(0, 5);
         countriesSessions = sortedArray[0].slice(0, 5);
+
+        return [countries, countriesSessions];
+
+    },
+    getCountryGraph: function() {
+
+        var countries = Statistics.findOne({ type: 'countries' }).value;
+        var countriesSessions = Statistics.findOne({ type: 'countriesSessions' }).value;
 
         var data = {
             labels: countries,
@@ -477,7 +868,7 @@ Meteor.methods({
         return data;
 
     },
-     getConvCountryData: function(type) {
+    getConvCountryData: function(type) {
 
         // Limit
         var now = new Date();
@@ -517,7 +908,7 @@ Meteor.methods({
         return data;
 
     },
-    getConvGraphData: function(type) {
+    getConvData: function(type) {
 
         var now = new Date();
         var limitDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -540,6 +931,13 @@ Meteor.methods({
         var twitter = (twitterClicks / twitterVisits * 100).toFixed(2);
         var organic = (organicClicks / organicVisits * 100).toFixed(2);
 
+        return [organic, youtube, facebook, twitter];
+
+    },
+    getConvGraphData: function(type) {
+
+        var data = Statistics.findOne({ type: type + 'Conv' }).value;
+
         var socialColors = [
             "#27DE55",
             "#e52d27",
@@ -556,7 +954,7 @@ Meteor.methods({
             ],
             datasets: [{
                 label: 'Conversions',
-                data: [organic, youtube, facebook, twitter],
+                data: data,
                 backgroundColor: socialColors,
                 hoverBackgroundColor: socialColors
             }]
@@ -566,12 +964,70 @@ Meteor.methods({
         return data;
 
     },
+    getTagsGraphData: function() {
+
+        var tags = Statistics.findOne({ type: 'bestTags' }).value;
+
+        var tagsNames = [];
+        var tagsVisits = [];
+        var colors = [];
+
+        for (i in tags) {
+            colors.push(Meteor.call('getRandomColor'));
+            tagsNames.push(tags[i].name);
+            tagsVisits.push(tags[i].visits);
+        }
+
+        var data = {
+            labels: tagsNames,
+            datasets: [{
+                label: 'Visits',
+                data: tagsVisits,
+                backgroundColor: colors,
+                hoverBackgroundColor: colors
+            }]
+        };
+
+        return data;
+
+    },
+    getCategoryGraphData: function() {
+
+        var categories = Statistics.findOne({ type: 'bestCategories' }).value;
+        console.log(categories);
+
+        var categoriesNames = [];
+        var categoriesVisits = [];
+        var colors = [];
+
+        for (i in categories) {
+            colors.push(Meteor.call('getRandomColor'));
+            categoriesNames.push(categories[i].name);
+            categoriesVisits.push(categories[i].visits);
+        }
+
+        var data = {
+            labels: categoriesNames,
+            datasets: [{
+                label: 'Visits',
+                data: categoriesVisits,
+                backgroundColor: colors,
+                hoverBackgroundColor: colors
+            }]
+        };
+
+        console.log(categoriesNames);
+        console.log(categoriesVisits);
+
+        return data;
+
+    },
     getSocialGraphData: function() {
 
         // Get sessions
-        var facebook = Stats.find({ medium: 'facebook' }).count();
-        var youtube = Stats.find({ medium: 'youtube' }).count();
-        var twitter = Stats.find({ medium: 'twitter' }).count();
+        var facebook = Statistics.findOne({ type: 'facebook' }).value;
+        var youtube = Statistics.findOne({ type: 'youtube' }).value;
+        var twitter = Statistics.findOne({ type: 'twitter' }).value;
 
         var socialColors = [
             "#e52d27",
@@ -600,8 +1056,6 @@ Meteor.methods({
     },
     getSessions: function(type) {
 
-        // console.log(Stats.find({}).fetch());
-
         return Stats.aggregate(
             [
                 { $match: { type: type } }, {
@@ -622,13 +1076,152 @@ Meteor.methods({
                 }
             ]);
     },
+    getEstimatedAmazonEarnings: function() {
+
+        // Get meta for conversion
+        if (Metas.findOne({ type: 'affiliateConversion' })) {
+
+            var conversion = Metas.findOne({ type: 'affiliateConversion' }).value;
+
+            // Get all clicks
+            var clicks = Stats.find({ type: 'affiliateClick', asin: { $exists: true }, locale: 'US' }).fetch();
+
+            // Find all ASINs
+            var asins = [];
+            for (i in clicks) {
+                if (asins.indexOf(clicks[i].asin) == -1) {
+                    asins.push(clicks[i].asin);
+                }
+            }
+
+            // Gather data
+            asinData = {};
+
+            for (a in asins) {
+                var productData = Meteor.call('getAmazonProductData', asins[a]);
+                if (productData.message) {
+                    console.log('Invalid ASIN: ' + asins[a]);
+
+                    // Remove all stats with this ASIN
+                    Stats.remove({ type: 'affiliateClick', asin: asins[a] });
+
+                } else {
+                    asinData[asins[a]] = productData['US'];
+                }
+            }
+
+            // Add estimated earning per click
+            var clickEarnings = [];
+            clickedPosts = [];
+            for (c in clicks) {
+
+                if (asinData[clicks[c].asin]) {
+
+                    // Estimate
+                    if (asinData[clicks[c].asin].price && asinData[clicks[c].asin].commission) {
+                        earnings = asinData[clicks[c].asin].price * asinData[clicks[c].asin].commission / 100 * conversion / 100;
+
+                        // Insert
+                        clickEarnings.push({
+                            date: clicks[c].date,
+                            earnings: earnings,
+                            postId: clicks[c].postId
+                        });
+
+                        // Posts
+                        if (clickedPosts.indexOf(clicks[c].postId) == -1) {
+                            clickedPosts.push(clicks[c].postId);
+                        }
+
+                    }
+
+                }
+
+            }
+
+            // Generate revenue per posts
+            var posts = Posts.find({ _id: { $in: clickedPosts } }).fetch();
+
+            postsEarnings = [];
+            for (i in posts) {
+
+                postEarnings = {
+                    _id: posts[i]._id,
+                    title: posts[i].title
+                };
+                var earnings = 0;
+
+                for (c in clickEarnings) {
+                    if (clickEarnings[c].postId == posts[i]._id) {
+                        earnings += clickEarnings[c].earnings;
+                    }
+                }
+
+                postEarnings.earnings = earnings.toFixed(2);
+                postsEarnings.push(postEarnings);
+
+            }
+
+            postsEarnings.sort(function(a, b) {
+                return parseFloat(b.earnings) - parseFloat(a.earnings);
+            });
+
+            // Get all dates
+            dates = [];
+            for (i in clickEarnings) {
+
+                var date = new Date(clickEarnings[i].date);
+                date.setHours(0);
+                date.setMinutes(0);
+                date.setSeconds(0);
+                date.setMilliseconds(0);
+
+                if (dates.indexOf(date.getTime()) == -1) {
+                    dates.push(date.getTime());
+                }
+            }
+
+            var data = [];
+
+            for (i in dates) {
+
+                data.push({
+                    x: new Date(dates[i]),
+                    y: 0
+                })
+
+                for (c in clickEarnings) {
+
+                    // Format date
+                    var date = new Date(clickEarnings[c].date);
+                    date.setHours(0);
+                    date.setMinutes(0);
+                    date.setSeconds(0);
+                    date.setMilliseconds(0);
+
+                    if (date.getTime() == dates[i]) {
+                        data[i].y += clickEarnings[c].earnings;
+                    }
+
+                }
+
+                // Set precision
+                data[i].y = (data[i].y).toFixed(2);
+
+            }
+
+            return [data, postsEarnings];
+
+        } else {
+            return [];
+        }
+
+    },
     getGraphSessions: function(type) {
 
         var sessions = Meteor.call('getSessions', type);
 
         data = [];
-
-        // console.log(sessions);
 
         for (i in sessions) {
 
@@ -636,7 +1229,6 @@ Meteor.methods({
 
             dataPoint.y = parseInt(sessions[i].count);
             var date = sessions[i]._id.year + '-' + sessions[i]._id.month + '-' + sessions[i]._id.day;
-            // console.log(date);
             dataPoint.x = new Date(date);
 
             data.push(dataPoint);
@@ -645,14 +1237,13 @@ Meteor.methods({
 
         // Sort
         data.sort(date_sort);
-        console.log(data);
 
         return data;
 
     },
     getGraphData: function(type) {
 
-        var sessions = Meteor.call('getGraphSessions', type);
+        var sessions = Statistics.findOne({ type: type }).value;
 
         if (type == 'visit') {
 
@@ -688,16 +1279,29 @@ Meteor.methods({
 
         if (type == 'affiliateClick') {
 
+            var affiliateEarnings = Statistics.findOne({ type: 'amazonEarnings' }).value;
+
             var data = {
                 datasets: [{
                     label: 'Affiliate Clicks',
                     fill: false,
                     data: sessions,
+                    yAxisID: 'A',
                     pointHoverBackgroundColor: "orange",
                     pointHoverBorderColor: "orange",
                     pointBorderColor: "orange",
                     backgroundColor: "orange",
                     borderColor: "orange"
+                }, {
+                    label: 'Affiliate Earnings',
+                    fill: false,
+                    data: affiliateEarnings,
+                    yAxisID: 'B',
+                    pointHoverBackgroundColor: "red",
+                    pointHoverBorderColor: "red",
+                    pointBorderColor: "red",
+                    backgroundColor: "red",
+                    borderColor: "red"
                 }]
             };
         }
@@ -709,6 +1313,23 @@ Meteor.methods({
 
         Stats.remove({});
 
+    },
+    calculateConversion: function(result, base) {
+
+        if (base != 0) {
+            return (result / base * 100).toFixed(2);
+        } else {
+            return 0;
+        }
+
+    },
+    getRandomColor: function() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     }
 
 })

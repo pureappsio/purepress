@@ -2,6 +2,23 @@ body {
   font-size: 18px;
 }
 
+.badge {
+	font-size: 18px !important;
+	padding: 7px;
+}
+
+.red {
+	color: red;
+}
+
+.green {
+	color: green;
+}
+
+.stats-variation {
+	font-size: 25px;
+}
+
 .post-title {
 	font-size: 26px;
 	margin-bottom: 25px;

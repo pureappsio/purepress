@@ -3,23 +3,53 @@ var cheerio = Npm.require("cheerio");
 
 Future = Npm.require('fibers/future');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
-knox = Npm.require('knox');
-Request = Npm.require('request');
-bound = Meteor.bindEnvironment(function(callback) {
-    return callback();
-});
-cfdomain = 'https://' + Meteor.settings.s3.cloudfront; // <-- Change to your Cloud Front Domain
-client = knox.createClient({
-    key: Meteor.settings.s3.key,
-    secret: Meteor.settings.s3.secret,
-    bucket: Meteor.settings.s3.bucket,
-    region: Meteor.settings.s3.region
-});
+// knox = Npm.require('knox');
+// Request = Npm.require('request');
+// bound = Meteor.bindEnvironment(function(callback) {
+//     return callback();
+// });
+// cfdomain = 'https://' + Meteor.settings.s3.cloudfront; // <-- Change to your Cloud Front Domain
+// client = knox.createClient({
+//     key: Meteor.settings.s3.key,
+//     secret: Meteor.settings.s3.secret,
+//     bucket: Meteor.settings.s3.bucket,
+//     region: Meteor.settings.s3.region
+// });
 
 Meteor.methods({
 
+    addPostTag: function(postId, tagId) {
+
+        // Get post
+        var post = Posts.findOne(postId);
+
+        if (post.tags) {
+
+            var tags = post.tags;
+
+            if (tags.indexOf(tagId) == -1) {
+                tags.push(tagId);
+            }
+
+        } else {
+            tags = [tagId];
+        }
+
+        console.log(tags);
+
+        // Update
+        Posts.update(postId, { $set: { tags: tags } });
+
+    },
+    createTag: function(tag) {
+
+        console.log(tag);
+
+        Tags.insert(tag);
+
+    },
     localiseAllPosts: function() {
 
         console.log('Started localising all posts');
@@ -68,6 +98,8 @@ Meteor.methods({
     },
     spotDeadAmazonLinks: function() {
 
+        console.log('Checking all posts for dead links ...');
+
         // Grab all posts
         var posts = Posts.find({}).fetch();
 
@@ -77,6 +109,8 @@ Meteor.methods({
             console.log('Post ' + posts[i]._id + ' has ' + badLinks.length + ' bad links');
 
         }
+
+        console.log(' ... done');
 
     },
     findDeadLinksPost: function(postId) {
@@ -136,7 +170,8 @@ Meteor.methods({
                         var element = {
                             countryCode: countryCode,
                             link: $(elem)[0].attribs.href,
-                            text: $(elem)[0].children[0].data
+                            text: $(elem)[0].children[0].data,
+                            asin: Meteor.call('extractAsinStats', $(elem)[0].attribs.href)
                         }
                         amazonLinks.push(element);
                     }
@@ -150,26 +185,32 @@ Meteor.methods({
             // Check for dead links
             for (l in amazonLinks) {
 
-                // Grab content
-                try {
-                    var answer = HTTP.get(amazonLinks[l].link, {
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    });
-                    // var content = answer.content;
-                    // console.log(content);
+                var data = Meteor.call('getAmazonProductData', amazonLinks[l].asin);
 
-                } catch (err) {
-                    // console.log('Bad link: ' + amazonLinks[l]);
+                if (data.message) {
                     badLinks.push(amazonLinks[l]);
                 }
+
+                // // Grab content
+                // try {
+                //     var answer = HTTP.get(amazonLinks[l].link, {
+                //         headers: {
+                //             "Content-Type": "application/json"
+                //         }
+                //     });
+                //     // var content = answer.content;
+                //     // console.log(content);
+
+                // } catch (err) {
+                //     // console.log('Bad link: ' + amazonLinks[l]);
+                //     badLinks.push(amazonLinks[l]);
+                // }
 
             }
 
         }
 
-        console.log(badLinks);
+        // console.log(badLinks);
 
         return badLinks;
 
@@ -325,72 +366,72 @@ Meteor.methods({
         Posts.update({}, { $set: { status: 'published' } }, { multi: true });
 
     },
-    importImage: function(url) {
+    // importImage: function(url) {
 
-        var myFuture = new Future();
+    //     var myFuture = new Future();
 
-        Images.load(url, function(err, fileRef) {
+    //     Images.load(url, function(err, fileRef) {
 
-            console.log('File uploaded');
+    //         console.log('File uploaded');
 
-            if (err) {
-                console.log(err);
-                myFuture.return("");
-            } else {
+    //         if (err) {
+    //             console.log(err);
+    //             myFuture.return("");
+    //         } else {
 
-                _.each(fileRef.versions, function(vRef, version) {
+    //             _.each(fileRef.versions, function(vRef, version) {
 
-                    var filePath = "files/" + (Random.id()) + "-" + version + "." + fileRef.extension;
+    //                 var filePath = "files/" + (Random.id()) + "-" + version + "." + fileRef.extension;
 
-                    client.putFile(vRef.path, filePath, function(error, res) {
-                        bound(function() {
-                            var upd;
-                            if (error) {
-                                console.error(error);
-                            } else {
-                                upd = {
-                                    $set: {}
-                                };
-                                upd['$set']["versions." + version + ".meta.pipeFrom"] = cfdomain + '/' + filePath;
-                                upd['$set']["versions." + version + ".meta.pipePath"] = filePath;
-                                Images.collection.update({
-                                    _id: fileRef._id
-                                }, upd, function(error) {
-                                    if (error) {
-                                        console.error(error);
-                                    } else {
-                                        // Unlink original files from FS
-                                        // after successful upload to AWS:S3
-                                        console.log('Uploaded to S3');
-                                        Images.unlink(Images.collection.findOne(fileRef._id), version);
-                                        myFuture.return(Images.collection.findOne(fileRef._id));
-                                    }
-                                });
-                            }
-                        });
-                    });
+    //                 client.putFile(vRef.path, filePath, function(error, res) {
+    //                     bound(function() {
+    //                         var upd;
+    //                         if (error) {
+    //                             console.error(error);
+    //                         } else {
+    //                             upd = {
+    //                                 $set: {}
+    //                             };
+    //                             upd['$set']["versions." + version + ".meta.pipeFrom"] = cfdomain + '/' + filePath;
+    //                             upd['$set']["versions." + version + ".meta.pipePath"] = filePath;
+    //                             Images.collection.update({
+    //                                 _id: fileRef._id
+    //                             }, upd, function(error) {
+    //                                 if (error) {
+    //                                     console.error(error);
+    //                                 } else {
+    //                                     // Unlink original files from FS
+    //                                     // after successful upload to AWS:S3
+    //                                     console.log('Uploaded to S3');
+    //                                     Images.unlink(Images.collection.findOne(fileRef._id), version);
+    //                                     myFuture.return(Images.collection.findOne(fileRef._id));
+    //                                 }
+    //                             });
+    //                         }
+    //                     });
+    //                 });
 
-                });
+    //             });
 
-            }
+    //         }
 
-        });
+    //     });
 
-        return myFuture.wait();
+    //     return myFuture.wait();
 
-    },
-    replaceImageLink: function(url) {
+    // },
+    // replaceImageLink: function(url) {
 
-        var fileRef = Meteor.call('importImage', url);
-        // console.log('/cdn/storage/Images/' + fileRef._id + '/original/' + fileRef._id + '.' + fileRef.extension);
+    //     var fileRef = Meteor.call('importImage', url);
+    //     // console.log('/cdn/storage/Images/' + fileRef._id + '/original/' + fileRef._id + '.' + fileRef.extension);
 
-        if (fileRef != "") {
-            return '/cdn/storage/Images/' + fileRef._id + '/original/' + fileRef._id + '.' + fileRef.extension;
-        } else {
-            return "";
-        }
+    //     if (fileRef != "") {
+    //         return '/cdn/storage/Images/' + fileRef._id + '/original/' + fileRef._id + '.' + fileRef.extension;
+    //     } else {
+    //         return "";
+    //     }
 
-    },
+    // },
     importPosts: function() {
 
         if (Integrations.findOne({ type: 'wordpress' })) {

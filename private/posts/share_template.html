@@ -1,0 +1,16 @@
+<div class='row'>
+    <div class='fixed'>
+        <div class='square-share'>
+            <div class='share-number'>{{shareNumber}}</div>
+            <div>Shares</div>
+        </div>
+        <a class='social_share_icon social_share_link' href='https://www.facebook.com/sharer/sharer.php?u={{postUrl}}'><img src='/facebook.png'></a>
+         <a class='social_share_icon social_share_link' href='https://plus.google.com/share?url={{postUrl}}'><img src='/googleplus.png'></a>
+        <a class='social_share_icon social_share_link' href="https://twitter.com/intent/tweet?text={{title}}&url={{postUrl}}{{#if twitterUsername}}&via={{twitterUsername}}{{/if}}"><img src='/twitter.png'></a>
+        <a class='social_share_icon social_share_link' href="https://pinterest.com/pin/create/button/?url={{postUrl}}&media={{imageUrl}}&description={{description}}">
+            <img src='/pinterest.png'>
+        </a>
+        <a class='social_share_icon social_share_link' href='https://www.linkedin.com/shareArticle?mini=true&title={{title}}&url={{postUrl}}&summary={{description}}'><img src='/linkedin.png'></a>
+        <a class='social_share_icon social_share_icon_link' href='{{email}}'><img src='/email.png'></a>
+    </div>
+</div>

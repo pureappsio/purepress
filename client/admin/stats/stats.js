@@ -10,7 +10,7 @@ Template.stats.helpers({
 
     visitsVariation: function() {
 
-        var variation = Statistics.findOne({ type: 'visitsVariation' }).value;
+        var variation = Statistics.findOne({ userId: Meteor.user()._id, type: 'visitsVariation' }).value;
         variation = parseInt(variation);
         if (variation > 999) {
             variation = 999;
@@ -20,14 +20,14 @@ Template.stats.helpers({
     },
     liveVisitors: function() {
 
-        return Visitors.find({ date: { $gte: Session.get("limitDate") } }).count();
+        return Visitors.find({ userId: Meteor.user()._id, date: { $gte: Session.get("limitDate") } }).count();
 
     },
     podcastEpisodes: function() {
-        return Posts.find({ podcastFileId: { $exists: true } })
+        return Posts.find({ userId: Meteor.user()._id, podcastFileId: { $exists: true } })
     },
     arePodcasts: function() {
-        if (Posts.findOne({ podcastFileId: { $exists: true } })) {
+        if (Posts.findOne({ userId: Meteor.user()._id, podcastFileId: { $exists: true } })) {
             return true;
         } else {
             return false;
@@ -35,32 +35,32 @@ Template.stats.helpers({
     },
     areSales: function() {
 
-        if (Integrations.findOne({ type: 'purecart' })) {
+        if (Integrations.findOne({ userId: Meteor.user()._id, type: 'purecart' })) {
             return true;
         }
 
     },
     mobile: function() {
-        return (Statistics.findOne({ type: 'totalMobile' }).value / Statistics.findOne({ type: 'allVisits' }).value * 100).toFixed(1) + '%';
+        return (Statistics.findOne({ userId: Meteor.user()._id, type: 'totalMobile' }).value / Statistics.findOne({ type: 'allVisits' }).value * 100).toFixed(1) + '%';
     },
     affEarnings: function() {
 
-        return '$' + (Statistics.findOne({ type: 'totalAmazonEarnings' }).value).toFixed(2);
+        return '$' + (Statistics.findOne({ userId: Meteor.user()._id, type: 'totalAmazonEarnings' }).value).toFixed(2);
 
     },
     sales: function() {
 
-        return '$' + Statistics.findOne({ type: 'sales' }).value;
+        return '$' + Statistics.findOne({ userId: Meteor.user()._id, type: 'sales' }).value;
 
     },
     listConversions: function() {
 
-        return (Statistics.findOne({ type: 'totalSubscribed' }).value / Statistics.findOne({ type: 'allVisits' }).value * 100).toFixed(1) + '%';
+        return (Statistics.findOne({ userId: Meteor.user()._id, type: 'totalSubscribed' }).value / Statistics.findOne({ userId: Meteor.user()._id, type: 'allVisits' }).value * 100).toFixed(1) + '%';
 
     },
     postsWithBox: function() {
 
-        return Statistics.findOne({ type: 'convertingPosts' }).value;
+        return Statistics.findOne({ userId: Meteor.user()._id, type: 'convertingPosts' }).value;
 
     },
     areConversions: function() {
@@ -70,7 +70,7 @@ Template.stats.helpers({
     },
     areAffiliates: function() {
 
-        return true;
+        return Session.get('areAffiliates');
 
     },
     allVisits: function() {
@@ -89,24 +89,24 @@ Template.stats.helpers({
     },
     affiliatePosts: function() {
 
-        return Statistics.findOne({ type: 'affiliatePosts' }).value;
+        return Statistics.findOne({ userId: Meteor.user()._id, type: 'affiliatePosts' }).value;
 
     },
     postsEarnings: function() {
 
-        var posts = Statistics.findOne({ type: 'postsEarnings' }).value;
+        var posts = Statistics.findOne({ userId: Meteor.user()._id, type: 'postsEarnings' }).value;
 
         return posts.slice(0, 7);
 
     },
     posts: function() {
 
-        return (Statistics.findOne({ type: 'visitedPosts' }).value).slice(0, 7);
+        return (Statistics.findOne({ userId: Meteor.user()._id, type: 'visitedPosts' }).value).slice(0, 7);
 
     },
     pages: function() {
 
-        return (Statistics.findOne({ type: 'visitedPages' }).value).slice(0, 7);
+        return (Statistics.findOne({ userId: Meteor.user()._id, type: 'visitedPages' }).value).slice(0, 7);
 
     },
     postsShared: function() {
@@ -116,6 +116,12 @@ Template.stats.helpers({
 });
 
 Template.stats.onRendered(function() {
+
+    Meteor.call('areAffiliateClicks', function(err, data) {
+
+        Session.set('areAffiliates', data);
+
+    });
 
     Session.set("limitDate", new Date(new Date().getTime() - 60 * 1000));
     Meteor.setInterval(function() {

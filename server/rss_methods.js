@@ -2,6 +2,8 @@
 // mp3Duration = Npm.require('mp3-duration');
 // Future = Npm.require('fibers/future');
 
+import Images from '../imports/api/files';
+
 Meteor.methods({
 
     renderRSS: function() {

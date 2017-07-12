@@ -6,7 +6,8 @@ Template.pricing.events({
         var pricing = {
             name: $('#element-name').val(),
             explainer: $('#element-explainer').val(),
-            type: 'structure'
+            type: 'structure',
+            userId: Meteor.user()._id
         }
 
         // Save
@@ -22,7 +23,8 @@ Template.pricing.events({
             price: $('#option-price').val(),
             button: $('#option-button').val(),
             link: $('#option-link').val(),
-            type: 'element'
+            type: 'element',
+            userId: Meteor.user()._id
         }
 
         // Get features

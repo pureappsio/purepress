@@ -53,8 +53,8 @@
         <div class='col-md-4 col-center'>
             <canvas id='category-chart' height="200"></canvas>
         </div>
-        <div class='col-md-4 col-center'>
-            <canvas id='tags-chart' height="200"></canvas>
+        <div class='col-md-8 col-center'>
+            <canvas id='tags-chart' height="95"></canvas>
         </div>
     </div>
     <div class='row voffset30'>
@@ -89,7 +89,7 @@
         </div>
     </div>
     <!-- {{/if}} -->
-    <!-- {{#if areAffiliates}} -->
+    {{#if areAffiliates}}
     <div class='row'>
         <div class="col-md-6">
             <h3>Affiliate Conversions</h3>
@@ -111,7 +111,7 @@
             <h3>Revenue per Post</h3> {{#each postsEarnings}} {{> postStats}} {{/each}}
         </div>
     </div>
-    <!--  {{/if}} -->
+     {{/if}}
     <div class='row'>
         <div class="col-md-6">
             <h3>Social Shares</h3>

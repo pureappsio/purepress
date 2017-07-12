@@ -4,7 +4,7 @@ Template.boxes.onRendered(function() {
 
 Template.boxes.events({
 
-	'click #create-box': function() {
+    'click #create-box': function() {
 
         // Build box
         var box = {
@@ -13,7 +13,8 @@ Template.boxes.events({
             boxContent: $('#box-content').summernote('code'),
             popupContent: $('#popup-content').summernote('code'),
             tags: $('#tags-id').val(),
-            displayTitle: $('#box-display-title').val()
+            displayTitle: $('#box-display-title').val(),
+            userId: Meteor.user()._id
         }
 
         // Save
@@ -26,7 +27,7 @@ Template.boxes.events({
 Template.boxes.helpers({
 
     boxesElements: function() {
-        return Boxes.find({});
+        return Boxes.find({ userId: Meteor.user()._id });
     }
 
 });

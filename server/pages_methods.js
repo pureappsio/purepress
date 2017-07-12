@@ -1,5 +1,47 @@
+import Images from '../imports/api/files';
+
 Meteor.methods({
 
+    deleteRecording: function(recordingId) {
+        Recordings.remove(recordingId);
+    },
+    saveRecording: function(data) {
+
+        // console.log(data);
+
+        // Decode
+        var buf = new Buffer(data.recording, 'base64');
+
+        // Save
+        var fileRef = Images.write(buf, {
+            fileName: 'recording.webm',
+            type: 'audio/webm'
+        }, function(error, fileRef) {
+            if (error) {
+                throw error;
+            } else {
+
+                // Recording
+                var recording = {
+                    fileId: fileRef._id,
+                    date: new Date(),
+                    email: data.email,
+                    name: data.name,
+                    rawData: buf
+                }
+
+                // Get URL
+                var url = Images.findOne(fileRef._id).link();
+                recording.recordingUrl = url;
+
+                console.log(recording);
+
+                Recordings.insert(recording);
+
+            }
+        });
+
+    },
     hasElement: function(pageId, elementType) {
 
         // Get all elements with type
@@ -164,7 +206,7 @@ Meteor.methods({
             // Get lists
             var url = "https://" + integration.url + "/api/products/" + productId + "?key=" + integration.key;
             var answer = HTTP.get(url);
-            
+
             // console.log(answer.data.product);
             return answer.data.product;
 

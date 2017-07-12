@@ -3,23 +3,45 @@ var cheerio = Npm.require("cheerio");
 
 Future = Npm.require('fibers/future');
 
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
-
-// knox = Npm.require('knox');
-// Request = Npm.require('request');
-// bound = Meteor.bindEnvironment(function(callback) {
-//     return callback();
-// });
-// cfdomain = 'https://' + Meteor.settings.s3.cloudfront; // <-- Change to your Cloud Front Domain
-// client = knox.createClient({
-//     key: Meteor.settings.s3.key,
-//     secret: Meteor.settings.s3.secret,
-//     bucket: Meteor.settings.s3.bucket,
-//     region: Meteor.settings.s3.region
-// });
-
 Meteor.methods({
 
+    getBusinessReport: function(month, year) {
+
+        if (Integrations.findOne({ type: 'puremetrics' })) {
+
+            var integration = Integrations.findOne({ type: 'puremetrics' });
+
+            // Build individual positions
+            var url = 'https://' + integration.url + '/api/report?key=' + integration.key;
+            url += '&month=' + month + '&year=' + year;
+            var report = HTTP.get(url).data;
+
+            return report;
+
+        } else {
+            return {};
+        }
+
+    },
+    getInvestmentReport: function(month, year) {
+
+        if (Integrations.findOne({ type: 'pureportfolio' })) {
+
+            var integration = Integrations.findOne({ type: 'pureportfolio' });
+
+            // Build individual positions
+            var url = 'https://' + integration.url + '/api/report';
+            url += '?month=' + month + '&year=' + year;
+            console.log(url);
+
+            var report = HTTP.get(url).data;
+
+            return report;
+
+        } else {
+            return {};
+        }
+    },
     addPostTag: function(postId, tagId) {
 
         // Get post
@@ -48,6 +70,17 @@ Meteor.methods({
         console.log(tag);
 
         Tags.insert(tag);
+
+    },
+    removeTag: function(tagId) {
+
+        // Remove tag
+        Tags.remove(tagId);
+
+        // Remove from all posts
+        console.log(Posts.find({ tags: tagId }).count());
+        Posts.update({ tags: tagId }, { $pull: { tags: tagId } }, { multi: true });
+        console.log(Posts.find({ tags: tagId }).count());
 
     },
     localiseAllPosts: function() {
@@ -524,6 +557,11 @@ Meteor.methods({
         console.log(category);
 
         Categories.insert(category);
+
+    },
+    removeCategory: function(categoryId) {
+
+        Categories.remove(categoryId);
 
     },
     getCategories: function() {

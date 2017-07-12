@@ -1,6 +1,6 @@
 Template.affiliateElementListing.events({
 
-    'click .affiliate-pic-save': function(){
+    'click .affiliate-pic-save': function() {
 
         Meteor.call('editElement', this._id, 'picture', Session.get('affiliatePictureNew'));
     },

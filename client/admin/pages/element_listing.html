@@ -7,8 +7,12 @@
             </div>
         </div>
         <div class="col-md-2">{{type}}</div>
-        <div class="col-md-7">
-            <div id='content-{{_id}}'>{{content}}</div>
+        {{#if image}}<div class="col-md-1"><img src='{{imgLink image}}' class="img-responsive"></div>{{/if}}
+        <div class="col-md-{{#if image}}6{{else}}7{{/if}}">
+            {{#if title}}
+            <div class='element-title' id='title-{{_id}}'>{{title}} {{#if link}}({{link}}){{/if}}</div>
+            {{/if}}
+            <div id='content-{{_id}}'>{{{content}}}</div>
         </div>
         <div class="col-md-1">
             {{#if isText}}

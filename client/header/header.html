@@ -1,3 +1,31 @@
 <template name="header">
-
+    <!-- <nav class="navbar navbar-toggleable-md   navbar-light bg-faded">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="/">
+            <div class='site-title'>PurePress</div>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            </ul>
+            <ul class="navbar-nav">
+                {{#if isAppUser}}
+                <li class="nav-item"><a class="nav-link" href="{{pathFor 'message'}}">Message Students</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{pathFor 'settings'}}">Settings</a></li>
+                {{/if}} {{#if isAdmin}}
+                <li class="nav-item"><a class="nav-link" href="{{pathFor 'admin'}}">Admin</a></li>
+                {{/if}} {{#if currentUser}}
+                <li class="nav-item"><a id='log-out' href='#' class="nav-link">Log Out</a></li>
+                {{/if}} {{#if notUser}}
+                <li class="nav-item">
+                    <a href="{{pathFor 'login'}}" class="form-nav nav-link">{{#if langEN}}Login{{else}}Se Connecter{{/if}}</a>
+                </li>
+                <form class="form-inline ">
+                    <a href="{{pathFor 'signup'}}" class="btn-nav btn btn-warning">{{#if langEN}}Sign Up{{else}}Créer un Compte{{/if}}</a>
+                </form>
+                {{/if}}
+            </ul>
+        </div>
+    </nav> -->
 </template>

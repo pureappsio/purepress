@@ -12,4 +12,7 @@ Meteor.startup(function() {
     // Create users if needed
     Meteor.call('createUsers');
 
+    // Grab conversion rates
+    Meteor.call('updateConversionRates');
+
 });

@@ -12,6 +12,10 @@ Meteor.publish("userElements", function() {
     return Elements.find({});
 });
 
+Meteor.publish("userRecordings", function() {
+    return Recordings.find({});
+});
+
 Meteor.publish("userNetworks", function() {
     return Networks.find({});
 });

@@ -4,34 +4,48 @@ Template.podcast.events({
 
         Meteor.call('insertMeta', {
             value: $('#podcast-title').val(),
-            type: 'podcastTitle'
+            type: 'podcastTitle',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#podcast-description').val(),
-            type: 'podcastDescription'
+            type: 'podcastDescription',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#itunes-summary').val(),
-            type: 'itunesSummary'
+            type: 'itunesSummary',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#itunes-author').val(),
-            type: 'itunesAuthor'
+            type: 'itunesAuthor',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#itunes-image').val(),
-            type: 'itunesImage'
+            type: 'itunesImage',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#itunes-subtitle').val(),
-            type: 'itunesSubtitle'
+            type: 'itunesSubtitle',
+            userId: Meteor.user()._id
         });
 
+    }
+
+});
+
+Template.podcast.helpers({
+
+    recordings: function() {
+        return Recordings.find({userId: Meteor.user()._id});
     }
 
 });

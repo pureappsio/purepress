@@ -1,7 +1,245 @@
 var cheerio = Npm.require("cheerio");
 Future = Npm.require('fibers/future');
 
+import Images from '../imports/api/files';
+
 Meteor.methods({
+
+    importPurePress: function() {
+
+        console.log('Importing from PurePress');
+
+        // Get integration
+        if (Integrations.findOne({ type: 'purepress' })) {
+
+            // Integration
+            var integration = Integrations.findOne({ type: 'purepress' });
+
+            // Posts
+            console.log('Importing posts');
+            var posts = Meteor.call('getPureData', integration, 'posts');
+            for (i in posts) {
+                posts[i].userId = Meteor.user()._id;
+                Posts.insert(posts[i]);
+            }
+
+            // Pages
+            console.log('Importing pages');
+            var pages = Meteor.call('getPureData', integration, 'pages');
+            for (i in pages) {
+                pages[i].userId = Meteor.user()._id;
+                Pages.insert(pages[i]);
+            }
+
+            // Metas
+            console.log('Importing metas');
+            var metas = Meteor.call('getPureData', integration, 'metas');
+            for (i in metas) {
+                metas[i].userId = Meteor.user()._id;
+                Meteor.call('insertMeta', metas[i]);
+            }
+
+            // Elements
+            console.log('Importing elements');
+            var elements = Meteor.call('getPureData', integration, 'elements');
+            for (i in elements) {
+                elements[i].userId = Meteor.user()._id;
+                Elements.insert(elements[i]);
+            }
+
+            // Networks
+            console.log('Importing networks');
+            var networks = Meteor.call('getPureData', integration, 'networks');
+            for (i in networks) {
+                networks[i].userId = Meteor.user()._id;
+                Networks.insert(networks[i]);
+            }
+
+            // Images
+            console.log('Importing images');
+            var images = Meteor.call('getPureData', integration, 'files');
+            for (i in images) {
+                images[i].userId = Meteor.user()._id;
+                Images.collection.insert(images[i]);
+            }
+
+            // Menus
+            console.log('Importing menus');
+            var menus = Meteor.call('getPureData', integration, 'menus');
+            for (i in menus) {
+                menus[i].userId = Meteor.user()._id;
+                Menus.insert(menus[i]);
+            }
+
+            // Boxes
+            console.log('Importing boxes');
+            var boxes = Meteor.call('getPureData', integration, 'boxes');
+            for (i in boxes) {
+                boxes[i].userId = Meteor.user()._id;
+                Boxes.insert(boxes[i]);
+            }
+
+            // Categories
+            console.log('Importing categories');
+            var categories = Meteor.call('getPureData', integration, 'categories');
+            for (i in categories) {
+                categories[i].userId = Meteor.user()._id;
+                Categories.insert(categories[i]);
+            }
+
+            // Pricing
+            console.log('Importing pricing');
+            var pricing = Meteor.call('getPureData', integration, 'pricing');
+            for (i in pricing) {
+                pricing[i].userId = Meteor.user()._id;
+                Pricing.insert(pricing[i]);
+            }
+
+            // Tags
+            console.log('Importing tags');
+            var tags = Meteor.call('getPureData', integration, 'tags');
+            for (i in tags) {
+                tags[i].userId = Meteor.user()._id;
+                Tags.insert(tags[i]);
+            }
+
+            // Recordings
+            console.log('Importing recordings');
+            var recordings = Meteor.call('getPureData', integration, 'recordings');
+            for (i in recordings) {
+                recordings[i].userId = Meteor.user()._id;
+                Recordings.insert(recordings[i]);
+            }
+
+            // Stats
+            console.log('Importing stats');
+            var stats = Meteor.call('getPureData', integration, 'stats');
+            for (i in stats) {
+                stats[i].userId = Meteor.user()._id;
+                Stats.insert(stats[i]);
+            }
+
+            // Statistics
+            console.log('Importing statistics');
+            var statistics = Meteor.call('getPureData', integration, 'statistics');
+            for (i in statistics) {
+                statistics[i].userId = Meteor.user()._id;
+                Statistics.insert(statistics[i]);
+            }
+
+        }
+
+    },
+    getPureData: function(integration, dataName) {
+
+        var url = "https://" + integration.url + "/api/" + dataName + "?key=" + integration.key;
+        console.log(url);
+        var answer = HTTP.get(url);
+        return answer.data[dataName];
+
+    },
+    getUserId: function(headers) {
+
+        var host = headers.host;
+        var hostnameArray = host.split(".");
+
+        if (hostnameArray.length == 3) {
+
+            var domain = hostnameArray[0];
+
+            if (domain == 'app') {
+                var domain = "admin"
+            }
+
+        } else {
+            var domain = "admin"
+        }
+
+        var user = Meteor.call('getUserDomain', domain);
+        return user._id;
+
+    },
+    getUserDomain: function(domain) {
+
+        if (domain == 'admin') {
+            return Meteor.users.findOne({ role: domain });
+        } else {
+            if (Meteor.users.findOne({ domain: domain })) {
+                return Meteor.users.findOne({ domain: domain });
+            } else {
+                return Meteor.users.findOne({ role: 'admin' });
+            }
+        }
+
+    },
+    createUserAccount: function(data) {
+
+        console.log(data);
+
+        // Check if exist
+        if (Meteor.users.findOne({ "emails.0.address": data.email })) {
+
+            console.log('Updating existing user');
+            var userId = Meteor.users.findOne({ "emails.0.address": data.email })._id;
+
+        } else {
+
+            console.log('Creating new user');
+
+            // Create
+            var userId = Accounts.createUser({
+                email: data.email,
+                password: data.password
+            });
+
+            // Assign role & teacher ID
+            Meteor.users.update(userId, { $set: { role: data.role } });
+
+        }
+
+        return userId;
+
+    },
+    setUserDomain: function(domain) {
+
+        Meteor.users.update(Meteor.user()._id, { $set: { domain: domain } });
+
+        console.log(Meteor.user());
+
+    },
+    setUser: function() {
+
+        console.log('Setting user ids');
+
+        Posts.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Pages.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Elements.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Metas.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Menus.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Caches.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Networks.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Boxes.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Categories.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Products.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Pricing.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Tags.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Visitors.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Recordings.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Stats.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Statistics.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+        Integrations.update({}, { $set: { userId: Meteor.user()._id } }, { multi: true });
+
+    },
+    updateConversionRates: function() {
+
+        var answer = HTTP.get('http://api.fixer.io/latest');
+
+        Meteor.call('insertMeta', {
+            type: 'rates',
+            value: answer.data.rates
+        });
+
+    },
 
     checkDisplayModal: function(headers) {
 
@@ -34,11 +272,10 @@ Meteor.methods({
                 if (subscriber.email) {
 
                     return false;
-                }
-                else {
+                } else {
                     return true;
                 }
-                
+
             }
 
         } else {
@@ -47,11 +284,11 @@ Meteor.methods({
         }
 
     },
-    getAmazonProductData: function(asin) {
+    getAmazonProductData: function(asin, locale) {
 
         try {
 
-            var answer = HTTP.get('https://localizer.schwartzindustries.com/links/' + asin);
+            var answer = HTTP.get('https://localizer.schwartzindustries.com/links/' + asin + '?locale=' + locale);
 
             if (answer.data.asin) {
                 return answer.data;
@@ -71,7 +308,7 @@ Meteor.methods({
     },
     getSubscriberData: function(ip) {
 
-       // Get integration
+        // Get integration
         if (Integrations.findOne({ type: 'puremail' })) {
 
             var integration = Integrations.findOne({ type: 'puremail' });

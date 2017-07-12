@@ -12,9 +12,49 @@
         <img class='img-fluid' src='{{elementImage element}}'>
     </div>
 </div>
-{{/if}} 
-
-{{#if isElementType element 'latestposts'}}
+{{/if}} {{#if isElementType element 'separator'}}
+<div class='row element-container voffset15'></div>
+{{/if}} {{#if isElementType element 'audiorecord'}}
+<div class='row element-container'>
+    <div class='col-md-2'></div>
+    <div class='col-md-2'>
+        <button class='btn btn-success btn-block' id=startRecord><i class="fa fa-microphone" aria-hidden="true"></i> Start Recording</button>
+    </div>
+    <div class='col-md-2'>
+        <button class='btn btn-danger btn-block' id=stopRecord disabled><i class="fa fa-stop" aria-hidden="true"></i> Stop Recording</button>
+    </div>
+    <div class='col-md-2'>
+        <div id='recordTimer'>0 seconds</div>
+    </div>
+    <div class='col-md-2'>
+        <button class='btn btn-warning btn-block' id=replay disabled><i class="fa fa-play" aria-hidden="true"></i> Replay Recorded Audio</button>
+    </div>
+    <div class="hidden">
+        <audio id=recordedAudio></audio>
+        <a id=audioDownload></a>
+    </div>
+</div>
+<div class='row element-container voffset30'>
+    <div class='col-md-3'></div>
+    <div class='col-md-3'>
+        <input placeholder='Your name ...' type="text" id='record-name' class="form-control">
+    </div>
+    <div class='col-md-3'>
+        <input placeholder='Your email ...' type="text" id='record-email' class="form-control">
+    </div>
+</div>
+<div class='row element-container'>
+    <div class='col-md-3'></div>
+    <div class='col-md-6'>
+        <button class='btn btn-primary btn-lg btn-block' disabled id=submitRecord>
+            <i class="fa fa-paper-plane" aria-hidden="true"></i> Submit Recording
+        </button>
+        <div id="thankYouRecord">
+            Thank you!
+        </div>
+    </div>
+</div>
+{{/if}} {{#if isElementType element 'latestposts'}}
 <div class='row'>
     <div class='col-md-1'></div>
     <div class='col-md-10 latest-post-title'>{{#if langEN}}Latest Posts{{else}}Derniers Articles{{/if}}</div>
@@ -36,9 +76,7 @@
         </div>
     </div>
 </div>
-{{/if}} 
-
-{{#if isElementType element 'bestposts'}}
+{{/if}} {{#if isElementType element 'bestposts'}}
 <div class='row'>
     <div class='col-md-1'></div>
     <div class='col-md-10 latest-post-title'>{{#if langEN}}Some of our most popular content:{{else}}Nos meilleurs articles:{{/if}}</div>
@@ -60,9 +98,7 @@
         </div>
     </div>
 </div>
-{{/if}} 
-
-{{#if isElementType element 'text'}}
+{{/if}} {{#if isElementType element 'text'}}
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
@@ -278,7 +314,7 @@
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
-        <table class="table">
+        <table class="table table-custom">
             <thead>
                 <tr>
                     <th>Type</th>
@@ -305,7 +341,7 @@
 <div class='row element-container'>
     <div class='col-md-2'></div>
     <div class='col-md-8'>
-        <table class="table">
+        <table class="table table-custom">
             <thead>
                 <tr>
                     {{#if isStock element.portfolioType}}

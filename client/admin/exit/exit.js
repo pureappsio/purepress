@@ -11,6 +11,11 @@ Template.exit.onRendered(function() {
             }));
         }
 
+        if (Metas.findOne({ type: 'exitSequence' })) {
+            var value = Metas.findOne({ type: 'exitSequence' }).value;
+            $('#exit-sequence').val(value);
+        }
+
     });
 
     $('#exit-content').summernote({
@@ -18,8 +23,13 @@ Template.exit.onRendered(function() {
     });
 
     if (Metas.findOne({ type: 'exitContent' })) {
-        var value = Metas.findOne({ type: 'exitContent' }).value;
+        var value = Metas.findOne({ type: 'exitContent', userId: Meteor.user()._id }).value;
         $('#exit-content').summernote('code', value);
+    }
+
+    if (Metas.findOne({ type: 'exitStatus' })) {
+        var value = Metas.findOne({ type: 'exitStatus', userId: Meteor.user()._id }).value;
+        $('#activate-intent').val(value);
     }
 
 });
@@ -28,10 +38,11 @@ Template.exit.events({
 
     'click #activate-intent': function() {
 
-         // Insert Metas
+        // Insert Metas
         Meteor.call('insertMeta', {
             value: $('#intent-status :selected').val(),
-            type: 'exitStatus'
+            type: 'exitStatus',
+            userId: Meteor.user()._id
         });
 
     },
@@ -40,22 +51,26 @@ Template.exit.events({
         // Insert Metas
         Meteor.call('insertMeta', {
             value: $('#exit-title').val(),
-            type: 'exitTitle'
+            type: 'exitTitle',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#exit-button').val(),
-            type: 'exitButton'
+            type: 'exitButton',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#exit-content').summernote('code'),
-            type: 'exitContent'
+            type: 'exitContent',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#exit-sequence :selected').val(),
-            type: 'exitSequence'
+            type: 'exitSequence',
+            userId: Meteor.user()._id
         });
 
     }

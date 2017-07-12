@@ -39,6 +39,18 @@ Template.postEdit.onRendered(function() {
 
     // Show podcast url
     if (this.data.category) {
+
+        Session.set('postType', this.data.category);
+
+        if (this.data.category == 'report') {
+
+            $('#report-conclusion').summernote({
+                minHeight: 100 // set editor height
+            })
+
+            $('#report-conclusion').summernote('code', this.data.conclusion);
+        }
+
         if (this.data.category == 'podcast') {
             $('.podcast-url-selector').show();
         } else {
@@ -78,19 +90,7 @@ Template.postEdit.onRendered(function() {
                 Session.set('wordCount', content.trim().split(/\s+/).length);
             }
         }
-        // popover: {
-        //     image: [
-        //         ['custom', ['imageAttributes']],
-        //         ['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
-        //         ['float', ['floatLeft', 'floatRight', 'floatNone']],
-        //         ['remove', ['removeMedia']]
-        //     ]
-        // },
-        // imageAttributes:{
-        //     imageDialogLayout:'default', // default|horizontal
-        //     icon:'<i class="note-icon-pencil"/>',
-        //     removeEmpty:false // true = remove attributes | false = leave empty if present
-        // }
+
     });
 
     // Init post content
@@ -128,6 +128,15 @@ Template.postEdit.onRendered(function() {
     // Init category
     if (this.data.postCategory) {
         $('#blog-post-category').val(this.data.postCategory);
+    }
+
+    // Init report
+    if (this.data.year) {
+        $('#report-year').val(this.data.year);
+    }
+
+    if (this.data.month) {
+        $('#report-month').val(this.data.month);
     }
 
     // Init editor
@@ -243,6 +252,7 @@ Template.postEdit.events({
         // Create element
         var element = {
             type: 'affiliate',
+            userId: Meteor.user()._id,
             rank: $('#affiliate-rank').val(),
             rating: $('#affiliate-rating').val(),
             title: $('#affiliate-title').val(),
@@ -267,7 +277,8 @@ Template.postEdit.events({
         var element = {
             type: 'ingredient',
             description: $('#ingredient-description').val(),
-            postId: this._id
+            postId: this._id,
+            userId: Meteor.user()._id
         }
 
         // Add element
@@ -280,7 +291,8 @@ Template.postEdit.events({
         var element = {
             type: 'step',
             description: $('#step-description').summernote('code'),
-            postId: this._id
+            postId: this._id,
+            userId: Meteor.user()._id
         }
 
         // Add element
@@ -314,6 +326,14 @@ Template.postEdit.events({
             $('.main-content').show();
             $('.affiliate-content').hide();
             $('.recipe-content').hide();
+        }
+
+        Session.set('postType', $('#post-category :selected').val());
+
+        if ($('#post-category :selected').val() == 'report') {
+            $('#report-conclusion').summernote({
+                minHeight: 100 // set editor height
+            })
         }
 
     },
@@ -372,6 +392,13 @@ Template.postEdit.events({
             post.conclusion = $('#post-recipe-conclusion').summernote('code');
         }
 
+        if ($('#post-category :selected').val() == 'report') {
+            post.content = $('#post-content').summernote('code');
+            post.conclusion = $('#report-conclusion').summernote('code');
+            post.month = $('#report-month :selected').val();
+            post.year = $('#report-year :selected').val();
+        }
+
         if (this.featuredPicture) {
             post.featuredPicture = this.featuredPicture;
         }
@@ -414,6 +441,13 @@ Template.postEdit.events({
 
 Template.postEdit.helpers({
 
+    reportSelected: function() {
+
+        if (Session.get('postType') == 'report') {
+            return true;
+        }
+
+    },
     podcastFileSize: function() {
 
         if (Session.get('podcastEpisodeLength')) {
@@ -430,7 +464,7 @@ Template.postEdit.helpers({
     },
     allTags: function() {
 
-        return Tags.find({});
+        return Tags.find({ userId: Meteor.user()._id });
 
     },
     tagsName: function() {
@@ -475,16 +509,16 @@ Template.postEdit.helpers({
         return Session.get('imgLink');
     },
     ingredients: function() {
-        return Elements.find({ postId: this._id, type: 'ingredient' }, { sort: { order: 1 } });
+        return Elements.find({ userId: Meteor.user()._id, postId: this._id, type: 'ingredient' }, { sort: { order: 1 } });
     },
     steps: function() {
-        return Elements.find({ postId: this._id, type: 'step' }, { sort: { order: 1 } });
+        return Elements.find({ userId: Meteor.user()._id, postId: this._id, type: 'step' }, { sort: { order: 1 } });
     },
     affiliateListings: function() {
         return Elements.find({ $or: [{ postId: this._id, type: 'affiliate' }, { postId: this._id, type: { $exists: false } }] }, { sort: { rank: 1 } });
     },
     categories: function() {
-        return Categories.find({});
+        return Categories.find({ userId: Meteor.user()._id });
     },
     statusLabel: function() {
         if (this.status) {

@@ -71,6 +71,20 @@ Template.elementBuilder.events({
 
         }
 
+        if (elementType == 'audiorecord') {
+
+            // No image
+            Session.set('imageNeeded', false);
+
+        }
+
+        if (elementType == 'separator') {
+
+            // No image
+            Session.set('imageNeeded', false);
+
+        }
+
         // Fill depending on choice
         if (elementType == 'signupbox') {
 

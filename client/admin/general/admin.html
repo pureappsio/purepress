@@ -1,5 +1,5 @@
 <template name="admin">
-    {{#if isAdmin}}
+    {{#if isAppUser}}
     <div class='admin-panel'>
         <h2>Admin Panel</h2>
         <nav aria-label="...">
@@ -17,6 +17,9 @@
                 <li><a class='section-selector' id="affiliate">Affiliate</a></li>
                 <li><a class='section-selector' id="stats">Stats</a></li>
                 <li><a class='section-selector' id="integrations">Admin</a></li>
+                <li>
+                    <button id='log-out' class='btn btn-primary'>Log Out</button>
+                </li>
             </ul>
         </nav>
         <div style='display: {{showSection "brand"}}'>
@@ -229,7 +232,11 @@
                     {{#each tags}} {{> tagDisplay}} {{/each}}
                 </div>
             </div>
-            
+            <div class='row'>
+                <div class='col-md-6'>
+                    {{#each categories}} {{> categoryDisplay}} {{/each}}
+                </div>
+            </div>
         </div>
         <div style='display: {{showSection "comments"}}'>
             <h3>Comments</h3>
@@ -337,7 +344,7 @@
         <div style='display: {{showSection "boxes"}}'>
             {{> boxes}}
         </div>
-         <div style='display: {{showSection "exit"}}'>
+        <div style='display: {{showSection "exit"}}'>
             {{> exit}}
         </div>
         <div style='display: {{showSection "pricing"}}'>
@@ -436,6 +443,8 @@
                         <option value='purepages'>PurePages</option>
                         <option value='puresocial'>PureSocial</option>
                         <option value='pureportfolio'>PurePortfolio</option>
+                        <option value='puremetrics'>PureMetrics</option>
+                        <option value='purepress'>PurePress</option>
                         <option value='wordpress'>WordPress</option>
                     </select>
                 </div>
@@ -479,6 +488,8 @@
                     <button id='set-pixel' class='btn btn-block btn-primary'>Set Facebook Pixel</button>
                 </div>
             </div>
+            <button id='set-user' class='btn btn-block btn-primary'>Set User Id</button>
+            <button id='import-pure' class='btn btn-block btn-primary'>Import From PurePress</button>
         </div>
         <div class='voffset30'></div>
     </div>

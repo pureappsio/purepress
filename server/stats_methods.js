@@ -1,5 +1,19 @@
+var countriesList = ['US', 'FR', 'CA', 'UK', 'DE', 'IT', 'ES'];
+
 Meteor.methods({
 
+    areAffiliateClicks: function() {
+
+        var clicks = Stats.find({ type: 'affiliateClick' }).count();
+        console.log(clicks);
+
+        if (clicks > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
+    },
     updateStatistics: function() {
 
         console.log('Updating site statistics');
@@ -61,12 +75,11 @@ Meteor.methods({
         Meteor.call('updateStatistic', 'organic', organic);
 
         // Social
-        var facebook = Stats.find({ medium: 'facebook' }).count();
-        Meteor.call('updateStatistic', 'facebook', facebook);
-        var youtube = Stats.find({ medium: 'youtube' }).count();
-        Meteor.call('updateStatistic', 'youtube', youtube);
-        var twitter = Stats.find({ medium: 'twitter' }).count();
-        Meteor.call('updateStatistic', 'twitter', twitter);
+        var socialNetworks = ['facebook', 'youtube', 'twitter', 'pinterest', 'instagram'];
+        for (n in socialNetworks) {
+            var facebook = Stats.find({ medium: socialNetworks[n] }).count();
+            Meteor.call('updateStatistic', socialNetworks[n], facebook);
+        }
 
         // Countries
         var countriesStats = Meteor.call('getCountryStats');
@@ -240,55 +253,18 @@ Meteor.methods({
         return data;
 
     },
-    // getPostsGraphData: function() {
-
-    //     // Get posts
-    //     var bestPosts = Meteor.call('getBestVisitedPosts');
-
-    //     var postsName = [];
-    //     var postsVisits = [];
-
-    //     for (i in bestPosts) {
-    //         postsName.push(bestPosts[i].title);
-    //         postsVisits.push(bestPosts[i].visits);
-    //     }
-
-    //     var data = {
-    //         labels: postsName,
-    //         datasets: [{
-    //             label: 'Most Visited Posts',
-    //             data: postsVisits,
-    //             backgroundColor: [
-    //                 "#FF6384",
-    //                 "#36A2EB",
-    //                 "#FFCE56",
-    //                 "#36A2EB",
-    //                 "#FFCE56"
-    //             ],
-    //             hoverBackgroundColor: [
-    //                 "#FF6384",
-    //                 "#36A2EB",
-    //                 "#FFCE56",
-    //                 "#36A2EB",
-    //                 "#FFCE56"
-    //             ]
-    //         }]
-    //     };
-
-    //     return data;
-
-    // },
     removeInactiveVisitors: function() {
 
         console.log('Removing inactive visitors');
         Visitors.remove({ date: { $lte: new Date(new Date().getTime() - 60 * 1000) } });
 
     },
-    insertVisitor: function(httpHeaders, query) {
+    insertVisitor: function(parameters) {
 
         visitor = {};
 
-        // console.log(httpHeaders);
+        var httpHeaders = parameters.headers;
+        var query = parameters.query;
 
         // Find IP & country
         if (httpHeaders['cf-connecting-ip']) {
@@ -299,6 +275,7 @@ Meteor.methods({
             visitor.country = 'US';
         }
         visitor.date = new Date();
+        visitor.userId = parameters.userId;
 
         // Check for referer
         if (!query.origin) {
@@ -335,11 +312,11 @@ Meteor.methods({
         }
 
         // Check if already logged
-        if (Visitors.findOne({ ip: visitor.ip })) {
+        if (Visitors.findOne({ ip: visitor.ip, userId: parameters.userId })) {
 
             console.log('Already existing visitor')
-            Visitors.update({ ip: visitor.ip }, { $set: { date: new Date() } });
-            console.log(Visitors.findOne({ ip: visitor.ip }));
+            Visitors.update({ ip: visitor.ip, userId: parameters.userId }, { $set: { date: new Date() } });
+            console.log(Visitors.findOne({ ip: visitor.ip, userId: parameters.userId }));
 
         } else {
 
@@ -389,7 +366,8 @@ Meteor.methods({
 
         var stat = {
             type: parameters.type,
-            date: new Date()
+            date: new Date(),
+            userId: parameters.userId
         };
 
         // Page or post
@@ -446,7 +424,7 @@ Meteor.methods({
             if (link.indexOf('facebook') != -1) {
                 network = 'facebook';
             }
-             if (link.indexOf('mailto') != -1) {
+            if (link.indexOf('mailto') != -1) {
                 network = 'email';
             }
             if (link.indexOf('linkedin') != -1) {
@@ -1028,22 +1006,28 @@ Meteor.methods({
         var facebook = Statistics.findOne({ type: 'facebook' }).value;
         var youtube = Statistics.findOne({ type: 'youtube' }).value;
         var twitter = Statistics.findOne({ type: 'twitter' }).value;
+        var pinterest = Statistics.findOne({ type: 'pinterest' }).value;
+        var instagram = Statistics.findOne({ type: 'instagram' }).value;
 
         var socialColors = [
             "#e52d27",
             "#3b5998",
-            "#4099FF"
+            "#4099FF",
+            "#bd081b",
+            "#885a4d"
         ];
 
         var data = {
             labels: [
                 "Youtube",
                 "Facebook",
-                "Twitter"
+                "Twitter",
+                "Pinterest",
+                "Instagram"
             ],
             datasets: [{
                 label: 'Social Visits',
-                data: [youtube, facebook, twitter],
+                data: [youtube, facebook, twitter, pinterest, instagram],
                 backgroundColor: socialColors,
                 hoverBackgroundColor: socialColors
             }]
@@ -1084,42 +1068,66 @@ Meteor.methods({
             var conversion = Metas.findOne({ type: 'affiliateConversion' }).value;
 
             // Get all clicks
-            var clicks = Stats.find({ type: 'affiliateClick', asin: { $exists: true }, locale: 'US' }).fetch();
+            var clicks = Stats.find({ type: 'affiliateClick', asin: { $exists: true }, locale: { $in: countriesList } }).fetch();
+            console.log('Affiliate clicks:' + clicks.length);
 
             // Find all ASINs
             var asins = [];
             for (i in clicks) {
                 if (asins.indexOf(clicks[i].asin) == -1) {
-                    asins.push(clicks[i].asin);
+                    asins.push({ asin: clicks[i].asin, locale: clicks[i].locale });
                 }
             }
 
             // Gather data
             asinData = {};
 
-            for (a in asins) {
-                var productData = Meteor.call('getAmazonProductData', asins[a]);
-                if (productData.message) {
-                    console.log('Invalid ASIN: ' + asins[a]);
+            asins = asins.sort(function(a, b) {
+                if (a.locale > b.locale) return -1;
+                if (a.locale < b.locale) return 1;
+                return 0;
+            });
 
-                    // Remove all stats with this ASIN
-                    Stats.remove({ type: 'affiliateClick', asin: asins[a] });
+            for (a in asins) {
+
+                var productData = Meteor.call('getAmazonProductData', asins[a].asin, asins[a].locale);
+
+                if (productData.message) {
+
+                    console.log('Invalid ASIN: ' + asins[a].asin + ' for locale ' + asins[a].locale);
 
                 } else {
-                    asinData[asins[a]] = productData['US'];
+                    asinData[asins[a].asin] = productData[asins[a].locale];
                 }
             }
 
             // Add estimated earning per click
             var clickEarnings = [];
             clickedPosts = [];
+
+            // Get rates
+            var rates = Metas.findOne({ type: 'rates' }).value;
+
             for (c in clicks) {
 
                 if (asinData[clicks[c].asin]) {
 
+                    // Data
+                    var asinClickData = asinData[clicks[c].asin];
+
                     // Estimate
-                    if (asinData[clicks[c].asin].price && asinData[clicks[c].asin].commission) {
-                        earnings = asinData[clicks[c].asin].price * asinData[clicks[c].asin].commission / 100 * conversion / 100;
+                    if (asinClickData.price && asinClickData.commission) {
+
+                        // Calculate earnings                        
+                        earnings = asinClickData.price * asinClickData.commission / 100 * conversion / 100;
+
+                        // Update currency
+                        if (asinClickData.currency != 'EUR') {
+                            earnings = earnings / rates[asinClickData.currency];
+                        }
+
+                        // Update stats
+                        Stats.update(clicks[c]._id, { $set: { earnings: earnings } });
 
                         // Insert
                         clickEarnings.push({

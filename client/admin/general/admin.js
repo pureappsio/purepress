@@ -68,6 +68,17 @@ Template.admin.onRendered(function() {
 
 Template.admin.events({
 
+    'click #log-out': function() {
+
+        Meteor.logout();
+
+    },
+    'click #set-user': function() {
+
+        Meteor.call('setUser');
+
+    },
+
     'click #create-tag': function() {
 
         var tag = {
@@ -116,7 +127,8 @@ Template.admin.events({
         // Insert Metas
         Meteor.call('insertMeta', {
             value: $('#disqus-id').val(),
-            type: 'disqus'
+            type: 'disqus',
+            userId: Meteor.user()._id
         });
 
     },
@@ -125,7 +137,8 @@ Template.admin.events({
         // Insert Metas
         Meteor.call('insertMeta', {
             value: $('#language').val(),
-            type: 'language'
+            type: 'language',
+            userId: Meteor.user()._id
         });
 
     },
@@ -161,37 +174,44 @@ Template.admin.events({
         // Insert Metas
         Meteor.call('insertMeta', {
             value: $('#affiliate-us').val(),
-            type: 'affiliateUS'
+            type: 'affiliateUS',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#affiliate-ca').val(),
-            type: 'affiliateCA'
+            type: 'affiliateCA',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#affiliate-de').val(),
-            type: 'affiliateDE'
+            type: 'affiliateDE',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#affiliate-uk').val(),
-            type: 'affiliateUK'
+            type: 'affiliateUK',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#affiliate-it').val(),
-            type: 'affiliateIT'
+            type: 'affiliateIT',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#affiliate-fr').val(),
-            type: 'affiliateFR'
+            type: 'affiliateFR',
+            userId: Meteor.user()._id
         });
 
         Meteor.call('insertMeta', {
             value: $('#affiliate-es').val(),
-            type: 'affiliateES'
+            type: 'affiliateES',
+            userId: Meteor.user()._id
         });
 
     },
@@ -199,7 +219,8 @@ Template.admin.events({
 
         var product = {
             productId: $('#product-id :selected').val(),
-            pageId: $('#page-id :selected').val()
+            pageId: $('#page-id :selected').val(),
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertProduct', product);
@@ -256,7 +277,8 @@ Template.admin.events({
         // Insert Meta
         meta = {
             value: $('#analytics-id').val(),
-            type: 'analytics'
+            type: 'analytics',
+            userId: Meteor.user()._id
         }
         Meteor.call('insertMeta', meta);
 
@@ -266,14 +288,16 @@ Template.admin.events({
         // Home
         meta = {
             value: $('#home-page :selected').val(),
-            type: 'homePage'
+            type: 'homePage',
+            userId: Meteor.user()._id
         }
         Meteor.call('insertMeta', meta);
 
         // Blog
         meta = {
             value: $('#blog-page :selected').val(),
-            type: 'blogPage'
+            type: 'blogPage',
+            userId: Meteor.user()._id
         }
         Meteor.call('insertMeta', meta);
 
@@ -451,10 +475,9 @@ Template.admin.events({
 
         meta = {
             value: $('#theme-value :selected').val(),
-            type: 'theme'
+            type: 'theme',
+            userId: Meteor.user()._id
         }
-
-        console.log(meta);
 
         Meteor.call('insertMeta', meta);
 
@@ -463,7 +486,8 @@ Template.admin.events({
 
         meta = {
             value: $('#affiliate-theme-value :selected').val(),
-            type: 'affiliateTheme'
+            type: 'affiliateTheme',
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
@@ -473,7 +497,8 @@ Template.admin.events({
 
         meta = {
             value: $('#blog-theme-value :selected').val(),
-            type: 'blogTheme'
+            type: 'blogTheme',
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
@@ -488,17 +513,24 @@ Template.admin.events({
 
         meta = {
             type: 'logo',
-            value: Session.get('websiteLogo')
+            value: Session.get('websiteLogo'),
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
+
+    },
+    'click #import-pure': function() {
+
+        Meteor.call('importPurePress');
 
     },
     'click #save-fav': function() {
 
         meta = {
             type: 'favicon',
-            value: Session.get('favicon')
+            value: Session.get('favicon'),
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
@@ -508,7 +540,8 @@ Template.admin.events({
 
         meta = {
             type: 'userName',
-            value: $('#user-name').val()
+            value: $('#user-name').val(),
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
@@ -541,7 +574,8 @@ Template.admin.events({
 
         meta = {
             type: 'brandName',
-            value: $('#brand-name').val()
+            value: $('#brand-name').val(),
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
@@ -612,7 +646,8 @@ Template.admin.events({
 
         meta = {
             type: 'pixelId',
-            value: $('#pixel-id').val()
+            value: $('#pixel-id').val(),
+            userId: Meteor.user()._id
         }
 
         Meteor.call('insertMeta', meta);
@@ -631,34 +666,34 @@ Template.admin.helpers({
         }
     },
     integrations: function() {
-        return Integrations.find({});
+        return Integrations.find({ userId: Meteor.user()._id });
     },
     posts: function() {
-        return Posts.find({}, { sort: { creationDate: -1 } });
+        return Posts.find({ userId: Meteor.user()._id }, { sort: { creationDate: -1 } });
     },
     tags: function() {
-        return Tags.find({});
+        return Tags.find({ userId: Meteor.user()._id });
+    },
+    categories: function() {
+        return Categories.find({ userId: Meteor.user()._id });
     },
     pages: function() {
-        return Pages.find({});
+        return Pages.find({ userId: Meteor.user()._id });
     },
     key: function() {
         return Meteor.user().apiKey;
     },
     networks: function() {
-        return Networks.find({});
+        return Networks.find({ userId: Meteor.user()._id });
     },
     menus: function() {
-        return Menus.find({ parent: { $exists: false } }, { sort: { order: 1 } });
+        return Menus.find({ userId: Meteor.user()._id, parent: { $exists: false } }, { sort: { order: 1 } });
     },
     submenus: function() {
-        return Menus.find({ parent: { $exists: true } });
-    },
-    getMeta: function(type) {
-        return Metas.findOne({ type: type }).value;
+        return Menus.find({ userId: Meteor.user()._id, parent: { $exists: true } });
     },
     products: function() {
-        return Products.find({});
+        return Products.find({ userId: Meteor.user()._id });
     }
 
 });

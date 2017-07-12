@@ -14,7 +14,8 @@ Template.boxEdit.events({
             popupContent: $('#popup-content').summernote('code'),
             tags: $('#tags-id').val(),
             _id: this._id,
-            displayTitle: $('#box-display-title').val()
+            displayTitle: $('#box-display-title').val(),
+            userId: Meteor.user()._id
         }
 
         // Save

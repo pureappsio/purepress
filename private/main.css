@@ -3,6 +3,54 @@ html {
     min-height: 100%;
 }
 
+/*.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}*/
+
+#thankYouRecord {
+    text-align: center;
+    margin-top: 10px; 
+    display: none;
+}
+
+#recordTimer {
+    font-size: 20px;
+    line-height: 36px;
+    height: 36px;
+}
+
+.hidden {
+    display: none;
+}
+
+.row-featured {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.business-row {
+    font-size: 16px;
+    font-weight: bold;
+    margin-top: 30px !important;
+}
+
+.row-report {
+    margin-top: 15px !important;
+}
+
+.table-invest th {
+    border-top: none !important;
+}
+
+.featured-row {
+    font-weight: bold;
+    font-size: 22px;
+}
+
 .fixed {
     position: fixed;
     top: 50%;
@@ -180,16 +228,16 @@ h2 {
     filter: opacity(66%);
 }
 
-.table {
+.table-custom {
     border: 1px solid #dddddd;
 }
 
-.table > tbody > tr > td {
+.table-custom > tbody > tr > td {
     vertical-align: middle !important;
     border: 1px solid #dddddd;
 }
 
-.table > tbody {
+.table-custom > tbody {
     text-align: center !important;
     font-size: 22px;
 }
@@ -212,7 +260,7 @@ h2 {
     margin-bottom: 15px;
 }
 
-.table > thead > tr > th {
+.table-custom > thead > tr > th {
     text-align: center !important;
     font-size: 22px;
     vertical-align: middle !important;
@@ -325,6 +373,11 @@ h2 {
 .element-container {
     margin-top: 15px;
     margin-bottom: 15px;
+}
+
+.element-container-report {
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .element-container-center {

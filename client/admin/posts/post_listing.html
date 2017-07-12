@@ -6,8 +6,7 @@
         <div class="col-md-2">
             {{#if areBadLinks}}
             <span class="label label-{{statusBadLinks}}">{{badLinks}}</span> {{/if}}
-            <span class="label label-{{statusLabel}}">{{statusMessage}}</span>
-            {{#each tagsName}} {{> tagDisplay}} {{/each}}
+            <span class="label label-{{statusLabel}}">{{statusMessage}}</span> {{#each tagsName}} {{> tagDisplay}} {{/each}}
         </div>
         <div class="col-md-1">
             <button class='btn btn-danger delete-post' data-toggle="modal" data-target="#deleteConfirm-{{_id}}">Delete</button>
@@ -25,7 +24,7 @@
                     <p>Are you sure you want to delete the post {{title}}?</p>
                 </div>
                 <div class="modal-footer">
-                  <button type="button" data-dismiss="modal" class="btn btn-danger delete-post-modal">Delete</button>
+                    <button type="button" data-dismiss="modal" class="btn btn-danger delete-post-modal">Delete</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>

@@ -12,41 +12,7 @@ Meteor.methods({
         Networks.remove(socialId);
         
     },
-    // saveLogo: function(websiteLogo) {
-    //
-    //   // Get brand
-    //   var brand = Brands.find({}).fetch()[0];
-    //
-    //   // Update
-    //   Brands.update(brand._id, {$set: {logo: websiteLogo}});
-    //   console.log(Brands.find({}).fetch()[0]);
-    //
-    // },
-    // saveLogo: function(websiteLogo) {
-    //
-    //   // Get brand
-    //   var brand = Brands.find({}).fetch()[0];
-    //
-    //   // Update
-    //   Brands.update(brand._id, {$set: {logo: websiteLogo}});
-    //   console.log(Brands.find({}).fetch()[0]);
-    //
-    // },
-    // saveFavicon: function(websiteFavicon) {
-    //
-    //   // Get brand
-    //   var brand = Brands.find({}).fetch()[0];
-    //
-    //   // Update
-    //   Brands.update(brand._id, {$set: {favicon: websiteFavicon}});
-    //
-    // },
-    // createBrand: function(brand) {
-    //
-    //     // Insert
-    //     Metas.insert({name: brand});
-    //
-    // },
+  
     insertMeta: function(meta) {
 
         console.log(meta);

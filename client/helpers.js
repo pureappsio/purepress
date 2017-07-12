@@ -15,6 +15,11 @@ Template.registerHelper("variationColor", function(variation) {
     }
 });
 
+Template.registerHelper("formatDate", function(date) {
+    return moment(date).format('MMM Do YYYY');
+});
+
+
 Template.registerHelper("variationDirection", function(variation) {
     variation = parseInt(variation);
     if (variation > 0) {
@@ -25,11 +30,25 @@ Template.registerHelper("variationDirection", function(variation) {
 });
 
 Template.registerHelper("getMeta", function(meta) {
-    return Metas.findOne({ type: meta }).value;
+    return Metas.findOne({ type: meta, userId: Meteor.user()._id }).value;
 });
 
 Template.registerHelper("getStatistic", function(meta) {
-    return Statistics.findOne({ type: meta }).value;
+    return Statistics.findOne({ type: meta, userId: Meteor.user()._id }).value;
+});
+
+Template.registerHelper("isAppUser", function() {
+    console.log(Meteor.user());
+    if (Meteor.user()) {
+        if (Meteor.user().role == 'appuser' || Meteor.user().role == 'admin') {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+
 });
 
 Template.registerHelper("isAdmin", function() {

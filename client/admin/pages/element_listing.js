@@ -1,3 +1,5 @@
+import Images from '/imports/api/files';
+
 Template.elementListing.events({
 
     'click .element-delete': function() {
@@ -5,16 +7,16 @@ Template.elementListing.events({
     },
     'click .element-edit': function() {
 
-    	var element = this;
-    	element.content = $('#content-' + this._id).summernote('code');
+        var element = this;
+        element.content = $('#content-' + this._id).summernote('code');
 
         Meteor.call('editPageElement', element);
     },
     'click .page-plus': function() {
-        Meteor.call('changeOrderPage', this._id, 1);
+        Meteor.call('changeOrderPage', this._id, -1);
     },
     'click .page-minus': function() {
-        Meteor.call('changeOrderPage', this._id, -1);
+        Meteor.call('changeOrderPage', this._id, 1);
     }
 
 });
@@ -25,6 +27,9 @@ Template.elementListing.helpers({
         if (this.type == 'text') {
             return true;
         }
+    },
+    imgLink: function(image) {
+        return Images.findOne(image).link();
     }
 });
 

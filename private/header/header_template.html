@@ -132,6 +132,94 @@ var trackOutboundLink = function(url) {
 
   </script>
 
+  {{#if recorder}}
+  <script type="text/javascript">
+  $(document).ready(function() {
+
+    var data = {};
+
+    navigator.mediaDevices.getUserMedia({
+            audio: true
+        })
+        .then(stream => {
+            rec = new MediaRecorder(stream);
+            rec.ondataavailable = e => {
+                audioChunks.push(e.data);
+                if (rec.state == "inactive") {
+
+                    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+                    console.log(blob);
+
+                     var reader = new FileReader();
+                    reader.onload = function() {
+                      var dataUrl = reader.result;
+                      var base64 = dataUrl.split(',')[1];
+                      data.recording = base64;
+                    };
+                    reader.readAsDataURL(blob);
+
+                    recordedAudio.src = URL.createObjectURL(blob);
+                    recordedAudio.controls = true;
+                    audioDownload.href = recordedAudio.src;
+                    audioDownload.download = 'mp3';
+                    audioDownload.innerHTML = 'download';
+                }
+            }
+        })
+        .catch(e => console.log(e));
+
+    timer = null;
+    count = 0;
+
+    startRecord.onclick = e => {
+        startRecord.disabled = true;
+        stopRecord.disabled = false;
+        audioChunks = [];
+        count = 0;
+        timer = setInterval(myTimer, 1000);
+        rec.start();
+    }
+    stopRecord.onclick = e => {
+        startRecord.disabled = false;
+        stopRecord.disabled = true;
+        submitRecord.disabled = false;
+        replay.disabled = false;
+        clearInterval(timer);
+        timer = null;
+        rec.stop();
+    }
+    replay.onclick = e => {
+        startRecord.disabled = false;
+        stopRecord.disabled = true;
+        recordedAudio.play();
+    }
+    submitRecord.onclick = e => {
+
+        data.name = $('#record-name').val();
+        data.email = $('#record-email').val();
+
+        $.ajax({
+            url: "{{appUrl}}api/recordings",
+            type: "POST",
+            crossDomain: true,
+            data: data,
+            dataType: "json"
+          });
+
+        $('#thankYouRecord').show();
+        $('#thankYouRecord').fadeOut(1000);
+    }
+
+    function myTimer() {
+        var d = new Date();
+        count = count + 1;
+        document.getElementById("recordTimer").innerHTML = count + ' seconds';
+    }
+
+  });
+</script>
+{{/if}}
+
   <script type="text/javascript">
 
   $(document).ready(function() {

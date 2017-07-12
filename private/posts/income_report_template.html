@@ -1,0 +1,246 @@
+<div class='row'>
+    <div class='col-md-1'></div>
+    <div class='col-md-10'>
+        <div class='post-featured'>
+            <img class='img-fluid' src='{{postImage featuredPicture}}'>
+        </div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-title single-post-title'>{{title}}</div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-info post-info-single'>{{#if langEN}}{{formatDate post.creationDate}} / by {{userName}} {{else}} {{formatDateFR post.creationDate}} / par {{userName}} {{/if}}
+        </div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{content}}}</div>
+    </div>
+</div>
+<div class='row element-container-report'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <h3>Business Income</h3>
+        <div class="row row-featured">
+            <div class='col-md-6'></div>
+            <div class='col-md-2'>Income</div>
+            <div class='col-md-2'>
+                Difference
+            </div>
+            <div class='col-md-2'>
+                Difference %
+            </div>
+        </div>
+        {{#each website in report.websites}}
+        <div class="row  business-row">
+            <div class='col-md-6'>{{website.name}}</div>
+            <div class='col-md-2'>{{website.total.current}}€</div>
+            <div class='col-md-2 {{variation website.total.variation}}'>
+                {{sign website.total.variation}}€
+            </div>
+            <div class='col-md-2 {{variation website.total.variation_percent}}'>
+                {{sign website.total.variation_percent}}%
+            </div>
+        </div>
+        {{#if website.earnings}}
+        <div class="row row-report">
+            <div class='col-md-6'>Products Sales (eBooks, video courses)</div>
+            <div class='col-md-2'>{{website.earnings.current}}€</div>
+            <div class='col-md-2 {{variation website.earnings.variation}}'>
+                {{sign website.earnings.variation}}€
+            </div>
+            <div class='col-md-2 {{variationwebsite.earnings.variation_percent}}'>
+                {{sign website.earnings.variation_percent}}%
+            </div>
+        </div>
+        {{/if}} {{#if website.amazonEarnings}}
+        <div class="row row-report">
+            <div class='col-md-6'>Amazon Affiliate Earnings</div>
+            <div class='col-md-2'>{{website.amazonEarnings.current}}€</div>
+            <div class='col-md-2 {{variation website.amazonEarnings.variation}}'>
+                {{sign website.amazonEarnings.variation}}€
+            </div>
+            <div class='col-md-2 {{variationwebsite.amazonEarnings.variation_percent}}'>
+                {{sign website.amazonEarnings.variation_percent}}%
+            </div>
+        </div>
+        {{/if}} {{#if website.additionalRevenue}} {{#each revenue in website.additionalRevenue}}
+        <div class="row row-report">
+            <div class='col-md-6'>{{revenue.name}}</div>
+            <div class='col-md-2'>{{revenue.current}}€</div>
+            <div class='col-md-2 {{variation revenue.variation}}'>
+                {{sign revenue.variation}}€
+            </div>
+            <div class='col-md-2 {{revenue.variation_percent}}'>
+                {{sign revenue.variation_percent}}%
+            </div>
+        </div>{{/each}} {{/if}} {{/each}}
+        <div class="row row-report featured-row">
+            <div class='col-md-6'>Business Gross Revenue</div>
+            <div class='col-md-2'>{{report.revenue.current}}€</div>
+            <div class='col-md-2 {{variation report.revenue.variation}}'>
+                {{sign report.revenue.variation}}€
+            </div>
+            <div class='col-md-2 {{variation report.revenue.variation_percent}}'>
+                {{sign report.revenue.variation_percent}}%
+            </div>
+        </div>
+    </div>
+</div>
+<div class='row element-container-report'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class="row row-featured">
+            <div class='col-md-6'></div>
+            <div class='col-md-2'>Expense</div>
+            <div class='col-md-2'>
+                Difference
+            </div>
+            <div class='col-md-2'>
+                Difference %
+            </div>
+        </div>
+        {{#each expense in report.expenses.detail}}
+        <div class="row row-report">
+            <div class='col-md-6'>{{expense.name}}</div>
+            <div class='col-md-2'>{{expense.current}}€</div>
+            <div class='col-md-2 {{variation expense.variation}}'>
+                {{sign expense.variation}}€
+            </div>
+            <div class='col-md-2 {{expense.variation_percent}}'>
+                {{sign expense.variation_percent}}%
+            </div>
+        </div>
+        {{/each}}
+        <div class="row row-report featured-row">
+            <div class='col-md-6'>Business Monthly Expenses</div>
+            <div class='col-md-2'>{{report.expenses.total.current}}€</div>
+            <div class='col-md-2 {{variation report.expenses.total.variation}}'>
+                {{sign report.expenses.total.variation}}€
+            </div>
+            <div class='col-md-2 {{variation report.expenses.total.variation_percent}}'>
+                {{sign report.expenses.total.variation_percent}}%
+            </div>
+        </div>
+    </div>
+</div>
+<div class='row element-container-report'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class="row row-featured">
+            <div class='col-md-6'></div>
+            <div class='col-md-2'>Income</div>
+            <div class='col-md-2'>
+                Difference
+            </div>
+            <div class='col-md-2'>
+                Difference %
+            </div>
+        </div>
+        <div class="row row-report featured-row">
+            <div class='col-md-6'>Total Business Profits</div>
+            <div class='col-md-2'>{{report.profits.current}}€</div>
+            <div class='col-md-2 {{variation report.profits.variation}}'>
+                {{sign report.profits.variation}}€
+            </div>
+            <div class='col-md-2 {{variation report.profits.variation_percent}}'>
+                {{sign report.profits.variation_percent}}%
+            </div>
+        </div>
+    </div>
+</div>
+<div class='row element-container-report'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <h3>Investment Income</h3>
+        <div class="row row-featured">
+            <div class='col-md-6'></div>
+            <div class='col-md-2'>Income</div>
+            <div class='col-md-2'>
+                Difference
+            </div>
+            <div class='col-md-2'>
+                Difference %
+            </div>
+        </div>
+        <div class="row row-report">
+            <div class='col-md-6'>Dividend Growth Investing</div>
+            <div class='col-md-2'>{{invest.stock.current}}€</div>
+            <div class='col-md-2 {{variation invest.stock.variation}}'>
+                {{sign invest.stock.variation}}€
+            </div>
+            <div class='col-md-2 {{variation invest.stock.variation_percent}}'>
+                {{sign invest.stock.variation_percent}}%
+            </div>
+        </div>
+        <div class="row row-report">
+            <div class='col-md-6'>Real Estate Crowdfunding</div>
+            <div class='col-md-2'>{{invest.realestate.current}}€</div>
+            <div class='col-md-2 {{variation invest.realestate.variation}}'>
+                {{sign invest.realestate.variation}}€
+            </div>
+            <div class='col-md-2 {{variation invest.realestate.variation_percent}}'>
+                {{sign invest.realestate.variation_percent}}%
+            </div>
+        </div>
+        <div class="row row-report">
+            <div class='col-md-6'>Peer-to-Peer Lending</div>
+            <div class='col-md-2'>{{invest.p2p.current}}€</div>
+            <div class='col-md-2 {{variation invest.p2p.variation}}'>
+                {{sign invest.p2p.variation}}€
+            </div>
+            <div class='col-md-2 {{variation invest.p2p.variation_percent}}'>
+                {{sign invest.p2p.variation_percent}}%
+            </div>
+        </div>
+        <div class="row row-report featured-row">
+            <div class='col-md-6'>Total Investment Income</div>
+            <div class='col-md-2'>{{invest.global.current}}€</div>
+            <div class='col-md-2 {{variation invest.global.variation}}'>
+                {{sign invest.global.variation}}€
+            </div>
+            <div class='col-md-2 {{variation invest.global.variation_percent}}'>
+                {{sign invest.global.variation_percent}}%
+            </div>
+        </div>
+    </div>
+</div>
+<div class='row element-container-report'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class="row row-featured">
+            <div class='col-md-6'></div>
+            <div class='col-md-2'>Income</div>
+            <div class='col-md-2'>
+                Difference
+            </div>
+            <div class='col-md-2'>
+                Difference %
+            </div>
+        </div>
+        <div class="row row-report featured-row">
+            <div class='col-md-6'>Total Monthly Income</div>
+            <div class='col-md-2'>{{total.current}}€</div>
+            <div class='col-md-2 {{variation total.variation}}'>
+                {{sign total.variation}}€
+            </div>
+            <div class='col-md-2 {{variation total.variation_percent}}'>
+                {{sign total.variation_percent}}%
+            </div>
+        </div>
+    </div>
+</div>
+<div class='row'>
+    <div class='col-md-2'></div>
+    <div class='col-md-8'>
+        <div class='post-content'>{{{conclusion}}}</div>
+    </div>
+</div>

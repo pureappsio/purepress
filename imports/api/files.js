@@ -123,14 +123,7 @@ const Images = new FilesCollection({
         }
 
         if (path) {
-            // If file is successfully moved to AWS:S3
-            // We will pipe request to AWS:S3
-            // So, original link will stay always secure
-
-            // To force ?play and ?download parameters
-            // and to keep original file name, content-type,
-            // content-disposition, chunked "streaming" and cache-control
-            // we're using low-level .serve() method
+      
             const opts = {
                 Bucket: s3Conf.bucket,
                 Key: path
@@ -161,6 +154,7 @@ const Images = new FilesCollection({
                         http.response.end();
                     }
                 } else {
+
                     if (http.request.headers.range && this.httpResponse.headers['content-range']) {
                         // Set proper range header in according to what is returned from AWS:S3
                         http.request.headers.range = this.httpResponse.headers['content-range'].split('/')[0].replace('bytes ', 'bytes=');

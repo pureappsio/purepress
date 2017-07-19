@@ -65,29 +65,29 @@ Meteor.methods({
         // Posts
         Posts.update({}, { $set: { cached: false } }, { multi: true });
 
-
     },
-    returnFooter: function() {
+    returnFooter: function(userId) {
 
         if (Meteor.settings.useCache == true) {
 
-            if (Caches.findOne({ element: 'footer' })) {
+            if (Caches.findOne({ element: 'footer', userId: userId })) {
 
                 // Check status of cache
-                var cache = Caches.findOne({ element: 'footer' });
+                var cache = Caches.findOne({ element: 'footer', userId: userId });
 
                 if (cache.cached == true) {
 
                     // console.log('Returning cached footer');
                     return cache.html;
+
                 } else {
 
                     // Render
                     // console.log('Updating footer cache');
-                    html = Meteor.call('renderFooter');
+                    html = Meteor.call('renderFooter', userId);
 
                     // Update cache
-                    Caches.update({ element: 'footer' }, { $set: { html: html, cached: true } });
+                    Caches.update({ element: 'footer', userId: userId }, { $set: { html: html, cached: true } });
 
                     return html;
 
@@ -97,10 +97,10 @@ Meteor.methods({
 
                 // Render
                 // console.log('Creating footer cache');
-                html = Meteor.call('renderFooter');
+                html = Meteor.call('renderFooter', userId);
 
                 // Create cache
-                Caches.insert({ element: 'footer', html: html, cached: true });
+                Caches.insert({ userId: userId, element: 'footer', html: html, cached: true });
 
                 return html;
 
@@ -112,7 +112,7 @@ Meteor.methods({
         }
 
     },
-    renderFooter: function(userId, ) {
+    renderFooter: function(userId) {
 
         // Compile header
         SSR.compileTemplate('footer', Assets.getText('footer/footer_template.html'));
@@ -324,7 +324,7 @@ Meteor.methods({
 
                     // console.log('Returning cached navbar');
                     return navCache.html;
-                    
+
                 } else {
 
                     // Render
@@ -648,14 +648,15 @@ Meteor.methods({
         var postHtml = SSR.render('allPosts');
 
         // Add exit intent?
-        if (Metas.findOne({ type: 'exitStatus' })) {
+        if (Metas.findOne({ type: 'exitStatus', userId: parameters.userId })) {
 
             // Check value
             var exitStatus = Metas.findOne({ type: 'exitStatus', userId: parameters.userId }).value;
 
             if (exitStatus == 'on') {
                 var exitHtml = Meteor.call('renderExitModal', {
-                    query: parameters.query
+                    query: parameters.query,
+                    userId: parameters.userId
                 });
                 postHtml += exitHtml;
             }
@@ -687,17 +688,22 @@ Meteor.methods({
             // Get Meteor URL
             var websiteUrl = Meteor.absoluteUrl();
 
-            // Look for posts
-            if (query.preview) {
+            // // Look for posts
+            // if (query.preview) {
 
-                if (Posts.findOne({ url: postUrl, userId: parameters.userId })) {
-                    var post = Posts.findOne({ url: postUrl, userId: parameters.userId });
-                }
+            //     if (Posts.findOne({ url: postUrl, userId: parameters.userId })) {
+            //         var post = Posts.findOne({ url: postUrl, userId: parameters.userId });
+            //     }
 
-            } else {
-                if (Posts.findOne({ url: postUrl, status: 'published', userId: parameters.userId })) {
-                    var post = Posts.findOne({ url: postUrl, userId: parameters.userId });
-                }
+            // } else {
+
+            //     if (Posts.findOne({ url: postUrl, status: 'published', userId: parameters.userId })) {
+            //         var post = Posts.findOne({ url: postUrl, userId: parameters.userId });
+            //     }
+            // }
+
+            if (Posts.findOne({ url: postUrl, userId: parameters.userId })) {
+                var post = Posts.findOne({ url: postUrl, userId: parameters.userId });
             }
 
             // Look for pages
@@ -860,7 +866,8 @@ Meteor.methods({
                             if (Metas.findOne({ type: 'disqus', userId: parameters.userId }).value != "") {
                                 parameters = {
                                     url: post.url,
-                                    websiteUrl: websiteUrl
+                                    websiteUrl: websiteUrl,
+                                    userId: parameters.userId
                                 };
                                 var commentHtml = Meteor.call('renderDisqus', parameters);
                                 postHtml += commentHtml;
@@ -965,12 +972,16 @@ Meteor.methods({
                                 // Get total
                                 var total = HTTP.get('https://' + integration.url + '/api/total').data;
 
+                                console.log(total);
+
                                 // Format
                                 total.value = (total.value).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
                                 total.yield = (total.yield).toFixed(2);
-                                total.monthlyIncome = (total.income / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");;
+                                total.monthlyIncome = (total.income / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 
-
+                                total.passiveValue = (total.passiveValue).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+                                total.passiveYield = (total.passiveYield).toFixed(2);
+                                total.passiveMonthlyIncome = (total.passiveIncome / 12).toFixed(0).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");;
 
                             }
 
@@ -986,15 +997,16 @@ Meteor.methods({
                                 var integration = Integrations.findOne({ type: 'pureportfolio' });
 
                                 // Build individual positions
-                                var p2p = HTTP.get('https://' + integration.url + '/api/positions?type=p2p').data;
+                                var p2p = HTTP.get('https://' + integration.url + '/api/positions?type=p2p&platforms=true').data;
                                 var stock = HTTP.get('https://' + integration.url + '/api/positions?type=stock').data;
-                                var realestate = HTTP.get('https://' + integration.url + '/api/positions?type=realestate').data;
+                                var realestate = HTTP.get('https://' + integration.url + '/api/positions?type=realestate&platforms=true').data;
 
                                 var positions = {
                                     p2p: p2p,
                                     stock: stock,
                                     realestate: realestate
                                 }
+
                             }
 
 
@@ -1021,8 +1033,6 @@ Meteor.methods({
                                 pricingLine.data = data;
                                 pricingData.push(pricingLine);
                             }
-
-                            console.log(pricingData);
 
 
                         } else {
@@ -1190,6 +1200,21 @@ Meteor.methods({
                             },
                             isStock: function(type) {
                                 if (type == 'stock') {
+                                    return true;
+                                }
+                            },
+                            isPlatform(type) {
+                                if (type == 'p2p' || type == 'realestate') {
+                                    return true;
+                                }
+                            },
+                            isP2p: function(type) {
+                                if (type == 'p2p') {
+                                    return true;
+                                }
+                            },
+                            isRe: function(type) {
+                                if (type == 'realestate') {
                                     return true;
                                 }
                             },
@@ -1660,7 +1685,8 @@ Meteor.methods({
                             if (Metas.findOne({ type: 'disqus', userId: parameters.userId }).value != "") {
                                 parameters = {
                                     url: post.url,
-                                    websiteUrl: websiteUrl
+                                    websiteUrl: websiteUrl,
+                                    userId: parameters.userId
                                 };
                                 var commentHtml = Meteor.call('renderDisqus', parameters);
                                 postHtml += commentHtml;
@@ -1679,7 +1705,8 @@ Meteor.methods({
 
                     if (exitStatus == 'on') {
                         var exitHtml = Meteor.call('renderExitModal', {
-                            query: query
+                            query: query,
+                            userId: parameters.userId
                         });
                         postHtml += exitHtml;
                     }

@@ -87,7 +87,7 @@ Meteor.methods({
 
         console.log('Started localising all posts');
 
-        var posts = Posts.find({}).fetch();
+        var posts = Posts.find({ userId: Meteor.user()._id }).fetch();
 
         for (p in posts) {
             Meteor.call('localisePost', posts[p]._id);
@@ -159,7 +159,13 @@ Meteor.methods({
         // console.log(post);
 
         // Render
-        Meteor.call('renderPost', post.url, 'US', {});
+        Meteor.call('renderPost', {
+            url: post.url,
+            location: 'US',
+            query: {},
+            userId: post.userId,
+            headers: {}
+        });
 
         for (c in countryCodes) {
 
@@ -224,21 +230,6 @@ Meteor.methods({
                     badLinks.push(amazonLinks[l]);
                 }
 
-                // // Grab content
-                // try {
-                //     var answer = HTTP.get(amazonLinks[l].link, {
-                //         headers: {
-                //             "Content-Type": "application/json"
-                //         }
-                //     });
-                //     // var content = answer.content;
-                //     // console.log(content);
-
-                // } catch (err) {
-                //     // console.log('Bad link: ' + amazonLinks[l]);
-                //     badLinks.push(amazonLinks[l]);
-                // }
-
             }
 
         }
@@ -292,7 +283,13 @@ Meteor.methods({
         } else {
 
             // Render
-            Meteor.call('renderPost', post.url, 'US', {});
+            Meteor.call('renderPost', {
+                url: post.url,
+                location: 'US',
+                query: {},
+                userId: post.userId,
+                headers: {}
+            });
 
             // Get US link
             var links = Meteor.call('getDeadLinksCountry', postId, 'US');
@@ -349,7 +346,7 @@ Meteor.methods({
     },
     setDatesPosts: function() {
 
-        var posts = Posts.find({}).fetch();
+        var posts = Posts.find({ userId: Meteor.user()._id }).fetch();
         console.log(posts.length);
 
         var refDate = new Date();
@@ -396,75 +393,10 @@ Meteor.methods({
     },
     publishAllPosts: function() {
 
-        Posts.update({}, { $set: { status: 'published' } }, { multi: true });
+        Posts.update({ userId: Meteor.user()._id }, { $set: { status: 'published' } }, { multi: true });
 
     },
-    // importImage: function(url) {
 
-    //     var myFuture = new Future();
-
-    //     Images.load(url, function(err, fileRef) {
-
-    //         console.log('File uploaded');
-
-    //         if (err) {
-    //             console.log(err);
-    //             myFuture.return("");
-    //         } else {
-
-    //             _.each(fileRef.versions, function(vRef, version) {
-
-    //                 var filePath = "files/" + (Random.id()) + "-" + version + "." + fileRef.extension;
-
-    //                 client.putFile(vRef.path, filePath, function(error, res) {
-    //                     bound(function() {
-    //                         var upd;
-    //                         if (error) {
-    //                             console.error(error);
-    //                         } else {
-    //                             upd = {
-    //                                 $set: {}
-    //                             };
-    //                             upd['$set']["versions." + version + ".meta.pipeFrom"] = cfdomain + '/' + filePath;
-    //                             upd['$set']["versions." + version + ".meta.pipePath"] = filePath;
-    //                             Images.collection.update({
-    //                                 _id: fileRef._id
-    //                             }, upd, function(error) {
-    //                                 if (error) {
-    //                                     console.error(error);
-    //                                 } else {
-    //                                     // Unlink original files from FS
-    //                                     // after successful upload to AWS:S3
-    //                                     console.log('Uploaded to S3');
-    //                                     Images.unlink(Images.collection.findOne(fileRef._id), version);
-    //                                     myFuture.return(Images.collection.findOne(fileRef._id));
-    //                                 }
-    //                             });
-    //                         }
-    //                     });
-    //                 });
-
-    //             });
-
-    //         }
-
-    //     });
-
-    //     return myFuture.wait();
-
-    // },
-    // replaceImageLink: function(url) {
-
-    //     var fileRef = Meteor.call('importImage', url);
-    //     // console.log('/cdn/storage/Images/' + fileRef._id + '/original/' + fileRef._id + '.' + fileRef.extension);
-
-    //     if (fileRef != "") {
-    //         return '/cdn/storage/Images/' + fileRef._id + '/original/' + fileRef._id + '.' + fileRef.extension;
-    //     } else {
-    //         return "";
-    //     }
-
-    // },
     importPosts: function() {
 
         if (Integrations.findOne({ type: 'wordpress' })) {
@@ -650,11 +582,16 @@ Meteor.methods({
         Integrations.remove(data);
 
     },
+    getUserIdFromKey: function(key) {
+
+        var user = Meteor.users.findOne({ apiKey: key });
+
+        return user._id;
+
+    },
     validateApiKey: function(key) {
 
-        var adminUser = Meteor.users.findOne({ apiKey: { $exists: true } });
-
-        if (adminUser.apiKey == key) {
+        if (Meteor.users.findOne({ apiKey: key })) {
             return true;
         } else {
             return false;

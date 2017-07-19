@@ -79,6 +79,31 @@ Template.admin.events({
 
     },
 
+    'click #set-url': function() {
+
+        var meta = {
+            type: 'siteUrl',
+            value: $('#site-url').val(),
+            userId: Meteor.user()._id
+        }
+
+        Meteor.call('insertMeta', meta);
+
+    },
+
+    'click #set-description': function() {
+
+        var meta = {
+            type: 'description',
+            value: $('#site-description').val(),
+            userId: Meteor.user()._id
+        }
+
+        Meteor.call('insertMeta', meta);
+
+    },
+
+
     'click #create-tag': function() {
 
         var tag = {

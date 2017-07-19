@@ -239,12 +239,12 @@ h2 {
 
 .table-custom > tbody {
     text-align: center !important;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 #mobile-table {
     text-align: center !important;
-    font-size: 22px;
+    font-size: 18px;
 }
 
 .affiliate-row {
@@ -262,7 +262,7 @@ h2 {
 
 .table-custom > thead > tr > th {
     text-align: center !important;
-    font-size: 22px;
+    font-size: 18px;
     vertical-align: middle !important;
     border: 1px solid #dddddd;
 }

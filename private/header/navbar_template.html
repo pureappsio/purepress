@@ -10,13 +10,20 @@
             <ul class="navbar-nav mr-auto"></ul>
             <ul class="navbar-nav">
                 {{#each menuElement in menuElements}} {{#if isDropdown menuElement}}
-                <li class="nav-item">
+                <!--  <li class="nav-item">
                     <a href="{{menuElement.link}}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{menuElement.name}}</a>
                     <ul class="dropdown-menu">
                         {{#each subMenuElements menuElement}}
                         <li><a href="{{link}}">{{name}}</a></li>
                         {{/each}}
                     </ul>
+                </li> -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="{{menuElement.link}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{menuElement.name}}</a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        {{#each subMenuElements menuElement}}
+                        <a class="dropdown-item" href="{{link}}">{{name}}</a>{{/each}}
+                    </div>
                 </li>
                 {{else}}
                 <li class='nav-item'>

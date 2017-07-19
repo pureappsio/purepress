@@ -9,7 +9,7 @@ Meteor.methods({
 
         // Get elements
         var menuElement = Menus.findOne(menuId);
-        var elements = Menus.find({order: {$exists: true}}, { sort: { order: -1 } }).fetch();
+        var elements = Menus.find({ userId: menuElement.userId, order: { $exists: true } }, { sort: { order: -1 } }).fetch();
         console.log('Elements: ' + elements.length);
 
         if ((change == -1 && menuElement.order != 1) || (change == 1 && menuElement.order != elements.length)) {
@@ -17,21 +17,20 @@ Meteor.methods({
             console.log('Changing order of menu element');
 
             // Update element
-            Menus.update(menuId, {$inc: {order: change}});
+            Menus.update(menuId, { $inc: { order: change } });
 
             // Update other element
-            Menus.update({order: menuElement.order + change}, {$inc: {order: -1 * change}});
+            Menus.update({ userId: menuElement.userId, order: menuElement.order + change }, { $inc: { order: -1 * change } });
 
             // Flush cache
             Meteor.call('flushCache');
 
-        } 
-        else {
+        } else {
 
             console.log('Doing nothing');
 
         }
-        
+
     },
     createMenuElement: function(element) {
 
@@ -46,7 +45,7 @@ Meteor.methods({
         } else {
 
             // Get order
-            var elements = Menus.find({order: {$exists: true}}, { sort: { order: -1 } }).fetch();
+            var elements = Menus.find({ userId: element.userId, order: { $exists: true } }, { sort: { order: -1 } }).fetch();
 
             if (elements.length == 0) {
                 element.order = 1;

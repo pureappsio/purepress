@@ -336,7 +336,13 @@ Meteor.methods({
         console.log('Localising post' + post.url);
 
         // Render post
-        Meteor.call('renderPost', post.url, 'US', { preview: true });
+        Meteor.call('renderPost', {
+            url: post.url,
+            location: 'US',
+            query: { preview: true },
+            userId: post.userId,
+            headers: {}
+        });
 
         // Refresh post
         var post = Posts.findOne(postId);
@@ -654,43 +660,43 @@ Meteor.methods({
 
         if (countryCode == 'US') {
             var result = 'https://www.amazon.com/dp/' + asin;
-            if (Metas.findOne({ type: 'affiliateUS' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateUS' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateUS' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateUS' }).value;
             }
         } else if (countryCode == 'FR') {
             var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
-            if (Metas.findOne({ type: 'affiliateFR' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateFR' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateFR' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateFR' }).value;
             }
         } else if (countryCode == 'CA') {
             var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
-            if (Metas.findOne({ type: 'affiliateCA' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateCA' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateCA' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateCA' }).value;
             }
         } else if (countryCode == 'GB') {
             var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
-            if (Metas.findOne({ type: 'affiliateUK' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateUK' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateUK' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateUK' }).value;
             }
         } else if (countryCode == 'DE') {
             var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
-            if (Metas.findOne({ type: 'affiliateDE' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateDE' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateDE' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateDE' }).value;
             }
         } else if (countryCode == 'IT') {
             var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
-            if (Metas.findOne({ type: 'affiliateIT' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateIT' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateIT' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateIT' }).value;
             }
         } else if (countryCode == 'ES') {
             var result = Meteor.call('localiseAsin', asin, countryCode, localisations);
-            if (Metas.findOne({ type: 'affiliateES' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateES' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateES' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateES' }).value;
             }
         } else {
             var result = 'https://www.amazon.com/dp/' + asin;
-            if (Metas.findOne({ type: 'affiliateUS' })) {
-                result += '?tag=' + Metas.findOne({ type: 'affiliateUS' }).value;
+            if (Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateUS' })) {
+                result += '?tag=' + Metas.findOne({ userId: Meteor.user()._id, type: 'affiliateUS' }).value;
             }
         }
         return result;

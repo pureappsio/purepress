@@ -25,19 +25,32 @@
         <div style='display: {{showSection "brand"}}'>
             <h3>Brand</h3>
             <div class='row'>
-                <div class='col-md-9'>
+                <div class='col-md-4'>
                     <input id='brand-name' type='text' class='form-control' placeholder="Brand name ..." value="{{getMeta 'brandName'}}">
                 </div>
-                <div class='col-md-3'>
+                <div class='col-md-2'>
                     <button id='create-brand' class='btn btn-block btn-primary'>Save Brand Name</button>
                 </div>
-            </div>
-            <div class='row'>
-                <div class='col-md-9'>
+                <div class='col-md-4'>
                     <input id='user-name' type='text' class='form-control' placeholder="User name ..." value="{{getMeta 'userName'}}">
                 </div>
-                <div class='col-md-3'>
+                <div class='col-md-2'>
                     <button id='set-name' class='btn btn-block btn-primary'>Set User Name</button>
+                </div>
+            </div>
+            <h3>Site</h3>
+            <div class='row'>
+                <div class='col-md-4'>
+                    <input id='site-url' type='text' class='form-control' placeholder="Website URL ..." value="{{getMeta 'siteUrl'}}">
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-url' class='btn btn-block btn-primary'>Save Site URL</button>
+                </div>
+                <div class='col-md-4'>
+                    <input id='site-description' type='text' class='form-control' placeholder="Website URL ..." value="{{getMeta 'description'}}">
+                </div>
+                <div class='col-md-2'>
+                    <button id='set-description' class='btn btn-block btn-primary'>Save Site Description</button>
                 </div>
             </div>
             <h3>Social Media Networks</h3>

@@ -366,8 +366,7 @@ Meteor.methods({
 
         var stat = {
             type: parameters.type,
-            date: new Date(),
-            userId: parameters.userId
+            date: new Date()
         };
 
         // Page or post
@@ -453,11 +452,15 @@ Meteor.methods({
             }
 
             if (Visitors.findOne({ ip: ip })) {
+
                 var visitor = Visitors.findOne({ ip: ip });
 
                 // Origin & medium
                 if (visitor.origin) {
                     stat.origin = visitor.origin;
+                }
+                if (visitor.userId) {
+                    stat.userId = visitor.userId;
                 }
                 if (visitor.country) {
                     stat.country = visitor.country;

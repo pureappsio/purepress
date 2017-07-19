@@ -93,7 +93,7 @@ Meteor.methods({
 
         // Get elements
         var pageElement = Pricing.findOne(elementId);
-        var elements = Pricing.find({ type: pageElement.type, order: { $exists: true } }, { sort: { order: -1 } }).fetch();
+        var elements = Pricing.find({ userId: pageElement.userId, type: pageElement.type, order: { $exists: true } }, { sort: { order: -1 } }).fetch();
         console.log('Pricing lements: ' + elements.length);
 
         if ((change == -1 && pageElement.order != 1) || (change == 1 && pageElement.order != elements.length)) {
@@ -104,7 +104,7 @@ Meteor.methods({
             Pricing.update(elementId, { $inc: { order: change } });
 
             // Update other element
-            Pricing.update({ type: pageElement.type, order: pageElement.order + change }, { $inc: { order: -1 * change } });
+            Pricing.update({ userId: pageElement.userId, type: pageElement.type, order: pageElement.order + change }, { $inc: { order: -1 * change } });
 
             // Flush cache
             Meteor.call('flushCache');
@@ -119,7 +119,7 @@ Meteor.methods({
     createPricing: function(pricing) {
 
         // Add order
-        var elements = Pricing.find({ type: pricing.type }).fetch();
+        var elements = Pricing.find({ userId: pricing.userId, type: pricing.type }).fetch();
         var order = elements.length + 1;
         pricing.order = order;
 
@@ -151,7 +151,7 @@ Meteor.methods({
         var page = Pages.findOne(data.originPageId);
 
         // Get all elements linked to page
-        var elements = Elements.find({ pageId: page._id }).fetch();
+        var elements = Elements.find({ userId: page.userId, pageId: page._id }).fetch();
 
         // Create new page
         page.url = data.targetUrl;
@@ -362,13 +362,13 @@ Meteor.methods({
         console.log(page);
 
         // Make sure URL is not taken
-        if (Pages.findOne({ url: page.url })) {
+        if (Pages.findOne({ userId: page.userId, url: page.url })) {
 
             // Update
-            Pages.update({ url: page.url }, page);
+            Pages.update({ userId: page.userId, url: page.url }, page);
 
             // Return id
-            return Pages.findOne({ url: page.url })._id;
+            return Pages.findOne({ userId: page.userId, url: page.url })._id;
 
         } else {
 

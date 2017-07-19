@@ -334,7 +334,7 @@
                 {{/each}}
             </tbody>
         </table>
-        <div class='post-content'>The current value of the portfolio is <b> {{total.value}} Euros</b>, producing an estimated monthly income of <b>{{total.monthlyIncome}} Euros</b>, yielding at <b>{{total.yield}}%</b> annually. This portfolio is updated live, as I update it anytime I make a new addition to the portfolio.</div>
+        <div class='post-content'>The current value of my investment portfolio (Stocks, real estate, Peer-to-Peer lending) is <b> {{total.passiveValue}} Euros</b>, producing an estimated monthly income of <b>{{total.passiveMonthlyIncome}} Euros</b>, yielding at <b>{{total.passiveYield}}%</b> annually. My current total net worth is <b>{{total.value}} Euros</b>. This portfolio is updated live, as I update it anytime I make a new addition to the portfolio.</div>
     </div>
 </div>
 {{/if}} {{#if isElementType element 'portfoliodetail'}}
@@ -347,9 +347,15 @@
                     {{#if isStock element.portfolioType}}
                     <th>Ticker</th>
                     {{/if}}
+                    {{#if isRe element.portfolioType}}
+                    <th>Platform</th>
+                    {{/if}}
                     <th>Name</th>
                     {{#if isStock element.portfolioType}}
                     <th>Shares</th>
+                    {{/if}}
+                    {{#if isRe element.portfolioType}}
+                    <th>Location</th>
                     {{/if}}
                     <th>Value</th>
                     <th>Yield</th>
@@ -362,9 +368,22 @@
                     {{#if isStock element.portfolioType}}
                     <td>{{position.ticker}}</td>
                     {{/if}}
+
+                    {{#if isRe element.portfolioType}}
+                    <td><a href='{{position.platform.link}}'>{{position.platform.name}}</a></td>
+                    {{/if}}
+
+                    {{#if isP2p element.portfolioType}}
+                    <td><a href='{{position.platform.link}}'>{{position.name}}</a></td>
+                    {{else}}
                     <td>{{position.name}}</td>
+                    {{/if}}
+
                     {{#if isStock element.portfolioType}}
                     <td>{{position.qty}}</td>
+                    {{/if}}
+                    {{#if isRe element.portfolioType}}
+                    <td>{{position.city}} ({{position.country}})</td>
                     {{/if}}
                     <td>{{formatMoney position.value}}</td>
                     <td>{{position.positionYield}}</td>

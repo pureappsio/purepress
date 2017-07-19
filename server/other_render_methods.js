@@ -24,9 +24,9 @@ Meteor.methods({
             },
             langEN: function() {
 
-                if (Metas.findOne({ type: 'language' })) {
+                if (Metas.findOne({ userId: post.userId, type: 'language' })) {
 
-                    if (Metas.findOne({ type: 'language' }).value == 'fr') {
+                    if (Metas.findOne({ userId: post.userId, type: 'language' }).value == 'fr') {
                         return false;
                     } else {
                         return true;
@@ -111,15 +111,15 @@ Meteor.methods({
 
             },
             buttonText: function() {
-                if (Metas.findOne({ type: 'exitButton' })) {
-                    return Metas.findOne({ type: 'exitButton' }).value;
+                if (Metas.findOne({ userId: parameters.userId, type: 'exitButton' })) {
+                    return Metas.findOne({ userId: parameters.userId, type: 'exitButton' }).value;
                 }
             },
             langEN: function() {
 
-                if (Metas.findOne({ type: 'language' })) {
+                if (Metas.findOne({ userId: parameters.userId, type: 'language' })) {
 
-                    if (Metas.findOne({ type: 'language' }).value == 'fr') {
+                    if (Metas.findOne({ userId: parameters.userId, type: 'language' }).value == 'fr') {
                         return false;
                     } else {
                         return true;
@@ -130,18 +130,18 @@ Meteor.methods({
 
             },
             boxContent: function() {
-                if (Metas.findOne({ type: 'exitContent' })) {
-                    return Metas.findOne({ type: 'exitContent' }).value;
+                if (Metas.findOne({ userId: parameters.userId, type: 'exitContent' })) {
+                    return Metas.findOne({ userId: parameters.userId, type: 'exitContent' }).value;
                 }
             },
             sequenceId: function() {
-                if (Metas.findOne({ type: 'exitSequence' })) {
-                    return Metas.findOne({ type: 'exitSequence' }).value;
+                if (Metas.findOne({ userId: parameters.userId, type: 'exitSequence' })) {
+                    return Metas.findOne({ userId: parameters.userId, type: 'exitSequence' }).value;
                 }
             },
             displayTitle: function() {
-                if (Metas.findOne({ type: 'exitTitle' })) {
-                    return Metas.findOne({ type: 'exitTitle' }).value;
+                if (Metas.findOne({ userId: parameters.userId, type: 'exitTitle' })) {
+                    return Metas.findOne({ userId: parameters.userId, type: 'exitTitle' }).value;
                 }
             }
 
@@ -186,9 +186,9 @@ Meteor.methods({
             },
             twitterUsername: function() {
 
-                if (Networks.findOne({ type: 'twitter' })) {
+                if (Networks.findOne({ userId: parameters.userId, type: 'twitter' })) {
 
-                    var link = Networks.findOne({ type: 'twitter' }).link;
+                    var link = Networks.findOne({ userId: parameters.userId, type: 'twitter' }).link;
 
                     var handleIndex = link.indexOf('twitter.com/') + 'twitter.com/'.length;
 
@@ -202,8 +202,8 @@ Meteor.methods({
 
             },
             email: function() {
-                if (Networks.findOne({ type: 'envelope-o' })) {
-                    return Networks.findOne({ type: 'envelope-o' }).link;
+                if (Networks.findOne({ userId: parameters.userId, type: 'envelope-o' })) {
+                    return Networks.findOne({ userId: parameters.userId, type: 'envelope-o' }).link;
                 }
             }
         });
@@ -222,8 +222,8 @@ Meteor.methods({
         Template.comments.helpers({
 
             disqusId: function() {
-                if (Metas.findOne({ type: 'disqus' })) {
-                    return Metas.findOne({ type: 'disqus' }).value;
+                if (Metas.findOne({ userId: parameters.userId, type: 'disqus' })) {
+                    return Metas.findOne({ userId: parameters.userId, type: 'disqus' }).value;
                 }
 
             },

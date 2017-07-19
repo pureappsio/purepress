@@ -6,15 +6,23 @@ import Images from '../imports/api/files';
 
 Meteor.methods({
 
-    renderRSS: function() {
+    renderRSS: function(userId) {
 
         // Get Metas
-        var websiteTitle = Metas.findOne({ type: 'brandName' }).value;
-        if (Metas.findOne({ type: 'description' })) {
-            var websiteDescription = Metas.findOne({ type: 'description' }).value;
+        var websiteTitle = Metas.findOne({ type: 'brandName', userId: userId }).value;
+        if (Metas.findOne({ type: 'description', userId: userId })) {
+            var websiteDescription = Metas.findOne({ type: 'description', userId: userId }).value;
 
         } else {
             var websiteDescription = "Just a PurePress site";
+        }
+
+        if (Metas.findOne({ type: 'siteUrl', userId: userId })) {
+            console.log(Metas.findOne({ type: 'siteUrl', userId: userId }).value);
+            var siteUrl = 'https://' + Metas.findOne({ type: 'siteUrl', userId: userId }).value + '/';
+
+        } else {
+            var siteUrl = Meteor.absoluteUrl();
         }
 
         // Build xml start
@@ -24,8 +32,8 @@ Meteor.methods({
         // Channel
         xml += '<channel>'
         xml += '<title>' + websiteTitle + '</title>';
-        xml += '<atom:link href="' + Meteor.absoluteUrl() + 'feed/" rel="self" type="application/rss+xml" />'
-        xml += '<link>' + Meteor.absoluteUrl() + '</link>';
+        xml += '<atom:link href="' + siteUrl + 'feed/" rel="self" type="application/rss+xml" />'
+        xml += '<link>' + siteUrl + '</link>';
         xml += '<description>' + websiteDescription + '</description>';
         xml += '<lastBuildDate>' + moment(new Date()).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</lastBuildDate>';
         xml += '<language>en-US</language>';
@@ -35,7 +43,7 @@ Meteor.methods({
 
         // Items
         var currentDate = new Date();
-        var postQuery = { status: 'published', creationDate: { $lte: currentDate } };
+        var postQuery = { status: 'published', userId: userId, creationDate: { $lte: currentDate } };
 
         var posts = Posts.find(postQuery);
 
@@ -45,7 +53,7 @@ Meteor.methods({
             xml += '<item>';
             xml += '<title><![CDATA[' + post.title + ']]></title>';
             xml += '<description><![CDATA[' + post.excerpt + ']]></description>';
-            xml += '<link>' + Meteor.absoluteUrl() + post.url + '</link>';
+            xml += '<link>' + siteUrl + post.url + '</link>';
             xml += '<pubDate>' + moment(post.creationDate).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</pubDate>';
             xml += '<category><![CDATA[' + post.postCategory + ']]></category>';
             xml += '<content:encoded><![CDATA[' + post.content + ']]></content:encoded>';
@@ -60,19 +68,26 @@ Meteor.methods({
 
     },
 
-    renderPodcastRSS: function() {
+    renderPodcastRSS: function(userId) {
 
         // Check if podcast exist
-        if (Metas.findOne({ type: 'podcastTitle' })) {
+        if (Metas.findOne({ type: 'podcastTitle', userId: userId })) {
 
             // Get Metas
-            var podcastTitle = Metas.findOne({ type: 'podcastTitle' }).value;
-            var podcastDescription = Metas.findOne({ type: 'podcastDescription' }).value;
+            var podcastTitle = Metas.findOne({ type: 'podcastTitle', userId: userId }).value;
+            var podcastDescription = Metas.findOne({ type: 'podcastDescription', userId: userId }).value;
 
-            var itunesSummary = Metas.findOne({ type: 'itunesSummary' }).value;
-            var itunesAuthor = Metas.findOne({ type: 'itunesAuthor' }).value;
-            var itunesImage = Metas.findOne({ type: 'itunesImage' }).value;
-            var itunesSubtitle = Metas.findOne({ type: 'itunesSubtitle' }).value;
+            var itunesSummary = Metas.findOne({ type: 'itunesSummary', userId: userId }).value;
+            var itunesAuthor = Metas.findOne({ type: 'itunesAuthor', userId: userId }).value;
+            var itunesImage = Metas.findOne({ type: 'itunesImage', userId: userId }).value;
+            var itunesSubtitle = Metas.findOne({ type: 'itunesSubtitle', userId: userId }).value;
+
+            if (Metas.findOne({ type: 'siteUrl', userId: userId })) {
+                var siteUrl = 'https://' + Metas.findOne({ type: 'siteUrl', userId: userId }).value + '/';
+
+            } else {
+                var siteUrl = Meteor.absoluteUrl();
+            }
 
             // Build xml start
             var xml = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -81,8 +96,8 @@ Meteor.methods({
             // Channel
             xml += '<channel>'
             xml += '<title>' + podcastTitle + '</title>';
-            xml += '<atom:link href="' + Meteor.absoluteUrl() + 'feed/podcast/" rel="self" type="application/rss+xml" />'
-            xml += '<link>' + Meteor.absoluteUrl() + 'feed/podcast/</link>';
+            xml += '<atom:link href="' + siteUrl + 'feed/podcast/" rel="self" type="application/rss+xml" />'
+            xml += '<link>' + siteUrl + 'feed/podcast/</link>';
             xml += '<description>' + podcastDescription + '</description>';
             xml += '<lastBuildDate>' + moment(new Date()).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</lastBuildDate>';
             xml += '<language>en-US</language>';
@@ -102,7 +117,7 @@ Meteor.methods({
             xml += '<itunes:subtitle><![CDATA[' + itunesSubtitle + ']]></itunes:subtitle>';
             xml += '<image>';
             xml += '<title>' + podcastTitle + '</title>';
-            xml += '<link>' + Meteor.absoluteUrl() + '</link>';
+            xml += '<link>' + siteUrl + '</link>';
             xml += '<url>' + itunesImage + '</url>';
             xml += '</image>';
             xml += '<itunes:category text="Business">';
@@ -110,7 +125,7 @@ Meteor.methods({
             xml += '</itunes:category>';
 
             // Items
-            var posts = Posts.find({ status: 'published', category: 'podcast' });
+            var posts = Posts.find({ status: 'published', category: 'podcast', userId: userId });
 
             posts.forEach(function(post) {
 
@@ -120,14 +135,14 @@ Meteor.methods({
                 }
                 if (post.podcastFileId) {
                     var file = Images.findOne(post.podcastFileId);
-                    podcastUrl = Meteor.absoluteUrl() + 'cdn/storage/Images/' + file._id + '/original/' + file._id + '.' + file.ext;
+                    podcastUrl = siteUrl + 'cdn/storage/Images/' + file._id + '/original/' + file._id + '.' + file.ext;
                 }
 
                 // Form XML
                 xml += '<item>';
                 xml += '<title><![CDATA[' + post.title + ']]></title>';
                 xml += '<description><![CDATA[' + post.content + ']]></description>';
-                xml += '<link>' + Meteor.absoluteUrl() + post.url + '</link>';
+                xml += '<link>' + siteUrl + post.url + '</link>';
                 xml += '<pubDate>' + moment(post.creationDate).format('ddd, DD MMM YYYY hh:mm:ss') + ' GMT' + '</pubDate>';
                 xml += '<category><![CDATA[Podcast]]></category>';
                 xml += '<enclosure url="' + podcastUrl + '" length="' + post.podcastSize + '" type="audio/mpeg" />'

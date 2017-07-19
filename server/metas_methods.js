@@ -10,19 +10,19 @@ Meteor.methods({
 
         // Remove
         Networks.remove(socialId);
-        
+
     },
-  
+
     insertMeta: function(meta) {
 
         console.log(meta);
 
         // Check if exist
-        if (Metas.findOne({ type: meta.type })) {
+        if (Metas.findOne({ userId: meta.userId, type: meta.type })) {
 
             // Update
             console.log('Updating meta');
-            Metas.update({ type: meta.type }, { $set: { value: meta.value } });
+            Metas.update({ userId: meta.userId, type: meta.type }, { $set: { value: meta.value } });
 
         } else {
 
